@@ -146,27 +146,76 @@
 
 ## Traceability
 
-Populated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 – AUTH-06 | Phase 1 | Pending |
-| HSLD-01 – HSLD-07 | Phase 1 | Pending |
-| TASK-01 – TASK-10 | Phase 2 | Pending |
-| BILL-01 – BILL-05 | Phase 3 | Pending |
-| EXPN-01 – EXPN-06 | Phase 3 | Pending |
-| PLAT-01 – PLAT-05 | Phase 1 | Pending |
-| AIDOC-01 – AIDOC-06 | Phase 4 | Pending |
-| AICH-01 – AICH-04 | Phase 5 | Pending |
-| AIAMB-01 – AIAMB-04 | Phase 5 | Pending |
-| MAINT-01 – MAINT-06 | Phase 6 | Pending |
+| AUTH-01 | Phase 1: Foundation | Pending |
+| AUTH-02 | Phase 1: Foundation | Pending |
+| AUTH-03 | Phase 1: Foundation | Pending |
+| AUTH-04 | Phase 1: Foundation | Pending |
+| AUTH-05 | Phase 1: Foundation | Pending |
+| AUTH-06 | Phase 1: Foundation | Pending |
+| HSLD-01 | Phase 1: Foundation | Pending |
+| HSLD-02 | Phase 1: Foundation | Pending |
+| HSLD-03 | Phase 1: Foundation | Pending |
+| HSLD-04 | Phase 1: Foundation | Pending |
+| HSLD-05 | Phase 1: Foundation | Pending |
+| HSLD-06 | Phase 1: Foundation | Pending |
+| HSLD-07 | Phase 1: Foundation | Pending |
+| PLAT-01 | Phase 1: Foundation | Pending |
+| PLAT-02 | Phase 1: Foundation | Pending |
+| PLAT-04 | Phase 1: Foundation | Pending |
+| PLAT-05 | Phase 1: Foundation | Pending |
+| TASK-01 | Phase 2: Tasks & Chores | Pending |
+| TASK-02 | Phase 2: Tasks & Chores | Pending |
+| TASK-03 | Phase 2: Tasks & Chores | Pending |
+| TASK-04 | Phase 2: Tasks & Chores | Pending |
+| TASK-05 | Phase 2: Tasks & Chores | Pending |
+| TASK-06 | Phase 2: Tasks & Chores | Pending |
+| TASK-07 | Phase 2: Tasks & Chores | Pending |
+| TASK-08 | Phase 2: Tasks & Chores | Pending |
+| TASK-09 | Phase 2: Tasks & Chores | Pending |
+| TASK-10 | Phase 2: Tasks & Chores | Pending |
+| BILL-01 | Phase 3: Financials Core | Pending |
+| BILL-02 | Phase 3: Financials Core | Pending |
+| BILL-03 | Phase 3: Financials Core | Pending |
+| BILL-04 | Phase 3: Financials Core | Pending |
+| BILL-05 | Phase 3: Financials Core | Pending |
+| EXPN-01 | Phase 3: Financials Core | Pending |
+| EXPN-02 | Phase 3: Financials Core | Pending |
+| EXPN-03 | Phase 3: Financials Core | Pending |
+| EXPN-04 | Phase 3: Financials Core | Pending |
+| EXPN-05 | Phase 3: Financials Core | Pending |
+| EXPN-06 | Phase 3: Financials Core | Pending |
+| AIDOC-01 | Phase 4: AI Document Intelligence | Pending |
+| AIDOC-02 | Phase 4: AI Document Intelligence | Pending |
+| AIDOC-03 | Phase 4: AI Document Intelligence | Pending |
+| AIDOC-04 | Phase 4: AI Document Intelligence | Pending |
+| AIDOC-05 | Phase 4: AI Document Intelligence | Pending |
+| AIDOC-06 | Phase 4: AI Document Intelligence | Pending |
+| AICH-01 | Phase 5: AI Assistant | Pending |
+| AICH-02 | Phase 5: AI Assistant | Pending |
+| AICH-03 | Phase 5: AI Assistant | Pending |
+| AICH-04 | Phase 5: AI Assistant | Pending |
+| AIAMB-01 | Phase 5: AI Assistant | Pending |
+| AIAMB-02 | Phase 5: AI Assistant | Pending |
+| AIAMB-03 | Phase 5: AI Assistant | Pending |
+| AIAMB-04 | Phase 5: AI Assistant | Pending |
+| MAINT-01 | Phase 6: Maintenance & Warranties | Pending |
+| MAINT-02 | Phase 6: Maintenance & Warranties | Pending |
+| MAINT-03 | Phase 6: Maintenance & Warranties | Pending |
+| MAINT-04 | Phase 6: Maintenance & Warranties | Pending |
+| MAINT-05 | Phase 6: Maintenance & Warranties | Pending |
+| MAINT-06 | Phase 6: Maintenance & Warranties | Pending |
+| PLAT-03 | Phase 7: Platform & Polish | Pending |
 
 **Coverage:**
-- v1 requirements: 55 total
-- Mapped to phases: 55
-- Unmapped: 0 ✓
+- v1 requirements: 59 total
+- Mapped to phases: 59
+- Unmapped: 0
+
+**Note on count:** The original traceability section listed 55 requirements. Actual count of defined v1 requirements is 59 (AUTH: 6, HSLD: 7, TASK: 10, BILL: 5, EXPN: 6, AIDOC: 6, AICH: 4, AIAMB: 4, MAINT: 6, PLAT: 5). All 59 are mapped.
 
 ---
 
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after initial definition*
+*Last updated: 2026-03-19 after roadmap creation*
