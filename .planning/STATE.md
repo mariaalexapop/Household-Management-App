@@ -9,7 +9,7 @@
 
 **Core Value:** One place for families to track everything they own, owe, and need to do — with an AI chatbot that answers questions and turns documents into actionable tasks.
 
-**Stack:** Next.js 15 (App Router) + TypeScript 5 + Supabase (Postgres, Auth, Realtime, Storage, pgvector) + Drizzle ORM + Vercel AI SDK + Anthropic Claude + OpenAI embeddings (text-embedding-3-small) + Inngest + Tailwind CSS 4 + shadcn/ui
+**Stack:** Next.js 15 (App Router) + TypeScript 5 + Supabase (Postgres, Auth, Realtime, Storage, pgvector) + Drizzle ORM + Vercel AI SDK + Anthropic Claude + Voyage AI embeddings (voyage-3-lite) + Inngest + Tailwind CSS 4 + shadcn/ui
 
 **Repo:** /Users/alexandrapop/Warp_project/Household-Management-App
 
@@ -59,7 +59,7 @@ Overall: 0/6 phases complete
 | RLS on every table from Phase 1 | Multi-tenant data isolation; not safely retrofittable |
 | All AI pipelines async via Inngest | Claude P99 latency (10–30s) exceeds Vercel's 10s default timeout |
 | RAG via pgvector (Supabase built-in) | No extra service; cost-effective for static documents embedded once |
-| OpenAI text-embedding-3-small for embeddings | Cheapest embeddings (~$0.02/1M tokens); Claude has no embeddings API |
+| Voyage AI voyage-3-lite for embeddings | Anthropic's official recommended embeddings partner; optimised for retrieval with Claude; same price tier as OpenAI; keeps stack in one ecosystem |
 | Modular onboarding (household type + module selection) | Different households have different needs; dashboard personalised from setup |
 | Children as named profiles, not accounts | Parents plan kids' activities; children don't need app access in v1 |
 | Single admin role (household management only) | Full content equality; admin only needed to manage membership |

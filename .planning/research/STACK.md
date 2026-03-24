@@ -51,7 +51,7 @@
 |-------|--------|---------|-----------|-----------|
 | LLM provider | **Anthropic Claude API** | claude-sonnet-4-6 | HIGH | Superior instruction following; strong for structured extraction and conversation; lower hallucination on household data queries |
 | AI SDK | **Vercel AI SDK** | 4.x | HIGH | Streaming responses; unified provider interface; tool-use/function-calling; React hooks (useChat); works seamlessly with Next.js |
-| Embeddings | **OpenAI text-embedding-3-small** | latest | HIGH | Cheapest embeddings (~$0.02/1M tokens); 1536 dimensions; documents embedded once at upload, queried many times via pgvector; Anthropic has no embeddings API |
+| Embeddings | **Voyage AI `voyage-3-lite`** | latest | HIGH | Anthropic's official recommended embeddings partner; optimised for retrieval with Claude; ~$0.02/1M tokens; 512 dimensions; documents embedded once at upload, queried many times via pgvector; keeps stack in one ecosystem (no OpenAI account needed) |
 | RAG store | **Supabase pgvector** | built-in | HIGH | Embeddings stored alongside data in Postgres; similarity search with RLS-scoped queries; no extra service |
 
 **v2 only (not in MVP):**
@@ -60,7 +60,8 @@
 
 **What NOT to use:**
 - LangChain — heavy abstraction layer; Vercel AI SDK is sufficient and lighter
-- Separate embedding services (Pinecone, Weaviate) — pgvector covers the use case
+- Separate vector databases (Pinecone, Weaviate) — pgvector covers the use case
+- OpenAI for embeddings — Voyage AI is Anthropic's recommended partner and keeps the stack in one ecosystem
 - OpenAI GPT-4o as primary LLM — Claude is already the session model and excels at structured extraction
 
 ---
@@ -75,19 +76,26 @@ Upload PDF (insurance policy / user manual / warranty doc)
   → Inngest worker:
       a. Fetch PDF from Supabase Storage
       b. Extract text (pdf-parse or pdf2pic + Claude for scanned PDFs)
-      c. Chunk text (512-token chunks, 50-token overlap)
-      d. Embed each chunk via OpenAI text-embedding-3-small
+      c. Chunk text (~512-token chunks, 50-token overlap)
+      d. Embed each chunk via Voyage AI voyage-3-lite (512 dimensions)
       e. Store embeddings in pgvector with metadata (household_id, document_id, module_type)
   → User notified: "Document ready for questions"
 
 Chatbot query:
-  → Embed user question via OpenAI
+  → Embed user question via Voyage AI voyage-3-lite
   → pgvector similarity search (cosine distance, top-k=5, scoped by household_id)
   → Retrieved chunks + question → Claude (claude-sonnet-4-6)
   → Stream response to user
 ```
 
 Cost profile: document embedding is a one-time cost (~$0.001/document); queries cost only the final Claude call, not re-reading the full document.
+
+**Why Voyage AI over OpenAI embeddings:**
+- Anthropic's official recommended embeddings partner for Claude-based RAG
+- Retrieval quality optimised specifically for use with Claude as the generation model
+- Same price tier as OpenAI text-embedding-3-small (~$0.02/1M tokens)
+- Keeps the AI stack in one ecosystem — no OpenAI account required
+- Upgrade path: `voyage-3` (1024 dimensions) for higher retrieval quality if needed
 
 ---
 
@@ -198,7 +206,7 @@ Cost profile: document embedding is a one-time cost (~$0.001/document); queries 
   "drizzle-kit": "^0.30.0",
   "ai": "^4.0.0",
   "@anthropic-ai/sdk": "latest",
-  "openai": "^4.0.0",
+  "voyageai": "^0.0.4",
   "inngest": "latest",
   "tailwindcss": "^4.0.0",
   "tw-animate-css": "latest",

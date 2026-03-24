@@ -42,7 +42,7 @@ A layered architecture with three primary tiers: a React/Next.js frontend, a Nex
        │              │   EXTERNAL SERVICES          │
        │              │   • Anthropic Claude API     │
        │              │     (chat + extraction)      │
-       │              │   • OpenAI Embeddings API    │
+       │              │   • Voyage AI Embeddings API    │
        │              │     (text-embedding-3-small) │
        │              │   • Resend (email)           │
        │              └─────────────────────────────┘
@@ -68,9 +68,9 @@ A layered architecture with three primary tiers: a React/Next.js frontend, a Nex
 | Supabase Realtime | Broadcasts row-level changes to household members | PostgreSQL (logical replication), Browser (WS) |
 | Supabase Storage | Raw file storage (insurance PDFs, user manuals, warranty docs) | API Layer (presigned URLs), Inngest worker (read for embedding) |
 | pgvector (Supabase) | Stores and queries document embeddings for RAG | Inngest (write), API Layer (read for chatbot) |
-| Async Worker (Inngest) | Document embedding, reminder scheduling, email sending | Supabase DB, Claude API, OpenAI Embeddings API, Resend |
+| Async Worker (Inngest) | Document embedding, reminder scheduling, email sending | Supabase DB, Claude API, Voyage AI, Resend |
 | Claude API | Chatbot responses, procedure extraction, task suggestions | API Layer (streaming chat), Inngest (extraction) |
-| OpenAI Embeddings API | Text → vector embeddings for RAG | Inngest (called on document upload) |
+| Voyage AI | Text → vector embeddings (voyage-3-lite, 512 dimensions) for RAG | Inngest (called on document upload + chatbot query) |
 
 ---
 
@@ -138,7 +138,7 @@ warranties            — id, item_id, household_id, expiry_date, coverage_summa
 -- AI / RAG
 document_embeddings   — id, household_id, source_document_id, source_document_type
                         (insurance_document|electronics_document), chunk_index,
-                        content (text), embedding (vector(1536)), metadata (jsonb), created_at
+                        content (text), embedding (vector(512)), metadata (jsonb), created_at
                         NOTE: source_document_type disambiguates which table source_document_id
                         references. Queries filter by household_id and optionally document_type.
 chat_messages         — id, household_id, user_id, role (user|assistant),
@@ -222,7 +222,7 @@ export const tasks = pgTable('tasks', {
    a. Fetch PDF from Supabase Storage
    b. Extract text (pdf-parse for text PDFs; Claude Vision for scanned PDFs)
    c. Chunk text (~512 tokens, 50-token overlap)
-   d. Embed each chunk via OpenAI text-embedding-3-small
+   d. Embed each chunk via Voyage AI voyage-3-lite
    e. Write chunks to document_embeddings (with household_id, source references)
    f. Update document record: { status: "ready" }
 6. Supabase Realtime fires → user receives notification: "Document ready for questions"
@@ -235,7 +235,7 @@ export const tasks = pgTable('tasks', {
 2. POST /api/ai/chat (streaming)
 3. API: authenticate → resolve household → determine query intent (document RAG vs live data)
 4a. Document query path (RAG):
-   - Embed user question via OpenAI text-embedding-3-small
+   - Embed user question via Voyage AI voyage-3-lite
    - pgvector similarity search: top-5 chunks, scoped to household_id
    - Retrieved chunks + question → Claude (streaming)
    - Response cites source document + section
@@ -385,7 +385,7 @@ Phase 6: Platform & Polish
 | Supabase Realtime respects RLS | HIGH | Phase 1 research verified against Supabase Realtime Authorization docs (2026-03-24) |
 | pgvector for RAG (Supabase built-in) | HIGH | Phase 1 research verified (2026-03-24) |
 | Inngest for all async work | HIGH | Project decision documented in PROJECT.md |
-| OpenAI text-embedding-3-small for embeddings | HIGH | Phase 1 research verified against npm registry (2026-03-24) |
+| Voyage AI voyage-3-lite for embeddings | HIGH | Anthropic's official recommended embeddings partner for Claude-based RAG; verify voyageai package version at Phase 5 |
 | PDF parsing approach for RAG | MEDIUM | pdf-parse + pdf2pic pattern is standard; verify at Phase 5 implementation |
 | Drizzle native RLS (pgPolicy) | HIGH | Phase 1 research verified against official Drizzle docs (2026-03-24) |
 

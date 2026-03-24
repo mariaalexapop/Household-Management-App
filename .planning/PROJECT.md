@@ -75,7 +75,7 @@ A single chatbot accessible from any section:
 
 ## Stack
 
-**Next.js 15** (App Router) + **TypeScript 5** + **Supabase** (Postgres, Auth, Realtime, Storage, pgvector) + **Drizzle ORM** + **Vercel AI SDK** + **Anthropic Claude** + **OpenAI embeddings** (text-embedding-3-small) + **Inngest** + **Tailwind CSS 4** + **shadcn/ui**
+**Next.js 15** (App Router) + **TypeScript 5** + **Supabase** (Postgres, Auth, Realtime, Storage, pgvector) + **Drizzle ORM** + **Vercel AI SDK** + **Anthropic Claude** + **Voyage AI embeddings** (voyage-3-lite) + **Inngest** + **Tailwind CSS 4** + **shadcn/ui**
 
 See `.planning/research/STACK.md` for full stack rationale and `.planning/research/ARCHITECTURE.md` for system architecture.
 

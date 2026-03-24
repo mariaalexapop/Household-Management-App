@@ -35,7 +35,7 @@ Next.js 15 (App Router) + TypeScript 5, deployed on Vercel. Supabase provides Po
 | Vector store | Supabase pgvector (built-in) | — |
 | Chat LLM | Anthropic Claude | claude-sonnet-4-6 |
 | AI SDK | Vercel AI SDK | 4.x |
-| Embeddings | OpenAI text-embedding-3-small | latest |
+| Embeddings | Voyage AI voyage-3-lite | latest |
 | Async jobs | Inngest | latest |
 | CSS | Tailwind CSS | 4.x |
 | Components | shadcn/ui (Radix) | latest |
