@@ -23,7 +23,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Onboarding | 0/7 | Not started | - |
+| 1. Foundation & Onboarding | 0/8 | Not started | - |
 | 2. Home Chores | 0/TBD | Not started | - |
 | 3. Kids Activities | 0/TBD | Not started | - |
 | 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
@@ -49,16 +49,17 @@
 4. When any household member makes a change, all other members see it update in their browser within seconds without refreshing.
 5. All data is stored in EU infrastructure; a user can request deletion of their personal data and it is removed.
 
-**Plans:** 7 plans across 5 waves
+**Plans:** 8 plans across 4 waves
 
 Plans:
-- [ ] 01-01-PLAN.md — Test scaffold (Vitest, Playwright, RLS helpers)
-- [ ] 01-02-PLAN.md — Project init (Next.js 15, pnpm, env, Supabase project + checkpoint)
-- [ ] 01-03-PLAN.md — Drizzle schema (all 5 Phase 1 tables + RLS + migrations)
-- [ ] 01-04-PLAN.md — Auth flows (signup, email verify, password reset, Google OAuth)
-- [ ] 01-05-PLAN.md — Onboarding wizard + module-based dashboard skeleton
-- [ ] 01-06-PLAN.md — Invite system (email + shareable link + accept flow + member removal)
-- [ ] 01-07-PLAN.md — Real-time sync, reconnect indicator, activity feed, GDPR deletion
+- [ ] 01-01-PLAN.md — Test scaffold (Vitest, Playwright, factory helpers) — Wave 1
+- [ ] 01-02-PLAN.md — Project init (Next.js 15, pnpm, env, Supabase project + checkpoint) — Wave 1
+- [ ] 01-03-PLAN.md — Drizzle schema (all 5 Phase 1 tables + RLS + migrations + RLS helper) — Wave 2
+- [ ] 01-04-PLAN.md — Auth flows (signup, email verify, password reset, Google OAuth) — Wave 2
+- [ ] 01-05-PLAN.md — Onboarding wizard (Zustand store, Server Action, 3 step pages, components) — Wave 2
+- [ ] 01-06-PLAN.md — Module-based dashboard skeleton (Server Component, ModuleCard, DashboardGrid) — Wave 3
+- [ ] 01-07-PLAN.md — Invite system (email + shareable link + accept flow + member removal) — Wave 3
+- [ ] 01-08-PLAN.md — Real-time sync, reconnect indicator, activity feed, GDPR deletion — Wave 4
 
 ---
 
@@ -255,3 +256,4 @@ Plans:
 *Roadmap created: 2026-03-24*
 *Replaces prior roadmap created 2026-03-19 — full concept revision*
 *Phase 1 plans created: 2026-03-24*
+*Phase 1 revised: 2026-03-24 — fixed plan checker blockers, split 01-05 into wizard (01-05) + dashboard (01-06), renumbered invite→01-07 and realtime→01-08, total plans 7→8*
