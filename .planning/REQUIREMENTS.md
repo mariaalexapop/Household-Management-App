@@ -1,98 +1,120 @@
 # Requirements: Household Management App
 
-**Defined:** 2026-03-19
-**Core Value:** The AI that turns fragmented household data into automated harmony — so nothing gets forgotten, costs stay visible, and maintenance never becomes a crisis.
+**Defined:** 2026-03-24
+**Core Value:** One place for families to track everything they own, owe, and need to do — with an AI chatbot that answers questions and turns documents into actionable tasks.
 
 ---
 
 ## v1 Requirements
 
-### Authentication
+### Authentication (AUTH)
 
 - [ ] **AUTH-01**: User can sign up with email and password
 - [ ] **AUTH-02**: User receives email verification after signup
 - [ ] **AUTH-03**: User can reset password via email link
 - [ ] **AUTH-04**: User can sign up and log in with Google OAuth
-- [ ] **AUTH-05**: User can sign up and log in with Apple OAuth
-- [ ] **AUTH-06**: User session persists across browser refresh
+- [ ] **AUTH-05**: User session persists across browser refresh
 
-### Household
+### Onboarding (ONBD)
 
-- [ ] **HSLD-01**: User can create a household with a name
-- [ ] **HSLD-02**: User can invite other members via shareable link
-- [ ] **HSLD-03**: User can invite other members via email
-- [ ] **HSLD-04**: Invited user can join a household by accepting an invitation
-- [ ] **HSLD-05**: User can view all members of their household
-- [ ] **HSLD-06**: User can set and update their display name and avatar
-- [ ] **HSLD-07**: User can view a household activity feed (who did what, when)
+- [ ] **ONBD-01**: User selects household type during initial setup (couple / family with kids / flatmates / single-living)
+- [ ] **ONBD-02**: User selects which modules to activate during setup (multi-select: Home Chores / Car Maintenance / Insurance / Electronics / Kids Activities)
+- [ ] **ONBD-03**: Dashboard is generated based on selected modules
+- [ ] **ONBD-04**: User can add or remove modules from settings at any time after setup
 
-### Tasks & Chores
+### Household (HSLD)
 
-- [ ] **TASK-01**: User can create a task with title, description, assignee, and due date
-- [ ] **TASK-02**: User can assign a task to any household member (including themselves)
-- [ ] **TASK-03**: User can mark a task as complete
-- [ ] **TASK-04**: User can edit and delete tasks they created
-- [ ] **TASK-05**: User can create recurring tasks with daily/weekly/monthly/custom frequency
-- [ ] **TASK-06**: Recurring tasks automatically regenerate on completion
-- [ ] **TASK-07**: User can organise tasks into categories (e.g. Cleaning, Garden, Admin)
-- [ ] **TASK-08**: User receives in-app notifications for tasks assigned to them
-- [ ] **TASK-09**: User receives push notifications for upcoming and overdue tasks
-- [ ] **TASK-10**: All household members can see and edit all tasks (full equality)
+- [ ] **HSLD-01**: User who creates a household becomes the household admin
+- [ ] **HSLD-02**: Admin can invite members by email
+- [ ] **HSLD-03**: Admin can generate a shareable invite link
+- [ ] **HSLD-04**: Invited person receives an email and joins by creating an account
+- [ ] **HSLD-05**: All members can view all other household members
+- [ ] **HSLD-06**: User can set their display name and avatar
+- [ ] **HSLD-07**: Admin can remove a member from the household
+- [ ] **HSLD-08**: User can view a household activity feed (who did what, when)
 
-### Bills & Subscriptions
+### Home Chores (CHORE)
 
-- [ ] **BILL-01**: User can add a bill with name, amount, due date, and recurrence
-- [ ] **BILL-02**: User can mark a bill as paid and view payment history
-- [ ] **BILL-03**: User receives in-app and push reminders before a bill is due (configurable days ahead)
-- [ ] **BILL-04**: User can view all upcoming bills sorted by due date
-- [ ] **BILL-05**: User can edit and delete bills
+- [ ] **CHORE-01**: User can create a task with title, description, category, assignee, and due date
+- [ ] **CHORE-02**: User can assign a task to any household member (including themselves)
+- [ ] **CHORE-03**: User can mark a task as complete
+- [ ] **CHORE-04**: User can edit and delete tasks
+- [ ] **CHORE-05**: User can create recurring tasks (daily / weekly / monthly / custom frequency)
+- [ ] **CHORE-06**: Recurring tasks auto-regenerate on completion
+- [ ] **CHORE-07**: User can organise tasks into categories (e.g. Cleaning, Garden, Admin)
+- [ ] **CHORE-08**: User receives in-app and push notification when a task is assigned to them
+- [ ] **CHORE-09**: All household members can view and edit all tasks
+- [ ] **CHORE-10**: User receives a configurable reminder before a task's due date (in-app and push)
 
-### Expenses
+### Car Maintenance (CAR)
 
-- [ ] **EXPN-01**: User can manually add an expense with amount, category, date, merchant, and payer
-- [ ] **EXPN-02**: User can edit and delete expenses they created
-- [ ] **EXPN-03**: User can view household expenses filtered by category, date range, and member
-- [ ] **EXPN-04**: User can create and manage expense categories (presets + custom)
-- [ ] **EXPN-05**: User can view a household spending dashboard (total by category and by period)
-- [ ] **EXPN-06**: User can view spending trends over time (month-on-month comparison)
+- [ ] **CAR-01**: User can add multiple cars per household (make, model, year, plate, colour)
+- [ ] **CAR-02**: User can log a service record per car (date, type, mileage, garage, cost [optional])
+- [ ] **CAR-03**: User can set key date reminders per car: MOT/inspection due, road tax renewal, next service due
+- [ ] **CAR-04**: User receives a reminder X days before a key date (configurable per reminder)
+- [ ] **CAR-05**: User can edit and delete cars and service records
+- [ ] **CAR-06**: User can view full service history per car
 
-### AI — Document Intelligence
+### Insurance Management (INS)
 
-- [ ] **AIDOC-01**: User can photograph a receipt and AI extracts merchant, date, total, and line items into a structured expense draft
-- [ ] **AIDOC-02**: User reviews and confirms the AI-parsed expense before it is saved (never auto-saved)
-- [ ] **AIDOC-03**: User can upload a warranty document (photo or PDF) and AI extracts product name, purchase date, expiry date, and coverage summary
-- [ ] **AIDOC-04**: User can upload any household document and AI auto-categorises it and extracts relevant data
-- [ ] **AIDOC-05**: OCR processing is asynchronous — user receives a notification when parsing is complete (not blocked waiting)
-- [ ] **AIDOC-06**: If AI extraction confidence is low, user is shown the raw extracted text and prompted to fill fields manually
+- [ ] **INS-01**: User can add a policy with type (home / car / health / life / travel / other), insurer, policy number, expiry date, and renewal contact details
+- [ ] **INS-02**: User can upload policy documents (PDF)
+- [ ] **INS-03**: User can log premium costs with payment schedule (annual / quarterly / monthly) and next payment date
+- [ ] **INS-04**: User receives a reminder X days before a policy expires (configurable)
+- [ ] **INS-05**: User receives a reminder before a premium payment is due
+- [ ] **INS-06**: User can edit and delete policies
+- [ ] **INS-07**: Chatbot can answer questions about a policy by querying its uploaded document (RAG)
+- [ ] **INS-08**: Chatbot can extract a step-by-step procedure from a policy document and offer to create tasks
+- [ ] **INS-09**: User selects which steps to add as tasks, confirms the target section (default: Chores), and tasks appear there for editing
 
-### AI — Chat Assistant
+### Electronics Management (ELEC)
 
-- [ ] **AICH-01**: User can ask natural language questions about their household data (e.g. "how much did we spend on food last month?")
-- [ ] **AICH-02**: Chat assistant queries the database for all financial figures — never relies on model memory
-- [ ] **AICH-03**: User can ask the chat assistant to create tasks or log expenses via natural language
-- [ ] **AICH-04**: Conversation history is persisted per household
+- [ ] **ELEC-01**: User can add an item to the electronics registry (name, brand, model number, purchase date, cost [optional])
+- [ ] **ELEC-02**: User can upload a warranty document and record expiry date and coverage summary
+- [ ] **ELEC-03**: User receives a reminder 30 days before a warranty expires
+- [ ] **ELEC-04**: User can upload a user manual (PDF) for any item
+- [ ] **ELEC-05**: Chatbot can answer questions about an item using its uploaded manual (RAG)
+- [ ] **ELEC-06**: User can edit and delete items and their associated documents
 
-### AI — Ambient Intelligence
+### Kids Activities (KIDS)
 
-- [ ] **AIAMB-01**: Dashboard displays AI-generated suggestion cards (e.g. "Your boiler was last serviced 11 months ago")
-- [ ] **AIAMB-02**: AI suggestions are generated as a background job — not computed per page load
-- [ ] **AIAMB-03**: User can dismiss individual AI suggestion cards
-- [ ] **AIAMB-04**: AI generates spend pattern alerts when household spending significantly exceeds typical patterns
+- [ ] **KIDS-01**: User can create child profiles (name, date of birth) — no account, parent-managed only
+- [ ] **KIDS-02**: User can add multiple children to the household
+- [ ] **KIDS-03**: User can add an activity for a child (title, child, date/time, location, category, responsible parent)
+- [ ] **KIDS-04**: User can create recurring activities
+- [ ] **KIDS-05**: User receives a reminder X hours/days before an activity (configurable)
+- [ ] **KIDS-06**: User can view a calendar of all kids activities across all children
+- [ ] **KIDS-07**: User can edit and delete activities and child profiles
+- [ ] **KIDS-08**: Activity categories: school / medical / sport / hobby / social
 
-### Maintenance & Warranties
+### AI Chatbot & RAG (AI)
 
-- [ ] **MAINT-01**: User can add appliances/items to a household registry (name, brand, model number, purchase date)
-- [ ] **MAINT-02**: Warranty documents scanned via AIDOC-03 automatically populate the appliance registry
-- [ ] **MAINT-03**: User receives a reminder 30 days before a warranty expires
-- [ ] **MAINT-04**: User can create maintenance tasks for appliances (e.g. "Annual boiler service") with a recurrence schedule
-- [ ] **MAINT-05**: User receives reminders when scheduled maintenance is due
-- [ ] **MAINT-06**: AI suggests scheduling a maintenance check when a warranty is approaching expiry (cross-linking)
+- [ ] **AI-01**: User can chat with a household assistant accessible from any section of the app
+- [ ] **AI-02**: Chatbot queries uploaded documents (insurance policies, user manuals, warranty docs) via RAG (pgvector similarity search)
+- [ ] **AI-03**: Documents are processed asynchronously — user is notified when the document is ready for chatbot queries
+- [ ] **AI-04**: Chatbot can answer questions about live household data (upcoming reminders, task status, warranty expiries)
+- [ ] **AI-05**: Chatbot presents extracted procedure steps from a document and asks if the user wants to create tasks
+- [ ] **AI-06**: User selects which steps to add as tasks, picks the target section, and the tasks appear there for editing
+- [ ] **AI-07**: Conversation history is persisted per household
 
-### Platform & Real-Time
+### Costs (COST)
+
+- [ ] **COST-01**: Cost is an optional field on: car service records, insurance premium logs, and electronics registry items
+- [ ] **COST-02**: User can view a basic costs dashboard aggregating all recorded costs across sections
+- [ ] **COST-03**: Costs dashboard shows breakdown by section and by month / year
+
+### Calendar (CAL)
+
+- [ ] **CAL-01**: A unified calendar aggregates all date-tied items across activated modules: chore due dates, car key dates (MOT, tax, service), insurance expiry and payment dates, electronics warranty expiries, and kids activities
+- [ ] **CAL-02**: Each module is represented by a distinct colour in the calendar (Chores: blue / Car: orange / Insurance: purple / Electronics: teal / Kids: green)
+- [ ] **CAL-03**: User can click any calendar item to navigate directly to it in its source section
+- [ ] **CAL-04**: Calendar supports month view and week view
+
+### Platform & Real-Time (PLAT)
 
 - [ ] **PLAT-01**: All household data syncs in real-time across all members without page refresh
-- [ ] **PLAT-02**: App shows a reconnecting indicator when real-time connection drops
-- [ ] **PLAT-03**: App is mobile-responsive and usable on phone browsers (including camera access for OCR)
+- [ ] **PLAT-02**: App shows a reconnecting indicator when the real-time connection drops
+- [ ] **PLAT-03**: App is mobile-responsive and usable on phone browsers
 - [ ] **PLAT-04**: User data is stored in EU infrastructure (GDPR compliance)
 - [ ] **PLAT-05**: User can request deletion of their personal data (right to erasure)
 
@@ -100,47 +122,48 @@
 
 ## v2 Requirements
 
-### Open Banking
+### Financial Intelligence
 
-- **BANK-01**: User can connect a bank/card account via TrueLayer (UK/EU) or Plaid (US)
-- **BANK-02**: Transactions are automatically imported and categorised from connected accounts
-- **BANK-03**: User receives notification when bank re-authentication is required
-- **BANK-04**: User can view bank connection health and reconnect broken connections
-- **BANK-05**: Manual CSV import from bank statements as fallback
+- **FIN-01**: User can photograph a receipt and AI parses it into a categorised expense (OCR + LLM)
+- **FIN-02**: User reviews and confirms the AI-parsed expense before it is saved (never auto-saved)
+- **FIN-03**: User can connect a bank or card account (Revolut, TrueLayer, Plaid) for automatic transaction import
+- **FIN-04**: Transactions are automatically imported and categorised from connected accounts
+- **FIN-05**: User can view a household spending dashboard (total by category and by period)
+- **FIN-06**: User can view spending trends over time (month-on-month comparison)
+- **FIN-07**: AI generates spend pattern alerts when household spending significantly exceeds typical patterns
+
+### Electronics — Extended
+
+- **ELEC-V2-01**: User can enter a model number and AI retrieves the user manual and product information automatically (no manual upload required)
 
 ### Advanced AI
 
-- **AIEXT-01**: User can enter a model number and AI retrieves the user manual and product information
-- **AIEXT-02**: AI detects anomalous individual expenses (e.g. unexpected duplicate charge)
-- **AIEXT-03**: AI generates monthly household summary report
+- **AI-V2-01**: AI generates a monthly household summary report
+- **AI-V2-02**: Ambient AI dashboard cards surface proactive insights as background jobs (e.g. "Your boiler was last serviced 11 months ago")
+- **AI-V2-03**: User can dismiss individual AI suggestion cards
 
 ### Mobile Apps
 
 - **MOB-01**: Native iOS app
 - **MOB-02**: Native Android app
 
-### Advanced Household Management
-
-- **ADV-01**: User can set a household budget per category and track against it
-- **ADV-02**: User can view an annual maintenance calendar for all appliances
-- **ADV-03**: User can export household expense history as CSV
-
 ---
 
-## Out of Scope
+## Out of Scope (v1)
 
 | Feature | Reason |
 |---------|--------|
-| Role-based permissions (Admin/Member) | Full equality in v1; RBAC adds complexity without clear v1 value. Revisit in v2 if user research demands it. |
-| Expense settlement / debt tracking | Splitwise does this well; building a worse version adds no value over recommending Splitwise |
-| Grocery list with retailer integration | Without smart integration, shopping lists are commoditised; focus on financials and maintenance |
-| Smart home integrations (Alexa, Google Home, IFTTT) | Deep integration work, low v1 demand; AI layer covers the use cases without integration |
-| Investment / asset tracking | Distinct domain from household ops; out of scope permanently |
-| Contractor / marketplace booking | Third-party complexity; maintenance scheduling without booking covers the need |
-| Budget creation and forecasting | Anomaly detection on actuals is more useful than budget planning; revisit in v2 |
-| Multi-household per user | Adds data model complexity; single active household per user; v2 for property managers |
-| Gamification (points, badges, rewards) | OurHome targets families with kids; this product targets adults |
-| Native mobile apps | Web-first; mobile apps are a subsequent milestone (v2) |
+| Receipt scanning / OCR | Deferred to v2; manual tracking is sufficient for MVP |
+| Bank / Revolut integrations | Regulatory and cost implications; validate demand via manual tracking first |
+| Spending dashboards from transactions | Depends on bank integrations; deferred to v2 |
+| Role-based permissions (beyond admin for household management) | Full content equality in v1; RBAC adds complexity without clear MVP value |
+| Expense settlement / debt tracking | Splitwise does this well; out of scope permanently |
+| Smart home integrations (Alexa, Google Home) | Low v1 demand; AI chatbot covers use cases without integration |
+| Investment / asset tracking | Distinct domain; out of scope permanently |
+| Contractor / marketplace booking | Third-party complexity; out of scope permanently |
+| Gamification (points, badges) | Out of target user model |
+| Native mobile apps | Web-first; mobile apps are a v2 milestone |
+| Multi-household per user | Single active household per user in v1; v2 for property managers |
 
 ---
 
@@ -148,74 +171,87 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1: Foundation | Pending |
-| AUTH-02 | Phase 1: Foundation | Pending |
-| AUTH-03 | Phase 1: Foundation | Pending |
-| AUTH-04 | Phase 1: Foundation | Pending |
-| AUTH-05 | Phase 1: Foundation | Pending |
-| AUTH-06 | Phase 1: Foundation | Pending |
-| HSLD-01 | Phase 1: Foundation | Pending |
-| HSLD-02 | Phase 1: Foundation | Pending |
-| HSLD-03 | Phase 1: Foundation | Pending |
-| HSLD-04 | Phase 1: Foundation | Pending |
-| HSLD-05 | Phase 1: Foundation | Pending |
-| HSLD-06 | Phase 1: Foundation | Pending |
-| HSLD-07 | Phase 1: Foundation | Pending |
-| PLAT-01 | Phase 1: Foundation | Pending |
-| PLAT-02 | Phase 1: Foundation | Pending |
-| PLAT-04 | Phase 1: Foundation | Pending |
-| PLAT-05 | Phase 1: Foundation | Pending |
-| TASK-01 | Phase 2: Tasks & Chores | Pending |
-| TASK-02 | Phase 2: Tasks & Chores | Pending |
-| TASK-03 | Phase 2: Tasks & Chores | Pending |
-| TASK-04 | Phase 2: Tasks & Chores | Pending |
-| TASK-05 | Phase 2: Tasks & Chores | Pending |
-| TASK-06 | Phase 2: Tasks & Chores | Pending |
-| TASK-07 | Phase 2: Tasks & Chores | Pending |
-| TASK-08 | Phase 2: Tasks & Chores | Pending |
-| TASK-09 | Phase 2: Tasks & Chores | Pending |
-| TASK-10 | Phase 2: Tasks & Chores | Pending |
-| BILL-01 | Phase 3: Financials Core | Pending |
-| BILL-02 | Phase 3: Financials Core | Pending |
-| BILL-03 | Phase 3: Financials Core | Pending |
-| BILL-04 | Phase 3: Financials Core | Pending |
-| BILL-05 | Phase 3: Financials Core | Pending |
-| EXPN-01 | Phase 3: Financials Core | Pending |
-| EXPN-02 | Phase 3: Financials Core | Pending |
-| EXPN-03 | Phase 3: Financials Core | Pending |
-| EXPN-04 | Phase 3: Financials Core | Pending |
-| EXPN-05 | Phase 3: Financials Core | Pending |
-| EXPN-06 | Phase 3: Financials Core | Pending |
-| AIDOC-01 | Phase 4: AI Document Intelligence | Pending |
-| AIDOC-02 | Phase 4: AI Document Intelligence | Pending |
-| AIDOC-03 | Phase 4: AI Document Intelligence | Pending |
-| AIDOC-04 | Phase 4: AI Document Intelligence | Pending |
-| AIDOC-05 | Phase 4: AI Document Intelligence | Pending |
-| AIDOC-06 | Phase 4: AI Document Intelligence | Pending |
-| AICH-01 | Phase 5: AI Assistant | Pending |
-| AICH-02 | Phase 5: AI Assistant | Pending |
-| AICH-03 | Phase 5: AI Assistant | Pending |
-| AICH-04 | Phase 5: AI Assistant | Pending |
-| AIAMB-01 | Phase 5: AI Assistant | Pending |
-| AIAMB-02 | Phase 5: AI Assistant | Pending |
-| AIAMB-03 | Phase 5: AI Assistant | Pending |
-| AIAMB-04 | Phase 5: AI Assistant | Pending |
-| MAINT-01 | Phase 6: Maintenance & Warranties | Pending |
-| MAINT-02 | Phase 6: Maintenance & Warranties | Pending |
-| MAINT-03 | Phase 6: Maintenance & Warranties | Pending |
-| MAINT-04 | Phase 6: Maintenance & Warranties | Pending |
-| MAINT-05 | Phase 6: Maintenance & Warranties | Pending |
-| MAINT-06 | Phase 6: Maintenance & Warranties | Pending |
-| PLAT-03 | Phase 7: Platform & Polish | Pending |
+| AUTH-01 | Phase 1: Foundation & Onboarding | Pending |
+| AUTH-02 | Phase 1: Foundation & Onboarding | Pending |
+| AUTH-03 | Phase 1: Foundation & Onboarding | Pending |
+| AUTH-04 | Phase 1: Foundation & Onboarding | Pending |
+| AUTH-05 | Phase 1: Foundation & Onboarding | Pending |
+| ONBD-01 | Phase 1: Foundation & Onboarding | Pending |
+| ONBD-02 | Phase 1: Foundation & Onboarding | Pending |
+| ONBD-03 | Phase 1: Foundation & Onboarding | Pending |
+| ONBD-04 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-01 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-02 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-03 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-04 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-05 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-06 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-07 | Phase 1: Foundation & Onboarding | Pending |
+| HSLD-08 | Phase 1: Foundation & Onboarding | Pending |
+| PLAT-01 | Phase 1: Foundation & Onboarding | Pending |
+| PLAT-02 | Phase 1: Foundation & Onboarding | Pending |
+| PLAT-04 | Phase 1: Foundation & Onboarding | Pending |
+| PLAT-05 | Phase 1: Foundation & Onboarding | Pending |
+| CHORE-01 | Phase 2: Home Chores | Pending |
+| CHORE-02 | Phase 2: Home Chores | Pending |
+| CHORE-03 | Phase 2: Home Chores | Pending |
+| CHORE-04 | Phase 2: Home Chores | Pending |
+| CHORE-05 | Phase 2: Home Chores | Pending |
+| CHORE-06 | Phase 2: Home Chores | Pending |
+| CHORE-07 | Phase 2: Home Chores | Pending |
+| CHORE-08 | Phase 2: Home Chores | Pending |
+| CHORE-09 | Phase 2: Home Chores | Pending |
+| CHORE-10 | Phase 2: Home Chores | Pending |
+| KIDS-01 | Phase 3: Kids Activities | Pending |
+| KIDS-02 | Phase 3: Kids Activities | Pending |
+| KIDS-03 | Phase 3: Kids Activities | Pending |
+| KIDS-04 | Phase 3: Kids Activities | Pending |
+| KIDS-05 | Phase 3: Kids Activities | Pending |
+| KIDS-06 | Phase 3: Kids Activities | Pending |
+| KIDS-07 | Phase 3: Kids Activities | Pending |
+| KIDS-08 | Phase 3: Kids Activities | Pending |
+| CAR-01 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAR-02 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAR-03 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAR-04 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAR-05 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAR-06 | Phase 4: Tracker Modules & Calendar | Pending |
+| INS-01 | Phase 4: Tracker Modules & Calendar | Pending |
+| INS-02 | Phase 4: Tracker Modules & Calendar | Pending |
+| INS-03 | Phase 4: Tracker Modules & Calendar | Pending |
+| INS-04 | Phase 4: Tracker Modules & Calendar | Pending |
+| INS-05 | Phase 4: Tracker Modules & Calendar | Pending |
+| INS-06 | Phase 4: Tracker Modules & Calendar | Pending |
+| ELEC-01 | Phase 4: Tracker Modules & Calendar | Pending |
+| ELEC-02 | Phase 4: Tracker Modules & Calendar | Pending |
+| ELEC-03 | Phase 4: Tracker Modules & Calendar | Pending |
+| ELEC-04 | Phase 4: Tracker Modules & Calendar | Pending |
+| ELEC-06 | Phase 4: Tracker Modules & Calendar | Pending |
+| COST-01 | Phase 4: Tracker Modules & Calendar | Pending |
+| COST-02 | Phase 4: Tracker Modules & Calendar | Pending |
+| COST-03 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAL-01 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAL-02 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAL-03 | Phase 4: Tracker Modules & Calendar | Pending |
+| CAL-04 | Phase 4: Tracker Modules & Calendar | Pending |
+| AI-01 | Phase 5: AI Chatbot & RAG | Pending |
+| AI-02 | Phase 5: AI Chatbot & RAG | Pending |
+| AI-03 | Phase 5: AI Chatbot & RAG | Pending |
+| AI-04 | Phase 5: AI Chatbot & RAG | Pending |
+| AI-05 | Phase 5: AI Chatbot & RAG | Pending |
+| AI-06 | Phase 5: AI Chatbot & RAG | Pending |
+| AI-07 | Phase 5: AI Chatbot & RAG | Pending |
+| INS-07 | Phase 5: AI Chatbot & RAG | Pending |
+| INS-08 | Phase 5: AI Chatbot & RAG | Pending |
+| INS-09 | Phase 5: AI Chatbot & RAG | Pending |
+| ELEC-05 | Phase 5: AI Chatbot & RAG | Pending |
+| PLAT-03 | Phase 6: Platform & Polish | Pending |
 
-**Coverage:**
-- v1 requirements: 59 total
-- Mapped to phases: 59
-- Unmapped: 0
-
-**Note on count:** The original traceability section listed 55 requirements. Actual count of defined v1 requirements is 59 (AUTH: 6, HSLD: 7, TASK: 10, BILL: 5, EXPN: 6, AIDOC: 6, AICH: 4, AIAMB: 4, MAINT: 6, PLAT: 5). All 59 are mapped.
+**Total v1 requirements: 75**
+**Mapped to phases: 75**
+**Unmapped: 0**
 
 ---
 
-*Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after roadmap creation*
+*Requirements defined: 2026-03-24*
+*Replaces prior requirements defined 2026-03-19 — full concept revision*
