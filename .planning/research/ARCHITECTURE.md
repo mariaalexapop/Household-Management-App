@@ -1,8 +1,9 @@
 # Architecture Patterns
 
-**Domain:** AI-powered household management web app
+**Domain:** Family household command centre with AI chatbot and RAG
 **Researched:** 2026-03-19
-**Confidence:** MEDIUM (training knowledge; web verification unavailable — flag for validation before implementation)
+**Last updated:** 2026-03-24 — significant revision; new domain tables, RAG data flow, corrected build order, admin model, v2 items noted
+**Confidence:** HIGH for patterns confirmed by Phase 1 research (01-RESEARCH.md); MEDIUM for v2 items not yet researched
 
 ---
 
@@ -10,43 +11,49 @@
 
 ### System Overview
 
-A layered architecture with three primary tiers: a React/Next.js frontend, a Next.js API layer (REST endpoints + SSR), and a Supabase backend (PostgreSQL + Realtime + Storage + Auth). A dedicated async worker handles all long-running AI and webhook workloads out of band from the request cycle.
+A layered architecture with three primary tiers: a React/Next.js frontend, a Next.js API layer (Server Actions + route handlers), and a Supabase backend (PostgreSQL + Realtime + Storage + pgvector + Auth). An async worker (Inngest) handles all long-running AI, notification, and document processing workloads out of band from the request cycle.
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                   BROWSER / PWA                     │
-│   React (Next.js) — dashboard, chat, camera OCR     │
+│   React (Next.js App Router) — dashboard, modules, │
+│   calendar, chat, document uploads                  │
 └───────────────┬─────────────────────────────────────┘
                 │ HTTPS / WebSocket
 ┌───────────────▼─────────────────────────────────────┐
 │              NEXT.JS API LAYER                       │
-│  /api/auth   /api/households   /api/expenses         │
-│  /api/tasks  /api/ai/chat      /api/documents        │
-│  /api/banking  (webhook receiver)                    │
+│  Server Actions (mutations) + Route Handlers (API)  │
+│  /api/household  /api/invite  /api/documents         │
+│  /api/ai/chat   /api/inngest (webhook receiver)      │
 └──────┬───────────────────────┬──────────────────────┘
        │                       │ enqueue jobs
 ┌──────▼──────────┐   ┌────────▼────────────────────┐
 │  SUPABASE       │   │   ASYNC WORKER (Inngest)     │
 │  - PostgreSQL   │   │                             │
-│  - Auth (JWT)   │   │   • OCR pipeline             │
-│  - Realtime     │   │   • LLM extraction           │
-│  - Storage      │   │   • AI suggestions gen       │
-│    (S3-compat)  │   │   • Banking webhook proc     │
-└──────┬──────────┘   │   • Warranty/reminder sched  │
-       │              └────────────┬────────────────┘
+│  - Auth (JWT)   │   │   • Document embedding       │
+│  - Realtime     │   │     (PDF → chunks → pgvector)│
+│  - Storage      │   │   • Reminder scheduler       │
+│    (PDFs,docs)  │   │     (MOT, insurance, warranty│
+│  - pgvector     │   │      kids activities)        │
+│    (embeddings) │   │   • Email notifications      │
+└──────┬──────────┘   └────────────┬────────────────┘
        │                           │
        │              ┌────────────▼────────────────┐
        │              │   EXTERNAL SERVICES          │
        │              │   • Anthropic Claude API     │
-       │              │   • TrueLayer (UK/EU)        │
-       │              │     or Plaid (US)            │
+       │              │     (chat + extraction)      │
+       │              │   • OpenAI Embeddings API    │
+       │              │     (text-embedding-3-small) │
+       │              │   • Resend (email)           │
        │              └─────────────────────────────┘
        │ Realtime subscription
 ┌──────▼──────────────────────────────────────────────┐
 │     BROWSER (Supabase Realtime channel)              │
-│     household:{id} — push delta events               │
+│     household:{id} — push delta events              │
 └─────────────────────────────────────────────────────┘
 ```
+
+**v2 additions to this diagram:** OCR pipeline (Claude Vision + Sharp), open banking (TrueLayer/Plaid webhook receiver + bank sync worker).
 
 ---
 
@@ -54,77 +61,16 @@ A layered architecture with three primary tiers: a React/Next.js frontend, a Nex
 
 | Component | Responsibility | Communicates With |
 |-----------|---------------|-------------------|
-| Next.js Frontend | UI, camera capture, Realtime subscription, optimistic updates | API Layer (HTTP), Supabase Realtime (WS) |
-| Next.js API Layer | Auth enforcement, CRUD, job enqueueing, webhook reception | Supabase DB, Worker queue, Supabase Storage |
-| Supabase Auth | JWT issuance, OAuth, session management | API Layer, RLS (passes user_id claim) |
-| Supabase PostgreSQL | All persistent state | API Layer, Worker, Realtime (change feed) |
+| Next.js Frontend | UI, camera capture (v2), Realtime subscription, optimistic updates | API Layer (HTTP/Server Actions), Supabase Realtime (WS) |
+| Next.js API Layer | Auth enforcement, CRUD, job enqueueing, invite management | Supabase DB, Inngest, Supabase Storage |
+| Supabase Auth | JWT issuance, OAuth (Google), session management | API Layer, RLS (passes user_id claim) |
+| Supabase PostgreSQL | All persistent state | API Layer, Inngest worker, Realtime (change feed) |
 | Supabase Realtime | Broadcasts row-level changes to household members | PostgreSQL (logical replication), Browser (WS) |
-| Supabase Storage | Raw file storage (receipts, warranty docs) | API Layer (presigned URLs), Worker (read for OCR), Browser (download) |
-| Async Worker (Inngest) | OCR, LLM extraction, banking webhooks, scheduled reminders | Supabase DB, Claude API, TrueLayer/Plaid |
-| Claude API | Image OCR + structured extraction, chat responses, suggestions | Worker (extraction), API Layer (chat) |
-| Open Banking | Transaction feeds, webhooks | Worker (inbound webhook), API Layer (OAuth init) |
-
----
-
-## Data Flow
-
-### Flow 1: Receipt OCR to Expense Record
-
-```
-1. User taps "Scan receipt" — browser opens camera
-2. Image uploaded direct to Supabase Storage via presigned PUT URL
-   (file never transits API server)
-3. API creates pending document record: { status: "processing", type: "receipt" }
-4. API enqueues job: { type: "ocr_receipt", document_id, storage_path }
-5. Worker:
-   a. Fetch image from Storage
-   b. POST to Claude Vision: "Extract receipt as JSON: { merchant, date, total, line_items }"
-   c. Validate + sanitise response
-   d. Write expense record(s) to DB
-   e. Update document: { status: "complete", parsed_data: {...} }
-6. Supabase Realtime fires change on expenses table — household channel
-7. All members' browsers update without refresh
-```
-
-### Flow 2: Warranty Document to Tracked Warranty
-
-```
-1-4. Same as Flow 1 (upload → pending doc → enqueue job)
-5. Worker: Claude Vision extraction → write warranty record → schedule reminder job
-   at (expiry_date - 30 days)
-6. Realtime pushes new warranty card to dashboard
-```
-
-### Flow 3: Open Banking Webhook to Transaction Import
-
-```
-1. User connects bank — API redirects to TrueLayer/Plaid OAuth
-2. Access token stored encrypted in DB
-3. Provider fires webhook POST to /api/banking/webhook
-4. API validates signature — enqueues bank_sync job
-5. Worker: fetch transactions → deduplicate (external_id) → categorise via Claude → write expenses
-6. Realtime pushes new expenses to household
-```
-
-### Flow 4: LLM Chat (Synchronous / Streaming)
-
-```
-1. User query — POST /api/ai/chat (NOT queued — latency-sensitive)
-2. API: authenticate → resolve household → build targeted context snapshot via SQL
-3. Claude prompt (streaming): system context + tool definitions + user query
-4. Stream response via SSE directly to requesting user
-5. Store exchange in conversation_messages
-```
-
-### Flow 5: Ambient AI Suggestions
-
-```
-1. Triggered: daily cron + on significant data change
-2. Worker: aggregate context (spend trends, upcoming bills, overdue tasks, expiring warranties)
-3. Claude: generate 3-5 JSON suggestions
-4. Upsert ai_suggestions table
-5. Realtime pushes updated cards to all household members' dashboards
-```
+| Supabase Storage | Raw file storage (insurance PDFs, user manuals, warranty docs) | API Layer (presigned URLs), Inngest worker (read for embedding) |
+| pgvector (Supabase) | Stores and queries document embeddings for RAG | Inngest (write), API Layer (read for chatbot) |
+| Async Worker (Inngest) | Document embedding, reminder scheduling, email sending | Supabase DB, Claude API, OpenAI Embeddings API, Resend |
+| Claude API | Chatbot responses, procedure extraction, task suggestions | API Layer (streaming chat), Inngest (extraction) |
+| OpenAI Embeddings API | Text → vector embeddings for RAG | Inngest (called on document upload) |
 
 ---
 
@@ -133,139 +79,298 @@ A layered architecture with three primary tiers: a React/Next.js frontend, a Nex
 ### Core Tables
 
 ```sql
-households            — id, name, invite_code, created_at
-household_members     — id, household_id, user_id, display_name, joined_at
-                        (no role column in v1 — full equality model)
+-- Households & Members
+households            — id, name, created_at
+household_members     — id, household_id, user_id, role (admin|member), display_name,
+                        avatar_url, joined_at
+                        NOTE: role is admin for household creator; member for invited users.
+                        Role controls membership management only — all content is equally accessible.
+household_settings    — id, household_id, household_type (couple|family|flatmates|single),
+                        active_modules (text[]), created_at, updated_at
+                        NOTE: active_modules drives dashboard rendering and reminder job activation.
+household_invites     — id, household_id, token (uuid), email (nullable — null for link invites),
+                        invited_by, expires_at, claimed_at, claimed_by
 
-expenses              — id, household_id, created_by, attributed_to, amount, currency,
-                        category_id, merchant, date, source, external_id, document_id
+-- Activity Feed
+activity_feed         — id, household_id, actor_id, event_type, entity_type,
+                        entity_id, metadata (jsonb), created_at
+                        NOTE: append-only. Never modified. Drives "who did what" UI.
 
-expense_categories    — id, household_id, name, icon, is_default
-                        (stored in DB table — not a hardcoded enum)
+-- Home Chores
+tasks                 — id, household_id, title, description, category, assigned_to,
+                        due_date, completed_at, recurrence_rule (RRULE string), created_by, created_at
 
-bills                 — id, household_id, name, amount, frequency,
-                        next_due_date, is_paid, reminder_days_before
+-- Children (no accounts — parent-managed profiles)
+children              — id, household_id, name, date_of_birth, created_at
 
-tasks                 — id, household_id, title, assigned_to, due_date,
-                        completed_at, recurrence_rule (RRULE), created_by
+-- Kids Activities
+kids_activities       — id, household_id, child_id, title, category
+                        (school|medical|sport|hobby|social), date_time, location,
+                        recurrence_rule (RRULE), responsible_parent_id, created_by, created_at
 
-documents             — id, household_id, uploaded_by, storage_path, mime_type,
-                        status (pending/processing/complete/failed),
-                        document_type, parsed_data (jsonb)
+-- Cars
+cars                  — id, household_id, make, model, year, plate, colour,
+                        notes, created_by, created_at
+car_service_records   — id, car_id, household_id, date, service_type, mileage,
+                        garage, cost (numeric, nullable), notes, created_by, created_at
+car_key_dates         — id, car_id, household_id, date_type (mot|tax|service|other),
+                        due_date, reminder_days_before, notes, created_at
 
-warranties            — id, household_id, document_id, product_name, brand,
-                        model_number, purchase_date, expiry_date,
-                        coverage_summary, reminder_sent
+-- Insurance
+insurance_policies    — id, household_id, policy_type (home|car|health|life|travel|other),
+                        insurer, policy_number, expiry_date,
+                        renewal_contact_name, renewal_contact_phone, renewal_contact_email,
+                        reminder_days_before, created_by, created_at
+insurance_documents   — id, policy_id, household_id, storage_path, filename,
+                        file_size, uploaded_by, created_at
+insurance_costs       — id, policy_id, household_id, annual_premium,
+                        payment_schedule (annual|quarterly|monthly),
+                        next_payment_date, reminder_days_before, created_at
 
-banking_connections   — id, household_id, provider, access_token_encrypted,
-                        refresh_token_encrypted, account_ids, last_synced_at, status
+-- Electronics
+electronics_items     — id, household_id, name, brand, model_number,
+                        purchase_date, cost (numeric, nullable), created_by, created_at
+electronics_documents — id, item_id, household_id, document_type (warranty|manual),
+                        storage_path, filename, file_size, uploaded_by, created_at
+warranties            — id, item_id, household_id, expiry_date, coverage_summary,
+                        reminder_sent, created_at
 
-ai_suggestions        — id, household_id, type, title, body, action_link,
-                        generated_at, dismissed_at, expires_at
-
-conversation_messages — id, household_id, user_id, role (user/assistant),
-                        content, created_at
-
-activity_feed         — id, household_id, actor_id, event_type,
-                        entity_type, entity_id, metadata (jsonb), created_at
+-- AI / RAG
+document_embeddings   — id, household_id, source_document_id, source_document_type
+                        (insurance_document|electronics_document), chunk_index,
+                        content (text), embedding (vector(1536)), metadata (jsonb), created_at
+                        NOTE: source_document_type disambiguates which table source_document_id
+                        references. Queries filter by household_id and optionally document_type.
+chat_messages         — id, household_id, user_id, role (user|assistant),
+                        content, tool_calls (jsonb, nullable), created_at
 ```
 
-### Multi-Tenant Isolation Pattern
+### Multi-Tenant Isolation Pattern (RLS)
 
 ```sql
-ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
+-- Pattern repeats for every household-scoped table.
+-- household_members is the single source of truth for membership.
 
-CREATE POLICY "household_member_read" ON expenses
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "household_member_read" ON tasks
   FOR SELECT USING (
     household_id IN (
       SELECT household_id FROM household_members WHERE user_id = auth.uid()
     )
   );
 
-CREATE POLICY "household_member_write" ON expenses
+CREATE POLICY "household_member_write" ON tasks
   FOR INSERT WITH CHECK (
     household_id IN (
       SELECT household_id FROM household_members WHERE user_id = auth.uid()
     )
   );
+
+-- Admin-only policies (for household management operations):
+CREATE POLICY "admin_only_delete_member" ON household_members
+  FOR DELETE USING (
+    household_id IN (
+      SELECT household_id FROM household_members
+      WHERE user_id = auth.uid() AND role = 'admin'
+    )
+  );
 ```
 
-This pattern repeats for every household-scoped table. `household_members` is the single source of truth for membership.
+**Drizzle RLS pattern (preferred over raw SQL):**
+```typescript
+// Source: Drizzle ORM official docs
+import { pgPolicy, authenticatedRole, authUid } from 'drizzle-orm/pg-core'
+
+export const tasks = pgTable('tasks', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  householdId: uuid('household_id').notNull(),
+  // ... other fields
+}, (table) => [
+  pgPolicy('household_member_read', {
+    for: 'select',
+    to: authenticatedRole,
+    using: sql`${table.householdId} IN (
+      SELECT household_id FROM household_members WHERE user_id = ${authUid()}
+    )`,
+  }),
+])
+```
 
 ---
 
-## Async Worker (Inngest)
+## Data Flows
 
-Inngest is preferred over BullMQ because it works natively with Next.js serverless (no Redis required), has built-in step functions and delayed scheduling (needed for warranty reminders), and provides managed observability.
+### Flow 1: Onboarding → Personalised Dashboard (v1)
+
+```
+1. User completes onboarding (household type + module selection)
+2. API writes household_settings: { household_type, active_modules: ['chores', 'cars'] }
+3. Dashboard server component reads household_settings
+4. Renders only activated module sections — inactive modules hidden
+5. Supabase Realtime: any member updating active_modules triggers dashboard re-render for all members
+```
+
+### Flow 2: Document Upload → RAG Ready (v1 Phase 5)
+
+```
+1. User uploads PDF (insurance policy or user manual)
+2. File uploads direct to Supabase Storage via presigned PUT URL (file never transits API)
+3. API creates insurance_documents / electronics_documents record: { status: "processing" }
+4. API enqueues Inngest job: { type: "embed_document", document_id, storage_path, household_id }
+5. Inngest worker:
+   a. Fetch PDF from Supabase Storage
+   b. Extract text (pdf-parse for text PDFs; Claude Vision for scanned PDFs)
+   c. Chunk text (~512 tokens, 50-token overlap)
+   d. Embed each chunk via OpenAI text-embedding-3-small
+   e. Write chunks to document_embeddings (with household_id, source references)
+   f. Update document record: { status: "ready" }
+6. Supabase Realtime fires → user receives notification: "Document ready for questions"
+```
+
+### Flow 3: Chatbot Query → RAG Response (v1 Phase 5)
+
+```
+1. User sends message: "What do I do if my boiler leaks?"
+2. POST /api/ai/chat (streaming)
+3. API: authenticate → resolve household → determine query intent (document RAG vs live data)
+4a. Document query path (RAG):
+   - Embed user question via OpenAI text-embedding-3-small
+   - pgvector similarity search: top-5 chunks, scoped to household_id
+   - Retrieved chunks + question → Claude (streaming)
+   - Response cites source document + section
+4b. Live data query path (tool-calling):
+   - Claude invokes tool (e.g., get_insurance_policies, get_car_key_dates)
+   - Tool executes SQL query scoped to household_id
+   - Query result injected into Claude context → response generated
+5. Stream response to user via SSE
+6. Store exchange in chat_messages
+```
+
+### Flow 4: Chatbot Procedure Extraction → Tasks (v1 Phase 5)
+
+```
+1. User: "What steps should I take after a burst pipe?"
+2. Claude queries insurance documents via RAG (Flow 3)
+3. Claude identifies a procedure (numbered/bulleted steps)
+4. Claude responds with steps + asks: "Would you like me to create tasks for these steps?"
+5. User selects which steps to add → confirms target section (default: Chores)
+6. API creates task records in tasks table, assigned to requesting user
+7. Supabase Realtime fires → tasks appear in Chores section for all household members
+8. User sees tasks in Chores module ready to edit/assign
+```
+
+### Flow 5: Reminder Scheduling (v1 Phases 2-4)
+
+```
+1. User sets a reminder (MOT due date, insurance expiry, warranty expiry, kids activity)
+2. API writes the record (car_key_dates, insurance_policies, warranties, kids_activities)
+3. API enqueues Inngest delayed function: fire X days before due_date
+4. Inngest fires at the scheduled time:
+   a. Check if household still has this module active (household_settings)
+   b. Check if reminder hasn't been dismissed
+   c. Send in-app notification (Supabase Realtime) + push notification (Web Push API)
+   d. Send email notification via Resend if configured
+```
+
+### v2 Data Flows (deferred)
+
+- **Receipt OCR → Expense:** image upload → Inngest OCR worker → Claude Vision extraction → review screen → expense record
+- **Bank webhook → Transaction import:** TrueLayer/Plaid webhook → Inngest sync worker → categorisation → expense records
+
+---
+
+## Async Worker (Inngest) — v1 Job Types
 
 | Job Type | Trigger | Target SLA |
 |----------|---------|------------|
-| `ocr_receipt` | Document upload | < 30s |
-| `ocr_warranty` | Document upload | < 30s |
-| `generate_suggestions` | Daily cron + data change | < 60s |
-| `bank_sync` | Provider webhook | < 60s |
-| `bill_reminder` | Cron | < 5s |
-| `warranty_reminder` | Delayed (set at record creation) | < 5s |
+| `embed_document` | Document upload (PDF) | < 60s |
+| `reminder_task_due` | Delayed (set when task due date saved) | < 5s |
+| `reminder_insurance_expiry` | Delayed (set when policy expiry saved) | < 5s |
+| `reminder_insurance_payment` | Delayed (set when payment schedule saved) | < 5s |
+| `reminder_warranty_expiry` | Delayed (set when warranty expiry saved) | < 5s |
+| `reminder_car_key_date` | Delayed (set when key date saved) | < 5s |
+| `reminder_kids_activity` | Delayed (set when activity date saved) | < 5s |
+| `send_invite_email` | Household invite created | < 10s |
 
 ---
 
 ## Key Architectural Patterns
 
-**Async command for AI pipelines.** Write operations triggering AI return `{ status: "processing" }` immediately. Result arrives via Realtime. Never hold an HTTP connection open for LLM latency.
+**Async command for document processing.** Document uploads return `{ status: "processing" }` immediately. Embedding result arrives via Realtime notification. Never hold an HTTP connection open for document processing.
 
-**Household context injection.** All Claude prompts receive a compact aggregated context snapshot from a `HouseholdContextBuilder` — never raw table rows. Controls token cost and prevents context window overflow at scale.
+**Household context injection for LLM.** All Claude prompts receive targeted context — never raw table dumps. For RAG: top-k pgvector results. For live data queries: aggregated SQL query results via tool-calling. Controls token cost.
 
-**Idempotent job processing.** Every worker job is safe to retry. Use `external_id` unique constraints and upsert semantics throughout. Webhooks re-deliver; duplicate expense records destroy trust.
+**Tool-calling for factual queries.** The chatbot must never recall factual household data from LLM memory. All queries about car dates, insurance policies, warranties, kids activities route through Vercel AI SDK tool-calling to execute scoped SQL queries.
 
-**Activity feed as append-only event log.** All significant mutations append to `activity_feed`. Never modify, only append. Drives both the "who did what" UI and provides structured data for AI suggestion generation.
+**Module-aware job activation.** Before firing any reminder job, Inngest worker checks `household_settings.active_modules`. If the relevant module is disabled, the reminder is skipped (not deleted — so it resumes if the module is re-enabled).
+
+**Activity feed as append-only event log.** All significant mutations append to `activity_feed`. Never modify existing entries. Drives "who did what" UI.
+
+**Idempotent job processing.** Every Inngest job is safe to retry. Use unique constraints and upsert semantics. Reminder jobs check whether they've already fired before sending notifications.
+
+**Realtime publication management.** Tables must be explicitly added to the `supabase_realtime` publication. Missing this is a common silent failure where real-time events never fire.
 
 ---
 
 ## Anti-Patterns to Avoid
 
-**Synchronous LLM in request handlers.** Vercel timeout is 10s default; Claude P99 is 10-30s. Always use the async worker. Return pending status, push result via Realtime.
+**Synchronous LLM in API route handlers.** Vercel timeout is 10s default; Claude P99 is 10-30s. All non-chat AI processing must use Inngest. Chat uses streaming SSE to stay within timeout.
 
-**Full table dumps in LLM context.** Sending raw expense rows scales linearly with household data size. Send aggregated summaries only.
+**Full table dumps in LLM context.** Sending raw table rows to Claude scales linearly with data. Use pgvector similarity search (RAG) for documents; use aggregated SQL query results for live data.
 
-**User-scoped tables for shared data.** Key all shared entities by `household_id` from day one. User identity appears only as `created_by` / `actor_id`.
+**User-scoped tables for shared household data.** Key all shared entities by `household_id` from day one. User identity appears only as `created_by`, `actor_id`, `responsible_parent_id`.
 
-**Banking tokens in plaintext.** Encrypt at rest with application-layer AES-256-GCM before writing. Key in environment secret, never in DB.
+**Skipping Realtime publication setup.** Adding a table to RLS is not enough for Realtime — the table must also be in the `supabase_realtime` publication. Verify per table.
 
-**Polling for real-time sync.** Use Supabase Realtime WebSocket subscriptions. Polling is acceptable only as connection-drop fallback.
+**Module preferences as client-only state.** Active modules must be stored in `household_settings` in the database — not in local storage or client state — so all household members see the same module configuration.
+
+**Using `getSession()` in server contexts.** Always use `getUser()` from `@supabase/ssr` — it validates the JWT server-side. `getSession()` trusts the client-provided token, which is a security gap.
 
 ---
 
-## Build Order (Phase Dependencies)
+## Build Order (v1 phases)
 
 ```
-Phase 1: Auth + Household Core
-  Supabase setup, Auth, households + household_members tables + RLS, invite flow
-  UNLOCKS: everything — all subsequent phases depend on household isolation
+Phase 1: Foundation & Onboarding
+  Supabase setup (EU region), Auth (@supabase/ssr 0.9+), households + household_members
+  (with role column) + household_settings + household_invites tables, RLS on ALL tables,
+  onboarding wizard (type + module selection), modular dashboard skeleton, Realtime
+  subscription, GDPR (EU region confirmed, right-to-erasure endpoint)
+  UNLOCKS: everything — all subsequent phases depend on household isolation and module system
 
-Phase 2: Tasks + Bills
-  CRUD for tasks and bills, first Realtime subscription, first Worker job (bill reminders)
-  UNLOCKS: proves Realtime + Worker stack before adding AI complexity
+Phase 2: Home Chores
+  tasks table + RLS, CRUD, RRULE recurrence, Inngest reminder jobs (first Inngest worker),
+  in-app + push notifications, notification permission ask UX
+  UNLOCKS: proves Inngest + Realtime + notification stack before adding document complexity
 
-Phase 3: Manual Expenses + Financial Views
-  expenses table (manual only), category taxonomy, spending views
-  UNLOCKS: financial foundation; AI augments these records later
+Phase 3: Kids Activities
+  children table + RLS, kids_activities table + RLS, activity CRUD, RRULE recurrence,
+  Inngest reminder jobs (reuses Phase 2 pattern), calendar view (kids only)
+  UNLOCKS: second domain module; notification infra reused
 
-Phase 4: OCR Pipeline + Document Intelligence
-  Storage setup, presigned uploads, Worker OCR + Claude extraction, warranties table
-  DEPENDS ON: Phases 1-3 (RLS, Worker, expenses table)
-  UNLOCKS: core AI differentiator
+Phase 4: Tracker Modules & Calendar
+  Car: cars + car_service_records + car_key_dates tables + RLS + CRUD + reminders
+  Insurance: insurance_policies + insurance_documents + insurance_costs + RLS + CRUD +
+    reminders + PDF upload to Supabase Storage
+  Electronics: electronics_items + electronics_documents + warranties + RLS + CRUD +
+    expiry reminders + PDF upload
+  Costs: optional cost fields on car_service_records + insurance_costs + electronics_items,
+    costs dashboard (aggregated query)
+  Calendar: unified calendar aggregating all date-typed records, colour-coded by module
+  UNLOCKS: all documents uploaded and available for RAG in Phase 5
 
-Phase 5: Open Banking
-  banking_connections, OAuth flow, webhook receiver, Worker transaction import
-  DEPENDS ON: Phase 2 (Worker), Phase 3 (expenses)
-  NOTE: requires provider account + regulatory check before starting
+Phase 5: AI Chatbot & RAG
+  pgvector extension enabled, document_embeddings table + RLS, chat_messages table + RLS,
+  Inngest embed_document job (PDF → text → chunks → OpenAI embeddings → pgvector),
+  chatbot API route (streaming, tool-calling for live data + RAG for documents),
+  procedure extraction → task creation flow
+  DEPENDS ON: Phases 1-4 (documents in Storage, modules populated with data)
+  UNLOCKS: AI differentiator; makes uploaded documents queryable
 
-Phase 6: AI Assistant (Chat + Ambient Suggestions)
-  Streaming chat API, ai_suggestions, Worker suggestion generation, dashboard cards
-  DEPENDS ON: all prior phases (needs full data model for meaningful context)
-
-Phase 7: Polish + Mobile Readiness
-  Push notifications, PWA manifest, camera UX polish, performance audit
+Phase 6: Platform & Polish
+  Mobile responsiveness audit, PWA manifest + service worker,
+  camera access prep (for v2 OCR), Playwright mobile E2E, Sentry, PostHog
   DEPENDS ON: all prior phases
 ```
 
@@ -275,16 +380,20 @@ Phase 7: Polish + Mobile Readiness
 
 | Claim | Confidence | Basis |
 |-------|-----------|-------|
-| Supabase RLS for multi-tenant isolation | HIGH | Well-documented standard pattern |
-| Async worker (Inngest) for AI pipelines | HIGH | Established Next.js pattern |
-| Presigned upload (no API transit) | HIGH | Standard S3 pattern |
-| Supabase Realtime respects RLS | MEDIUM | Documented as of Aug 2025 — verify current docs |
-| Inngest delayed steps for reminders | MEDIUM | Verify current Inngest API |
-| TrueLayer webhook signature format | LOW | Implementation detail — verify TrueLayer docs |
-| Claude Vision as primary OCR | MEDIUM | Needs cost/accuracy benchmarking for receipts |
+| Supabase RLS for multi-tenant isolation | HIGH | Phase 1 research verified against official Drizzle + Supabase docs (2026-03-24) |
+| @supabase/ssr 0.9 getUser() pattern | HIGH | Phase 1 research verified against official Supabase SSR docs (2026-03-24) |
+| Supabase Realtime respects RLS | HIGH | Phase 1 research verified against Supabase Realtime Authorization docs (2026-03-24) |
+| pgvector for RAG (Supabase built-in) | HIGH | Phase 1 research verified (2026-03-24) |
+| Inngest for all async work | HIGH | Project decision documented in PROJECT.md |
+| OpenAI text-embedding-3-small for embeddings | HIGH | Phase 1 research verified against npm registry (2026-03-24) |
+| PDF parsing approach for RAG | MEDIUM | pdf-parse + pdf2pic pattern is standard; verify at Phase 5 implementation |
+| Drizzle native RLS (pgPolicy) | HIGH | Phase 1 research verified against official Drizzle docs (2026-03-24) |
 
 ---
 
 ## Sources
 
-WebSearch and WebFetch were unavailable during this research session. All findings are from training knowledge (cutoff Aug 2025). All external service implementation details (Supabase Realtime RLS behaviour, Inngest step API, TrueLayer webhook format, Plaid API shape) must be verified against current official documentation before implementation.
+- Phase 1 research (01-RESEARCH.md, 2026-03-24) — primary source for verified patterns
+- Supabase official docs — Auth SSR, Realtime Authorization, pgvector
+- Drizzle ORM official docs — pgPolicy, Supabase tutorial
+- Training knowledge (cutoff Aug 2025) — async patterns, data flow design

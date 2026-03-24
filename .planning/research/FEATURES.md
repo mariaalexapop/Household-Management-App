@@ -1,92 +1,108 @@
 # Feature Landscape
 
-**Domain:** AI-powered household management app
+**Domain:** Family household command centre with AI chatbot and RAG
 **Researched:** 2026-03-19
-**Confidence note:** WebSearch and WebFetch were unavailable during research. All competitive analysis drawn from training knowledge (cutoff August 2025) of Flatastic, OurHome, Cozi, Splitwise, and home inventory apps. Confidence is MEDIUM for competitive comparisons; HIGH for feature categorisation logic derived from product structure.
+**Last updated:** 2026-03-24 — revised for new concept (5 modules, modular onboarding, RAG v1, OCR/banking v2)
+**Confidence note:** Competitive analysis drawn from training knowledge (cutoff August 2025). Confidence is MEDIUM for competitive comparisons; HIGH for feature categorisation derived from product structure and direct user input.
+
+---
+
+## Target Audience
+
+This product targets **families with children and multiple assets** (cars, home, electronics) who need to track obligations across multiple life domains in one place. Secondary audiences: couples, flatmates. The key pain is fragmentation — families currently use a combination of Google Calendar, spreadsheets, phone reminders, physical files, and memory to manage things that should live in one place.
 
 ---
 
 ## Competitive Reference Map
 
-| App | Primary Strength | Missing |
-|-----|-----------------|---------|
-| Flatastic | Shared chores + shared expenses, household-first UX | No AI, no warranty/maintenance, no bank sync |
-| OurHome | Chore gamification, rewards for kids, family focus | No financials, no AI |
-| Cozi | Family calendar + shopping lists, deeply established | No expense tracking, no AI, very calendar-centric |
-| Splitwise | Expense splitting/settling between people | No chores, no maintenance, no AI, not household-first |
-| Centriq / Homebook | Home inventory, appliance records, manual storage | No financials, no chores, minimal AI (basic) |
-| Tody | Chore scheduling with frequency logic | No financials, no AI, no household-shared model |
+| App | Primary Strength | What's Missing |
+|-----|-----------------|----------------|
+| Flatastic | Shared chores + shared expenses, household-first UX | No car maintenance, no insurance, no kids activities, no AI chatbot |
+| OurHome | Chore gamification, rewards for kids, family focus | No maintenance, no insurance, no AI, limited to tasks/chores |
+| Cozi | Family calendar + shopping lists, deeply established | No expense tracking, no insurance management, no AI, very calendar-centric |
+| Splitwise | Expense splitting/settling between people | No chores, no maintenance, no insurance, no AI, not household-first |
+| Centriq / Homebook | Home inventory, appliance records, warranty storage | No chores, no insurance management, no AI chat, no reminders |
+| Tody | Chore scheduling with frequency logic | No financials, no insurance, no AI, no multi-domain |
 
-**Gap this app fills:** No existing product combines financials + chores + maintenance + warranties + AI in one place. Users currently stitch together Splitwise + Todoist + Apple Notes + spreadsheets. The fragmentation is the pain point.
+**Gap this app fills:** No existing product combines home chores + car maintenance + insurance management + electronics/warranty tracking + kids activity planning in one place, with an AI chatbot that understands your specific household's documents. Users currently stitch together Google Calendar + Cozi + spreadsheets + physical folders + memory. The fragmentation and document inaccessibility are the core pain points.
 
 ---
 
 ## Table Stakes
 
-Features users expect from any household management app. Missing = product feels incomplete or users leave within the first week.
+Features users expect from any household management app. Missing = product feels incomplete.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Multi-user household with invite | Core promise — "household" means more than one person | Med | Email + link invite; Flatastic/OurHome both do this |
-| Shared task / chore list | Foundational household coordination feature | Low | CRUD + assignment; expected by all competitors |
-| Recurring chores with frequency | One-time chores are insufficient; weekly cleaning, etc. | Low-Med | Cron-like scheduling; daily/weekly/monthly/custom |
-| Push/in-app reminders for tasks | Chores not completed without prompting | Med | Requires notification infrastructure |
-| Expense logging (manual) | Any finance tool needs manual entry as fallback | Low | Amount, category, date, payer — minimum viable |
-| Expense categorisation | Raw numbers without categories are useless | Low-Med | Preset categories + custom; grocery/utilities/rent/etc. |
-| Household spending summary | Dashboard-level spend visibility | Med | By category and period at minimum |
-| Bill / subscription tracking | Recurring bills are universal household pain | Med | Due dates, amounts, paid/unpaid state |
-| Bill due reminders | Bills missed without reminders — high anxiety feature | Med | Tied to notification infrastructure |
+| Multi-user household with invite | Core promise — "household" means more than one person | Med | Admin creates, invites by email or link |
+| Household admin model | Someone needs to manage membership | Low | Admin for membership only; full content equality |
+| Personalised onboarding | Different households have different needs | Med | Type selection + module selection → custom dashboard |
+| Shared task / chore list | Foundational household coordination | Low | CRUD + assignment + recurring |
+| Due date reminders for tasks | Chores not completed without prompting | Med | In-app + push |
+| Car maintenance tracking | Families with cars need MOT/service reminders | Med | Multiple cars; service history; key dates |
+| Insurance document storage | Policies get lost; procedures inaccessible in emergencies | Med | PDF upload + basic metadata |
+| Insurance renewal reminders | Lapses are catastrophic; forgetting is common | Med | Configurable days-before alerts |
+| Kids activity planning | Families with kids need a shared activity calendar | Med | Child profiles (no accounts); per-activity reminders |
+| Electronics/warranty tracking | Warranties expire silently; manuals get lost | Low-Med | Registry + expiry reminders + manual upload |
+| Unified calendar | All date-tied items in one view | Med | Multi-module aggregation; colour-coded by module |
+| Basic costs dashboard | Cross-module cost visibility | Med | Service costs, insurance premiums, electronics spend |
 | Activity feed | "Who did what" is expected in shared apps | Low-Med | Simple event log per household |
-| User profiles per member | Task attribution and expense splitting requires identity | Low | Name, avatar; no complex RBAC needed in v1 |
-| Auth (email + OAuth) | Table stakes for any web app | Low | Email/password + Google/Apple OAuth |
-| Mobile-responsive web | Household tasks happen on phone | Low-Med | PWA patterns; camera access for OCR |
-| Real-time sync | Multi-user apps feel broken without live updates | High | Websocket or SSE; latency must be imperceptible |
+| User profiles per member | Task attribution requires identity | Low | Name, avatar |
+| Auth (email + OAuth) | Table stakes for any web app | Low | Email/password + Google OAuth |
+| Real-time sync | Multi-user apps feel broken without live updates | High | Supabase Realtime WebSocket |
+| Mobile-responsive web | Household tasks happen on phone | Low-Med | Camera access needed for Phase 5 document uploads |
 
 ---
 
 ## Differentiators
 
-### AI-Powered Differentiators
+### AI-Powered Differentiators (v1)
 
-| Feature | Value Proposition | Complexity | Confidence | Notes |
+| Feature | Value Proposition | Complexity | Confidence | Phase |
 |---------|-------------------|------------|-----------|-------|
-| Receipt OCR + AI parsing | Snap a photo → expense created automatically; removes the #1 friction of manual entry | High | HIGH | Core differentiator. Uses OCR + LLM to extract merchant, amount, line items, category. No competitor does this. |
-| Warranty document scanning | Scan any warranty → product name, purchase date, expiry, coverage extracted | High | HIGH | Huge pain point: warranties get lost. AI extraction + reminder at expiry is novel. |
-| Model number → user manual retrieval | Type/scan a model number → AI surfaces the manual and useful product info | High | MEDIUM | Leverages LLM tool-use or RAG over product databases. Novel. Verify feasibility: depends on public manual availability. |
-| Proactive AI reminders (contextual) | AI cross-links data (e.g., warranty expiring → schedule a check) vs dumb calendar reminders | High | HIGH | The "ambient intelligence" layer. Turns passive data into action. |
-| Chat assistant (natural language queries) | "How much did we spend on food last month?" — no dashboard navigation required | High | HIGH | LLM with household data context. Two modes: query answering + action creation via chat. |
-| Ambient AI cards on dashboard | Passive suggestions surface without user prompting ("Your boiler service is overdue") | Med | HIGH | No competitor has this. Low friction — users benefit without learning the UI. |
-| Document intelligence (any document) | Drop any document → AI categorises and extracts data automatically | High | HIGH | Generalises receipt/warranty scanning to arbitrary household docs. |
-| Spend pattern alerts | "You're £120 over your usual grocery budget" — anomaly detection, not just totals | Med-High | HIGH | Requires historical baseline. Novel vs. competitors. |
+| AI chatbot over uploaded documents (RAG) | "What do I do if my boiler floods?" → answers from your actual insurance policy | High | HIGH | Phase 5 |
+| Procedure extraction → task creation | Chatbot reads your insurance document and turns "what to do after a flood" into a checklist of tasks you can approve | High | HIGH | Phase 5 |
+| Document-grounded answers | Answers cite the specific section of your uploaded document — no hallucination | High | HIGH | Phase 5 |
+| Household data queries | "When is my car's next MOT?" answered from your actual car records — tool-calling, not LLM recall | Med | HIGH | Phase 5 |
+
+### AI-Powered Differentiators (v2)
+
+| Feature | Value Proposition | Complexity | Confidence | Phase |
+|---------|-------------------|------------|-----------|-------|
+| Receipt OCR + AI parsing | Snap a photo → expense created automatically | High | HIGH | v2 Phase 1 |
+| Model number → user manual retrieval | Enter model number → AI fetches the manual | High | MEDIUM | v2 Phase 4 |
+| Ambient AI dashboard cards | Passive suggestions without user action | Med | HIGH | v2 Phase 5 |
+| Spend pattern anomaly alerts | "£120 over usual grocery spend" | Med-High | HIGH | v2 Phase 3 |
 
 ### Non-AI Differentiators
 
-| Feature | Value Proposition | Complexity | Confidence | Notes |
-|---------|-------------------|------------|-----------|-------|
-| Bank/card sync (open banking) | Automatic transaction import eliminates manual entry entirely | High | HIGH | Plaid (US), TrueLayer (UK/EU). Significant regulatory + cost overhead. Strong differentiator vs. Flatastic/OurHome. |
-| Maintenance scheduling with history | Log appliances, set service intervals, see full service history | Med | HIGH | Home inventory apps do this in isolation; combined with AI is novel. |
-| Warranty + maintenance cross-link | AI links warranty expiry to maintenance schedule | High | HIGH | Pure AI-layer value. Requires both features to exist first. |
-| Full equality multi-user model | No admin/member hierarchy — suits couples and flatmates specifically | Low | HIGH | OurHome has parent/child model; Flatastic has creator privileges. This is a deliberate UX differentiator. |
-| Unified household OS | Single source of truth for bills + chores + maintenance + warranties | Med | HIGH | The integration is the differentiator, not any individual feature. |
+| Feature | Value Proposition | Confidence |
+|---------|-------------------|------------|
+| Modular personalised dashboard | Only see what's relevant to your household; not a generic app | HIGH |
+| 5 integrated modules | Car + insurance + electronics + chores + kids in one place with a shared calendar | HIGH |
+| Document accessibility in emergencies | Upload your home insurance policy; ask the chatbot "what do I do if my pipe bursts?" | HIGH |
+| Full equality multi-user model | Both parents have equal access; no admin/member hierarchy for content | HIGH |
 
 ---
 
 ## Anti-Features
 
-Features to explicitly NOT build in v1.
+Features to explicitly NOT build.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Native iOS / Android app | App Store review cycles, separate codebase, 3-4x scope increase | Mobile-responsive PWA; camera API works in mobile browser for OCR |
-| Role-based permissions (Admin/Member/Guest) | Adds UX complexity; most households don't need ACL | Full equality model; revisit in v2 based on user feedback |
-| Smart home integrations (Alexa, Google Home, IFTTT) | Deep integration work, versioning fragility, low v1 demand | Manual data entry + AI parsing covers use cases without integration |
-| Investment / asset tracking | Distinct domain from household ops; different mental model | Household expenses and bills only |
-| Contractor / marketplace booking | Third-party relationships, liability, complex UX | Maintenance scheduling without booking |
-| Budget creation and forecasting | Complex UX; spend visibility is the v1 value | Anomaly detection on actuals is more useful than budget planning |
-| Expense settlement / debt tracking between members | Splitwise already does this well; building a worse version adds no value | Track who paid; settlement is out of scope |
-| Grocery list with retailer integration | Without smart integration, shopping lists are commoditised | v2 consideration; focus on financial and maintenance in v1 |
-| Gamification (points, badges, rewards) | OurHome targets families with kids; this targets adults | Task completion visibility is the adult equivalent |
-| Multi-household support per user | Adds data model complexity; most users have one household | Single active household per user; v2 for property managers |
+| Receipt scanning in v1 | Adds OCR pipeline complexity before core tracking value is proven | Manual cost tracking + v2 OCR |
+| Bank / card sync in v1 | Regulatory overhead; validate demand first | Manual cost fields + v2 bank integration |
+| Expense splitting / debt tracking | Splitwise does this better | Out of scope permanently |
+| Gamification (points, badges) | This targets adult families, not kids | Task completion visibility is sufficient |
+| Native iOS / Android app in v1 | App Store cycles, separate codebase | Mobile-responsive PWA |
+| Role-based content permissions | Full equality in v1 | Admin is membership-only |
+| Smart home integrations | Low v1 demand | AI chatbot covers use cases without integration |
+| Investment / asset tracking | Distinct domain | Out of scope permanently |
+| Contractor / marketplace booking | Third-party complexity | Maintenance scheduling without booking |
+| Multi-household per user | Data model complexity | Single active household per user in v1 |
+| Grocery lists | Commoditised feature | Out of scope |
+| Budget creation and forecasting | Complex UX; tracking is sufficient v1 value | v2 consideration |
 
 ---
 
@@ -94,89 +110,101 @@ Features to explicitly NOT build in v1.
 
 ```
 Auth + User profiles
-  → Household creation + member invite
-    → Activity feed (needs members)
-    → All shared features (tasks, expenses, etc.)
+  → Household creation + member invite (admin model)
+    → Onboarding (household type + module selection)
+      → Personalised dashboard
+        → All modules (only activated ones render)
 
-Expense manual entry (category, amount, date, payer)
-  → Expense categorisation taxonomy
-    → Household spending summary / dashboard
-      → Spend pattern alerts (needs historical baseline — 30+ days of data)
-        → Bank sync (extends same data model, adds auto-import)
+Home Chores module
+  → Task CRUD + recurring + assignments
+    → Notification infrastructure (in-app + push)
+      → All other reminder features depend on this
 
-Receipt OCR pipeline (image → text)
-  → AI expense parsing (text → structured expense)
-    → Document intelligence generalisation (same pipeline, broader input types)
+Kids Activities module
+  → Child profiles (name, DOB — no accounts)
+    → Activity CRUD + recurring + per-activity reminders
+      → Kids calendar view
 
-Bill tracking (amount, due date, recurrence)
-  → Bill paid/history state
-    → Bill due reminders
+Car Maintenance module
+  → Car profiles (multiple per household)
+    → Service history records (optional cost field)
+      → Key date reminders (MOT, tax, service)
 
-Chore CRUD (title, assignee, frequency)
-  → Recurring chore scheduler
-    → Chore reminders (push/in-app)
+Insurance Management module
+  → Policy metadata (type, insurer, expiry, contact)
+    → PDF document upload (Supabase Storage)
+      → Premium cost tracking + payment schedule reminders
+        → Document embeddings for RAG (Phase 5 dependency)
 
-Appliance / item registry (name, model, purchase date)
-  → Warranty document scanning (populates registry via AI)
-    → Maintenance scheduling (acts on items in registry)
-      → Warranty expiry reminders
-        → AI cross-link (warranty + maintenance suggestion)
+Electronics Management module
+  → Item registry (name, brand, model, purchase date)
+    → Warranty document upload + expiry reminders
+      → User manual PDF upload
+        → Document embeddings for RAG (Phase 5 dependency)
 
-LLM integration (household data context window)
-  → Chat assistant
-  → Ambient AI cards
-  → Proactive contextual reminders
-    (All three share the same underlying AI context layer)
+Unified Calendar (Phase 4)
+  → Aggregates: chore due dates, car key dates, insurance expiry/payment dates,
+    electronics warranty expiries, kids activities
+  → Requires all modules to be implemented before calendar is fully populated
 
-Notification infrastructure (push / in-app)
-  → All reminder features (bill, chore, maintenance, warranty, AI proactive)
+Costs Dashboard (Phase 4)
+  → Aggregates: car service costs, insurance premiums, electronics item costs
+  → Optional cost fields on relevant records from each module
+
+AI Chatbot & RAG (Phase 5)
+  → Document embeddings (insurance docs + user manuals → pgvector)
+    → Chatbot answers questions from documents (RAG)
+      → Chatbot extracts procedures → creates tasks
+  → Tool-calling for live household data queries
+  → Depends on: Phases 1-4 (documents uploaded, modules populated)
+
+Notification Infrastructure (Phase 2)
+  → All reminder features: chore due dates, car key dates, insurance expiry,
+    insurance payments, electronics warranty expiries, kids activities
 ```
 
 ---
 
-## MVP Recommendation
+## MVP Recommendation (v1)
 
-The MVP must prove two things: (1) the household coordination core works reliably, and (2) at least one AI feature delivers visible "wow" value.
+The MVP proves: (1) the household coordination modules work reliably, and (2) the AI chatbot delivers tangible value by making uploaded documents queryable and actionable.
 
-**Prioritise in MVP:**
+**Build order:**
 
-1. Auth + household creation + member invite (prerequisite for everything)
-2. Chore CRUD + recurring + reminders (fastest to deliver; validates daily engagement)
-3. Expense manual entry + categorisation + household summary (validates financial value)
-4. Bill tracking + due date reminders (quick win; high anxiety relief)
-5. Receipt OCR + AI parsing (primary AI "wow" — proves the AI layer)
-6. Chat assistant with household data context (second AI "wow" — low marginal cost once LLM integration exists)
-7. Ambient AI cards on dashboard (passive value; builds on same LLM context layer)
+1. **Foundation & Onboarding** — auth, household, admin+invite, modular onboarding, dashboard skeleton, real-time, GDPR
+2. **Home Chores** — fastest to deliver; validates daily engagement; proves notification infrastructure
+3. **Kids Activities** — high value for target audience; relatively simple; builds on notification infra
+4. **Tracker Modules & Calendar** — car + insurance + electronics + costs + unified calendar; delivers the tracking core
+5. **AI Chatbot & RAG** — the differentiator; requires documents uploaded in Phase 4; makes the product "wow"
+6. **Platform & Polish** — mobile responsiveness, PWA, performance
 
-**Defer to Phase 2+:**
+**Defer to v2:**
 
 | Feature | Reason for Deferral |
 |---------|---------------------|
-| Bank / card sync (open banking) | Regulatory overhead, provider cost, integration complexity — validate demand with OCR first |
-| Warranty document scanning | High value but lower urgency than financial tracking |
-| Model number → user manual retrieval | Feasibility risk (depends on public manual databases); needs dedicated feasibility research |
-| Maintenance scheduling | Builds on warranty registry — natural Phase 2 addition |
-| Spend pattern alerts | Requires 30+ days of data baseline before useful |
+| Receipt OCR | Core tracking value must be proven first; OCR adds pipeline complexity |
+| Bank / Revolut integration | Regulatory overhead; validate demand via manual tracking |
+| Spending dashboards from transactions | Depends on bank integration |
+| Model number → auto-fetch user manuals | Feasibility risk; manual PDF upload covers v1 need |
+| Ambient AI dashboard cards | Requires data baseline from v1; adds to AI costs |
 
 ---
 
-## Phase-Specific Feature Flags
+## Phase-Specific Feature Map
 
 | Phase | Features | Research Needed? |
 |-------|---------|-----------------|
-| Foundation | Auth, household, multi-user, real-time sync | No — standard patterns |
-| Chores | Task CRUD, recurring, reminders, notification infra | No — standard patterns |
-| Financials Core | Manual expense entry, categories, bill tracking, dashboard | No — standard patterns |
-| AI Layer 1 | Receipt OCR + parsing, chat assistant, ambient cards | YES — OCR provider selection, LLM prompt engineering, context window design |
-| Open Banking | Bank/card sync via Plaid/TrueLayer | YES — provider selection, regulatory (PSD2/UK open banking), cost modelling |
-| Maintenance + Warranties | Warranty scanning, appliance registry, maintenance scheduling | YES — OCR reuse, model number lookup feasibility |
-| AI Layer 2 | Proactive reminders, spend anomaly detection, cross-linking | YES — ML baseline approach, LLM orchestration |
+| 1. Foundation & Onboarding | Auth, household, admin+invite, modular onboarding, real-time sync | No — standard patterns |
+| 2. Home Chores | Task CRUD, recurring, assignments, due date reminders | No — standard patterns |
+| 3. Kids Activities | Child profiles, activity CRUD, calendar, reminders | No — standard patterns |
+| 4. Tracker Modules & Calendar | Car, insurance, electronics (base), costs dashboard, unified calendar | No — standard patterns; PDF upload is standard Supabase Storage |
+| 5. AI Chatbot & RAG | Document embedding pipeline, pgvector RAG, chatbot, task creation from chat | YES — PDF parsing, chunking strategy, RAG prompt engineering, cost modelling |
+| 6. Platform & Polish | Mobile responsiveness, PWA, camera UX (for v2 OCR readiness), performance | No — standard patterns |
 
 ---
 
 ## Sources
 
-- Competitor feature analysis based on training knowledge (Flatastic, OurHome, Cozi, Splitwise, Centriq — as of August 2025 knowledge cutoff). Confidence: MEDIUM.
-- Feature categorisation derived from project constraints in `.planning/PROJECT.md`. Confidence: HIGH.
-- AI feature feasibility based on established industry patterns as of knowledge cutoff. Confidence: HIGH for feasibility, MEDIUM for specific tooling.
-- WebSearch and WebFetch were unavailable. Competitive analysis should be re-verified with live sources before roadmap finalisation.
+- Competitor feature analysis: training knowledge (Flatastic, OurHome, Cozi, Splitwise, Centriq — as of August 2025 knowledge cutoff). Confidence: MEDIUM.
+- Feature categorisation derived from project requirements in `.planning/REQUIREMENTS.md` and direct user input (2026-03-24). Confidence: HIGH.
+- AI feature feasibility based on Phase 1 research (01-RESEARCH.md, 2026-03-24). Confidence: HIGH for RAG architecture.
