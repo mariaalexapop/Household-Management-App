@@ -23,7 +23,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Onboarding | 0/TBD | Not started | - |
+| 1. Foundation & Onboarding | 0/7 | Not started | - |
 | 2. Home Chores | 0/TBD | Not started | - |
 | 3. Kids Activities | 0/TBD | Not started | - |
 | 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
@@ -49,7 +49,16 @@
 4. When any household member makes a change, all other members see it update in their browser within seconds without refreshing.
 5. All data is stored in EU infrastructure; a user can request deletion of their personal data and it is removed.
 
-**Plans:** TBD
+**Plans:** 7 plans across 5 waves
+
+Plans:
+- [ ] 01-01-PLAN.md — Test scaffold (Vitest, Playwright, RLS helpers)
+- [ ] 01-02-PLAN.md — Project init (Next.js 15, pnpm, env, Supabase project + checkpoint)
+- [ ] 01-03-PLAN.md — Drizzle schema (all 5 Phase 1 tables + RLS + migrations)
+- [ ] 01-04-PLAN.md — Auth flows (signup, email verify, password reset, Google OAuth)
+- [ ] 01-05-PLAN.md — Onboarding wizard + module-based dashboard skeleton
+- [ ] 01-06-PLAN.md — Invite system (email + shareable link + accept flow + member removal)
+- [ ] 01-07-PLAN.md — Real-time sync, reconnect indicator, activity feed, GDPR deletion
 
 ---
 
@@ -245,3 +254,4 @@
 
 *Roadmap created: 2026-03-24*
 *Replaces prior roadmap created 2026-03-19 — full concept revision*
+*Phase 1 plans created: 2026-03-24*
