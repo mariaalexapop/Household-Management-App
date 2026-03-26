@@ -23,7 +23,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Onboarding | 1/8 | In Progress|  |
+| 1. Foundation & Onboarding | 2/8 | In Progress|  |
 | 2. Home Chores | 0/TBD | Not started | - |
 | 3. Kids Activities | 0/TBD | Not started | - |
 | 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
@@ -49,7 +49,7 @@
 4. When any household member makes a change, all other members see it update in their browser within seconds without refreshing.
 5. All data is stored in EU infrastructure; a user can request deletion of their personal data and it is removed.
 
-**Plans:** 1/8 plans executed
+**Plans:** 2/8 plans executed
 
 Plans:
 - [ ] 01-01-PLAN.md — Test scaffold (Vitest, Playwright, factory helpers) — Wave 1

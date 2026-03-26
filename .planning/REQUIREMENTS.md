@@ -9,7 +9,7 @@
 
 ### Authentication (AUTH)
 
-- [ ] **AUTH-01**: User can sign up with email and password
+- [x] **AUTH-01**: User can sign up with email and password
 - [ ] **AUTH-02**: User receives email verification after signup
 - [ ] **AUTH-03**: User can reset password via email link
 - [ ] **AUTH-04**: User can sign up and log in with Google OAuth
@@ -171,7 +171,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1: Foundation & Onboarding | Pending |
+| AUTH-01 | Phase 1: Foundation & Onboarding | Complete |
 | AUTH-02 | Phase 1: Foundation & Onboarding | Pending |
 | AUTH-03 | Phase 1: Foundation & Onboarding | Pending |
 | AUTH-04 | Phase 1: Foundation & Onboarding | Pending |
