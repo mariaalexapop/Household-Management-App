@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinship | Household Selection</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Public+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary": "#e2fff9",
+              "inverse-on-surface": "#9a9d9f",
+              "secondary-dim": "#681ad9",
+              "on-error-container": "#65000b",
+              "surface-container-low": "#f1f4f6",
+              "primary-container": "#acbfff",
+              "on-surface-variant": "#596063",
+              "on-primary-fixed": "#002265",
+              "surface-variant": "#dde3e7",
+              "outline": "#757c7f",
+              "on-tertiary-fixed": "#00443e",
+              "tertiary-fixed-dim": "#74e1d3",
+              "inverse-primary": "#618bff",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed": "#acbfff",
+              "on-tertiary-container": "#005951",
+              "tertiary-fixed": "#83efe1",
+              "on-primary": "#faf8ff",
+              "primary": "#0053dc",
+              "on-secondary-container": "#6617d7",
+              "on-primary-container": "#003592",
+              "on-primary-fixed-variant": "#003ca5",
+              "on-error": "#fff7f6",
+              "surface-container": "#eaeef1",
+              "surface": "#f7f9fb",
+              "surface-container-high": "#e3e9ec",
+              "secondary-fixed": "#eaddff",
+              "tertiary": "#006b62",
+              "secondary-fixed-dim": "#deccff",
+              "outline-variant": "#acb3b7",
+              "surface-container-highest": "#dde3e7",
+              "on-tertiary-fixed-variant": "#00635b",
+              "inverse-surface": "#0b0f10",
+              "on-surface": "#2d3337",
+              "primary-fixed-dim": "#98b1ff",
+              "on-secondary-fixed-variant": "#702ae1",
+              "on-secondary-fixed": "#5100b3",
+              "on-background": "#2d3337",
+              "primary-dim": "#0049c2",
+              "surface-dim": "#d3dbdf",
+              "surface-bright": "#f7f9fb",
+              "tertiary-container": "#83efe1",
+              "on-secondary": "#fdf7ff",
+              "tertiary-dim": "#005e56",
+              "background": "#f7f9fb",
+              "secondary-container": "#eaddff",
+              "error-dim": "#70030f",
+              "surface-tint": "#0053dc",
+              "error-container": "#f56965",
+              "secondary": "#742fe5",
+              "error": "#ac3434"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .editorial-gap {
+            letter-spacing: -0.02em;
+        }
+        .card-shadow {
+            box-shadow: 0 20px 40px rgba(45, 51, 55, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-x-hidden">
+<!-- Sidebar Shell Implementation (Navigation Suppressed for Onboarding as per Rule) -->
+<!-- Applying SideNavBar JSON commands for Onboarding context -->
+<aside class="h-screen w-80 fixed left-0 top-0 bg-slate-50 dark:bg-slate-950 border-r border-slate-100 dark:border-slate-800 flex flex-col pt-12 pb-8 px-8 z-40">
+<div class="mb-12">
+<h1 class="text-xl font-black text-slate-900 dark:text-white editorial-gap">Kinship</h1>
+</div>
+<div class="flex-1 space-y-2">
+<!-- Active State: Welcome/Onboarding -->
+<div class="flex items-center gap-4 px-5 py-4 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 rounded-xl shadow-sm border-l-4 border-blue-600">
+<span class="material-symbols-outlined" data-icon="door_open">door_open</span>
+<span class="font-headline font-bold">Welcome</span>
+</div>
+<div class="flex items-center gap-4 px-5 py-4 text-slate-400 dark:text-slate-600 cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-headline font-medium">Family Setup</span>
+</div>
+<div class="flex items-center gap-4 px-5 py-4 text-slate-400 dark:text-slate-600 cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="home_work">home_work</span>
+<span class="font-headline font-medium">Home Sync</span>
+</div>
+<div class="flex items-center gap-4 px-5 py-4 text-slate-400 dark:text-slate-600 cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="settings_heart">settings_heart</span>
+<span class="font-headline font-medium">Preferences</span>
+</div>
+<div class="flex items-center gap-4 px-5 py-4 text-slate-400 dark:text-slate-600 cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-headline font-medium">Launch</span>
+</div>
+</div>
+<div class="mt-auto pt-8">
+<button class="w-full py-4 bg-slate-200 text-slate-500 font-bold rounded-xl cursor-not-allowed">
+                Save Progress
+            </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-80 min-h-screen flex flex-col items-center justify-center p-12 lg:p-24">
+<!-- Progress Header -->
+<div class="w-full max-w-5xl mb-12 flex items-center justify-between">
+<div class="flex flex-col gap-1">
+<span class="text-sm font-label font-bold text-primary tracking-widest uppercase">Step 1 of 5</span>
+<div class="w-48 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-1/5 h-full bg-primary rounded-full"></div>
+</div>
+</div>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-medium">
+<span class="material-symbols-outlined text-lg" data-icon="help_outline">help_outline</span>
+<span>Need help?</span>
+</button>
+</div>
+<!-- Content Section -->
+<div class="w-full max-w-5xl">
+<header class="mb-16">
+<h2 class="text-5xl font-headline font-extrabold text-on-surface editorial-gap mb-6">Tell us about your household</h2>
+<p class="text-xl text-on-surface-variant max-w-2xl leading-relaxed">Choose the setup that best describes your current living situation to personalize your dashboard.</p>
+</header>
+<!-- Household Types Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Single Living -->
+<button class="group relative flex flex-col p-8 bg-surface-container-lowest rounded-xl text-left transition-all duration-300 hover:-translate-y-2 card-shadow ring-2 ring-transparent hover:ring-primary/20">
+<div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-primary mb-8 transition-colors group-hover:bg-primary group-hover:text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="person">person</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-3 text-on-surface">Single Living</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Solo dweller managing life and space on your own terms.</p>
+<div class="mt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-primary font-bold flex items-center gap-2">Select <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span></span>
+</div>
+</button>
+<!-- Couple -->
+<button class="group relative flex flex-col p-8 bg-surface-container-lowest rounded-xl text-left transition-all duration-300 hover:-translate-y-2 card-shadow ring-2 ring-transparent hover:ring-primary/20">
+<div class="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center text-secondary mb-8 transition-colors group-hover:bg-secondary group-hover:text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="favorite">favorite</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-3 text-on-surface">Couple</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Two partners sharing a home and synchronizing schedules.</p>
+<div class="mt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-secondary font-bold flex items-center gap-2">Select <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span></span>
+</div>
+</button>
+<!-- Family with Kids -->
+<button class="group relative flex flex-col p-8 bg-surface-container-lowest rounded-xl text-left transition-all duration-300 hover:-translate-y-2 card-shadow ring-4 ring-primary shadow-xl scale-105 z-10">
+<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white mb-8">
+<span class="material-symbols-outlined text-3xl" data-icon="family_history">family_history</span>
+</div>
+<div class="absolute top-6 right-6">
+<span class="bg-primary-container text-on-primary-container text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full">Popular</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-3 text-on-surface">Family with Kids</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Dynamic household with children, school runs, and chores.</p>
+<div class="mt-8">
+<span class="text-primary font-bold flex items-center gap-2">Selected <span class="material-symbols-outlined text-sm" data-icon="check_circle" data-weight="fill">check_circle</span></span>
+</div>
+</button>
+<!-- Flatmates -->
+<button class="group relative flex flex-col p-8 bg-surface-container-lowest rounded-xl text-left transition-all duration-300 hover:-translate-y-2 card-shadow ring-2 ring-transparent hover:ring-primary/20">
+<div class="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center text-tertiary mb-8 transition-colors group-hover:bg-tertiary group-hover:text-white">
+<span class="material-symbols-outlined text-3xl" data-icon="group_work">group_work</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-3 text-on-surface">Flatmates</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Sharing space with friends or peers and splitting the load.</p>
+<div class="mt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-tertiary font-bold flex items-center gap-2">Select <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span></span>
+</div>
+</button>
+</div>
+<!-- Illustration & Decorative Area -->
+<div class="mt-16 grid grid-cols-12 gap-8 items-center">
+<div class="col-span-7">
+<div class="relative rounded-xl overflow-hidden aspect-[16/6]">
+<img alt="Modern kitchen" class="w-full h-full object-cover grayscale opacity-20" data-alt="Modern minimalist kitchen with warm wood accents and soft morning light entering through large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_LnUuQUru9EV-HFkdvfLnrW1ZyErPbEN6cckexyW6hnYEYjzIj7g6RfULQ7fCdpPU2vGf83bqh6XkrrCS2q6AErUwbmODHBlqbMJipCpqKa_XP-Pov3p8v8yfR0E4ThfnpnijrDhESntv5DKLClsj2f_tFBzTZGJpsS51ODLk7hDFtYUtdfvpF-70GW6qrcVkZ59Mp_J3GZ6nVLv7FuP_JMKbUyZxjyLfk8eFm_N3rSabID4q-d-IvxpjvpdJQzIgjg19wJZ-FMM4"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-transparent to-transparent"></div>
+<div class="absolute inset-0 flex flex-col justify-center px-12">
+<h4 class="text-lg font-headline font-bold text-on-surface/60 mb-2 italic">"Organization is the foundation of family harmony."</h4>
+<p class="text-sm text-on-surface-variant">— Kinship Curator</p>
+</div>
+</div>
+</div>
+<div class="col-span-5 flex justify-end gap-6">
+<button class="px-8 py-4 rounded-full font-bold text-on-surface-variant hover:bg-surface-container transition-all">
+                        Previous
+                    </button>
+<button class="px-12 py-4 rounded-full bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                        Next Step
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Visual Polish: Decorative elements -->
+<div class="fixed top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none -z-10"></div>
+<div class="fixed bottom-0 left-80 w-64 h-64 bg-secondary/5 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+</body></html>

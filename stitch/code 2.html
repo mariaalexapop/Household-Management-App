@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Public+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-surface": "#0b0f10",
+              "on-surface": "#2d3337",
+              "surface-variant": "#dde3e7",
+              "inverse-primary": "#618bff",
+              "surface-tint": "#0053dc",
+              "error-dim": "#70030f",
+              "on-tertiary-fixed": "#00443e",
+              "surface-container-low": "#f1f4f6",
+              "secondary-dim": "#681ad9",
+              "secondary-fixed": "#eaddff",
+              "surface": "#f7f9fb",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#e3e9ec",
+              "primary-fixed": "#acbfff",
+              "primary": "#0053dc",
+              "surface-bright": "#f7f9fb",
+              "surface-dim": "#d3dbdf",
+              "surface-container-highest": "#dde3e7",
+              "on-primary-fixed-variant": "#003ca5",
+              "primary-container": "#acbfff",
+              "on-tertiary-container": "#005951",
+              "outline-variant": "#acb3b7",
+              "on-primary": "#faf8ff",
+              "secondary-container": "#eaddff",
+              "on-secondary-fixed": "#5100b3",
+              "tertiary": "#006b62",
+              "on-primary-container": "#003592",
+              "on-background": "#2d3337",
+              "on-secondary-fixed-variant": "#702ae1",
+              "tertiary-container": "#83efe1",
+              "primary-dim": "#0049c2",
+              "on-error-container": "#65000b",
+              "on-tertiary": "#e2fff9",
+              "inverse-on-surface": "#9a9d9f",
+              "surface-container": "#eaeef1",
+              "outline": "#757c7f",
+              "on-surface-variant": "#596063",
+              "tertiary-dim": "#005e56",
+              "tertiary-fixed": "#83efe1",
+              "tertiary-fixed-dim": "#74e1d3",
+              "secondary-fixed-dim": "#deccff",
+              "error-container": "#f56965",
+              "error": "#ac3434",
+              "primary-fixed-dim": "#98b1ff",
+              "on-primary-fixed": "#002265",
+              "on-secondary-container": "#6617d7",
+              "on-tertiary-fixed-variant": "#00635b",
+              "on-secondary": "#fdf7ff",
+              "secondary": "#742fe5",
+              "background": "#f7f9fb",
+              "on-error": "#fff7f6"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-nav {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+      }
+      .editorial-shadow {
+        box-shadow: 0 20px 40px rgba(45, 51, 55, 0.06);
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 glass-nav shadow-sm">
+<div class="max-w-7xl mx-auto flex justify-between items-center px-8 py-4">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-slate-900 font-headline">Harmonious Home</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-600 hover:text-blue-500 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 hover:text-blue-500 transition-colors" href="#">Features</a>
+<a class="text-slate-600 hover:text-blue-500 transition-colors" href="#">Pricing</a>
+<a class="text-slate-600 hover:text-blue-500 transition-colors" href="#">Family Hub</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-600 px-4 py-2 hover:bg-slate-50 rounded-lg transition-all active:scale-95">Log In</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-medium transition-transform active:scale-90 shadow-sm">Get Started</button>
+</div>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section: Split Layout -->
+<section class="max-w-7xl mx-auto px-8 py-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<!-- Left: Value Proposition -->
+<div class="space-y-8">
+<div class="space-y-4">
+<span class="text-primary font-bold tracking-widest text-sm uppercase">THE DIGITAL CURATOR</span>
+<h1 class="text-5xl lg:text-7xl font-headline font-extrabold text-on-surface leading-[1.1] tracking-tight">
+                        One place for families to track everything
+                    </h1>
+<p class="text-xl text-on-surface-variant max-w-xl leading-relaxed">
+                        Transform the chaos of modern living into a bespoke editorial experience. Organise your assets, liabilities, and daily tasks with intentional design.
+                    </p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-lg shadow-sm hover:bg-primary-dim transition-all active:scale-95 flex items-center justify-center gap-2">
+                        Get Started
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="bg-surface-container-highest text-on-surface px-8 py-4 rounded-full font-bold text-lg border border-outline-variant/15 hover:bg-surface-container-high transition-all active:scale-95 flex items-center justify-center gap-3">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvZWgmNyOOQUI4Bd8yV9uitNnpv6lRtznB7LzbctsN9DKvZc8OTd2sHiLdsm_7c4lvf0Pq7By5cC4mw97wToNnyfloQuRS9qEI-K4RPDViBV8GMbyX1hf9imr1Q1NM8U77qyZAdIUgGiTNhUYnUIOQmS1sJhbbxKfP0jUVw0A6z2RnsRiFb4OMlnOjxFPyqXJJYLJjvI7EbwEFrV3yN45It8LxKLBnyVlbt9zKCU7ExAh8a6luq16CoIfWifJ4isvxj-QSLcN_59lS"/>
+                        Sign in with Google
+                    </button>
+</div>
+<div class="flex items-center gap-4 text-sm text-on-surface-variant">
+<div class="flex -space-x-2">
+<img alt="User 1" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="portrait of a smiling woman with a warm friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuJYy-fm-Ee-jOZaYAG3uNXQsGvXaC7hpgIvMDllLIfmXNLSMfZ9hmyWd6FEZcrKO85ZZKFgPmKrw0mJIbCLMIcrvGwRHU3nKwfEqWrflxecfWOe74Ump1r6JsfStT7cyB8s3YLxMpMK8iIvAkKmKohwHnQaRxvMjwo9KpzNzeWMCNizu59H05mwP1qHBEW3v-bzrqTNPUlddKh7tPvpybGIwfe_0v67qu3_9HE8pW4CrMQESOHxsGp20TYVCumr8ay9W20WBlVzKe"/>
+<img alt="User 2" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="portrait of a young man looking professional and reliable" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1g2e_sDR3sCZidZayk26bAqKh07qussgMW2kyXAKjjqzKqT_R4WN8dNCJda39em1N4LIcKK7_45E1Oc3bGOpjLn8NssED3jn7wDtw0D-VSPVZD0bxL6BMzFPvig9hAI6Z2lV8Kft9FuZWAzFPO9_2RRUDhixVCRARj9xkFmvHn8Bbe-_5aO4T5KC8vAitROiMl4wjbDeHlANVAFdVDEsjvYNJ3wrWnqKGgZSivfdWimym_fo3pbT_mrrYGNeFo-VfpvNmi0WAF8h1"/>
+<img alt="User 3" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="vibrant portrait of a woman in sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZAR9lwfmeOKOokBaIRKqW1Ihl3GWcPagEW70GUASECUQ25nw02U4BETKLMFDvfoa8Jb9lOaDI0Njaf5b4VKfVgvZ0AYtK_HAZ_--J00SbL_AwTR9bIBw47B-ypFZy1Qs0kvQj7gHnSjFkUJUD0nRvAxhD9Qb14kU3mTojCSOhXbxXRCFtEb6taS0qsW607YHyv3tUAUFyCLuYHn_tgdykRA8x6fLIS09ts8HanD_gVGCTVp2BeCv38lnU4yXJXYTKwz8svQGnIeLV"/>
+</div>
+<span>Joined by 12,000+ modern families this month</span>
+</div>
+</div>
+<!-- Right: App Preview Modular Bento -->
+<div class="relative">
+<div class="bg-surface-container-low rounded-xl p-6 lg:p-10 editorial-shadow">
+<div class="grid grid-cols-2 gap-4">
+<!-- Module: Assets -->
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm space-y-4 col-span-2 md:col-span-1">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary" data-weight="fill">home</span>
+<span class="bg-primary-container text-on-primary-container px-2 py-1 rounded text-xs font-bold">LIVING</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg">Family Home</h3>
+<p class="text-sm text-on-surface-variant">Valuation: $840k</p>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary h-full w-3/4"></div>
+</div>
+</div>
+<!-- Module: Car/Insurance -->
+<div class="bg-secondary p-6 rounded-lg shadow-sm text-on-secondary space-y-4 col-span-2 md:col-span-1">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined" data-weight="fill">directions_car</span>
+<span class="material-symbols-outlined text-error-container animate-pulse text-sm">error</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg">Model S</h3>
+<p class="text-sm opacity-80">Insurance expires in 4d</p>
+</div>
+<button class="w-full py-2 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold uppercase tracking-wider">Renew Now</button>
+</div>
+<!-- Module: Chores/Tasks -->
+<div class="bg-tertiary-container p-6 rounded-lg shadow-sm col-span-2 space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline font-bold text-on-tertiary-container">Weekly Family Sync</h3>
+<span class="text-xs font-bold text-tertiary uppercase">65% Done</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-3 text-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-tertiary">check_circle</span>
+<span>Review monthly budget</span>
+</div>
+<div class="flex items-center gap-3 text-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-outline">radio_button_unchecked</span>
+<span>Plan weekend hiking trip</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative Elements -->
+<div class="absolute -top-6 -right-6 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary/5 rounded-full blur-3xl"></div>
+</div>
+</section>
+<!-- Features Fold -->
+<section class="bg-surface-container py-24">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center mb-16 space-y-4">
+<h2 class="text-4xl font-headline font-bold">Engineered for Clarity</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">No more spreadsheets or forgotten renewals. Our curated modules keep your lifestyle organised.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature: What you own -->
+<div class="bg-surface-container-lowest p-10 rounded-xl editorial-shadow hover:translate-y-[-4px] transition-transform">
+<div class="w-14 h-14 bg-primary-container rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill">inventory_2</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-4">What you own</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            From real estate to rare collections. Keep an up-to-date digital ledger of every asset your family has built.
+                        </p>
+<ul class="space-y-3 text-sm font-medium">
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-primary rounded-full"></span> Real Estate Portfolio</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-primary rounded-full"></span> Digital Assets</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-primary rounded-full"></span> Physical Inventory</li>
+</ul>
+</div>
+<!-- Feature: What you owe -->
+<div class="bg-surface-container-lowest p-10 rounded-xl editorial-shadow hover:translate-y-[-4px] transition-transform">
+<div class="w-14 h-14 bg-secondary-container rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-secondary text-3xl" data-weight="fill">account_balance</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-4">What you owe</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            Crystal clear visibility on mortgages, loans, and subscriptions. Never be surprised by an auto-renewal again.
+                        </p>
+<ul class="space-y-3 text-sm font-medium">
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span> Mortgage Tracking</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span> Subscription Manager</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-secondary rounded-full"></span> Credit Health</li>
+</ul>
+</div>
+<!-- Feature: What you need to do -->
+<div class="bg-surface-container-lowest p-10 rounded-xl editorial-shadow hover:translate-y-[-4px] transition-transform">
+<div class="w-14 h-14 bg-tertiary-container rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-weight="fill">checklist_rtl</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-4">What you need to do</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            A unified family hub for chores, appointments, and maintenance. Coordination without the friction.
+                        </p>
+<ul class="space-y-3 text-sm font-medium">
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-tertiary rounded-full"></span> Smart Home Reminders</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-tertiary rounded-full"></span> Shared Chore Lists</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-tertiary rounded-full"></span> Document Renewals</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-7xl mx-auto px-8 py-24">
+<div class="bg-slate-900 rounded-xl overflow-hidden relative p-12 lg:p-20 text-center">
+<div class="relative z-10 space-y-8 max-w-3xl mx-auto">
+<h2 class="text-4xl lg:text-5xl font-headline font-extrabold text-white">Ready to harmonise your home?</h2>
+<p class="text-slate-400 text-lg">Join thousands of families who have reclaimed their mental space. Free for the first 14 days.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-dim transition-all active:scale-95">
+                            Start Free Trial
+                        </button>
+<button class="bg-white/10 text-white backdrop-blur px-10 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all active:scale-95">
+                            Book a Demo
+                        </button>
+</div>
+</div>
+<!-- Decorative Abstract Art -->
+<div class="absolute top-0 right-0 w-full h-full opacity-20 pointer-events-none">
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary rounded-full blur-3xl"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-12 border-t border-slate-200/50 bg-slate-50 dark:bg-slate-950">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+<div class="space-y-4">
+<span class="text-lg font-bold text-slate-900 dark:text-slate-100 font-headline">Harmonious Home</span>
+<p class="text-slate-500 dark:text-slate-400 text-sm tracking-wide font-body max-w-xs">
+                    © 2024 Harmonious Home. The Digital Curator for Modern Families.
+                </p>
+</div>
+<div class="flex flex-wrap gap-x-8 gap-y-4 md:justify-end text-sm font-body">
+<a class="text-slate-500 hover:text-blue-500 transition-colors underline-offset-4 hover:underline" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-blue-500 transition-colors underline-offset-4 hover:underline" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-blue-500 transition-colors underline-offset-4 hover:underline" href="#">Help Center</a>
+<a class="text-slate-500 hover:text-blue-500 transition-colors underline-offset-4 hover:underline" href="#">Contact Us</a>
+<a class="text-slate-500 hover:text-blue-500 transition-colors underline-offset-4 hover:underline" href="#">Our Story</a>
+</div>
+</div>
+</footer>
+</body></html>
