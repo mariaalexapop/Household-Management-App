@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-24T19:52:11.543Z"
+last_updated: "2026-03-26T15:23:34.686Z"
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 8
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State: Household Management App
 
-**Last updated:** 2026-03-24
-**Session:** Concept revision + requirements rewrite
+**Last updated:** 2026-03-26
+**Session:** Phase 01 Plan 02 — Bootstrap Next.js 15 + Supabase clients
 
 ---
 
@@ -31,7 +31,7 @@ progress:
 ## Current Position
 
 Phase: 01 (Foundation & Onboarding) — EXECUTING
-Plan: 1 of 8
+Plan: 2 of 8 complete (advancing to Plan 3)
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: 1 of 8
 | Phases complete | 0 |
 
 ---
+| Phase 01 P02 | 45 | 1 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,10 @@ Plan: 1 of 8
 | Unified calendar deferred to Phase 4 | Only useful once multiple modules are populated with data |
 | Receipt OCR and bank sync deferred to v2 | Validates core tracking value before adding infrastructure complexity |
 | Chatbot creates tasks from document procedures | Reduces friction; turns insurance/manual content into actionable household tasks |
+| Middleware uses getUser() not getSession() | getSession() reads cookie without JWT verification — insecure for auth decisions |
+| Tailwind v4 CSS-first: no tailwind.config.ts | All tokens in @theme inline {} in globals.css; v4 paradigm shift |
+| tw-animate-css (not tailwindcss-animate) | Correct package for Tailwind v4 animation compatibility |
+| next/font/google for Plus Jakarta Sans + Public Sans | Eliminates CLS, automatic font subsetting, better performance than @import url() |
 
 ### Architecture Flags (verify before implementation)
 
@@ -84,7 +89,7 @@ None.
 
 ## Session Continuity
 
-**To resume:** Run `/gsd:plan-phase 1` to decompose Phase 1 into executable plans.
+**Stopped at:** Completed Phase 01 Plan 02 — Next.js 15 bootstrap + Supabase clients
 
 **Context for next session:**
 

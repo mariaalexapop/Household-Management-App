@@ -13,7 +13,7 @@
 - [ ] **AUTH-02**: User receives email verification after signup
 - [ ] **AUTH-03**: User can reset password via email link
 - [ ] **AUTH-04**: User can sign up and log in with Google OAuth
-- [ ] **AUTH-05**: User session persists across browser refresh
+- [x] **AUTH-05**: User session persists across browser refresh
 
 ### Onboarding (ONBD)
 
@@ -115,7 +115,7 @@
 - [ ] **PLAT-01**: All household data syncs in real-time across all members without page refresh
 - [ ] **PLAT-02**: App shows a reconnecting indicator when the real-time connection drops
 - [ ] **PLAT-03**: App is mobile-responsive and usable on phone browsers
-- [ ] **PLAT-04**: User data is stored in EU infrastructure (GDPR compliance)
+- [x] **PLAT-04**: User data is stored in EU infrastructure (GDPR compliance)
 - [ ] **PLAT-05**: User can request deletion of their personal data (right to erasure)
 
 ---
@@ -175,7 +175,7 @@
 | AUTH-02 | Phase 1: Foundation & Onboarding | Pending |
 | AUTH-03 | Phase 1: Foundation & Onboarding | Pending |
 | AUTH-04 | Phase 1: Foundation & Onboarding | Pending |
-| AUTH-05 | Phase 1: Foundation & Onboarding | Pending |
+| AUTH-05 | Phase 1: Foundation & Onboarding | Complete |
 | ONBD-01 | Phase 1: Foundation & Onboarding | Pending |
 | ONBD-02 | Phase 1: Foundation & Onboarding | Pending |
 | ONBD-03 | Phase 1: Foundation & Onboarding | Pending |
@@ -190,7 +190,7 @@
 | HSLD-08 | Phase 1: Foundation & Onboarding | Pending |
 | PLAT-01 | Phase 1: Foundation & Onboarding | Pending |
 | PLAT-02 | Phase 1: Foundation & Onboarding | Pending |
-| PLAT-04 | Phase 1: Foundation & Onboarding | Pending |
+| PLAT-04 | Phase 1: Foundation & Onboarding | Complete |
 | PLAT-05 | Phase 1: Foundation & Onboarding | Pending |
 | CHORE-01 | Phase 2: Home Chores | Pending |
 | CHORE-02 | Phase 2: Home Chores | Pending |
