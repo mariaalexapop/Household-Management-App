@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Completed Phase 01 Plan 01 — Test Scaffold (Vitest, Playwright, factories)
-last_updated: "2026-03-26T15:39:40.778Z"
+status: executing
+stopped_at: Completed Phase 01 Plan 07 — Invite system
+last_updated: "2026-04-01T15:30:00Z"
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 8
-  completed_plans: 2
+  completed_plans: 7
 ---
 
 # Project State: Household Management App
 
-**Last updated:** 2026-03-26
-**Session:** Phase 01 Plan 01 — Test Scaffold (Vitest, Playwright, factories)
+**Last updated:** 2026-04-01
+**Session:** Phase 01 Plan 07 — Invite system (email invite, shareable link, accept flow, member removal)
 
 ---
 
@@ -32,7 +32,7 @@ progress:
 ## Current Position
 
 Phase: 01 (Foundation & Onboarding) — EXECUTING
-Plan: 2 of 8 complete (01-01 + 01-02 done; advancing to Plan 03)
+Plan: 7 of 8 complete (01-01 through 01-07 done; advancing to Plan 08)
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Plan: 2 of 8 complete (01-01 + 01-02 done; advancing to Plan 03)
 | Phases complete | 0 |
 
 ---
+| Phase 01 P07 | 611 | 2 tasks | 16 files |
 | Phase 01 P02 | 45 | 1 tasks | 15 files |
 | Phase 01 P01 | 7 | 2 tasks | 6 files |
 
@@ -70,6 +71,10 @@ Plan: 2 of 8 complete (01-01 + 01-02 done; advancing to Plan 03)
 | Tailwind v4 CSS-first: no tailwind.config.ts | All tokens in @theme inline {} in globals.css; v4 paradigm shift |
 | tw-animate-css (not tailwindcss-animate) | Correct package for Tailwind v4 animation compatibility |
 | next/font/google for Plus Jakarta Sans + Public Sans | Eliminates CLS, automatic font subsetting, better performance than @import url() |
+| Inngest v4 createFunction is 2-arg (triggers in options) | v4 changed from 3-arg form (options, trigger, handler) to 2-arg (options with triggers array, handler) |
+| Atomic invite claim via Supabase admin client (not Drizzle) | Drizzle does not expose rowsAffected for UPDATE — admin client UPDATE...RETURNING * provides atomic single-use enforcement |
+| Dialog built on @base-ui/react/dialog (not Radix) | Project uses base-ui throughout; no Radix UI dependency; base-ui/dialog provides equivalent API |
+| Accept flow redirects unauthenticated to /auth/signup?invite=token | Preserves invite token through signup flow; authenticated users with invalid tokens go to /auth/login?error=invite_invalid |
 
 ### Architecture Flags (verify before implementation)
 
@@ -91,15 +96,17 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Completed Phase 01 Plan 01 — Test Scaffold (Vitest, Playwright, factories)
+**Stopped at:** Completed Phase 01 Plan 07 — Invite system
 
 **Context for next session:**
 
-- Full concept revision completed 2026-03-24: 5 modules (Chores, Car, Insurance, Electronics, Kids) + modular onboarding + unified calendar + RAG chatbot
-- 75 v1 requirements across 6 phases (up from 59 across 7 phases in the original plan)
-- The most critical Phase 1 constraints: RLS and EU data residency locked in from day one; onboarding flow must support module selection and generate a dynamic dashboard
-- Phase 1 also establishes the household admin/member model (admin manages membership, equal content access)
-- Architecture research is still valid in `.planning/research/` — ARCHITECTURE.md and SUMMARY.md are the primary references; STACK.md updated implicitly (OpenAI embeddings added to stack)
+- Phase 01 Plans 01–07 complete. Only Plan 08 remains to complete Phase 1.
+- Invite system (Plan 07) is fully functional: email invite via Supabase admin + Inngest/Resend, shareable link with atomic UUID token claim, member removal with activity log, household management page.
+- Key Inngest v4 pattern: `createFunction({ id, name, triggers: [{ event }] }, handler)` — NOT 3-arg form.
+- Key Zod v4 pattern: use `.issues` not `.errors` on ZodError.
+- Dialog component is now available at `src/components/ui/dialog.tsx` (base-ui backed).
+- Firefox E2E tests require `pnpm exec playwright install firefox` before running.
+- Plan 08 is the final Phase 1 plan — should complete Foundation & Onboarding phase.
 - Config is in `.planning/config.json`: mode=yolo, granularity=standard, parallelization=true
 
 ---
