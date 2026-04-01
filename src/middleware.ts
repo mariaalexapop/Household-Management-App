@@ -43,6 +43,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Redirect unverified users to the verify-email page
+  if (user && !user.email_confirmed_at && !isAuthRoute && !isApiRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/verify-email'
+    url.searchParams.set('email', user.email ?? '')
+    return NextResponse.redirect(url)
+  }
+
   // IMPORTANT: Return supabaseResponse to ensure cookies are properly propagated.
   // Do NOT return NextResponse.next() directly — it would lose cookie mutations.
   return supabaseResponse

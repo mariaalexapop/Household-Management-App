@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ResendButton } from './ResendButton'
 
 export const metadata = {
   title: 'Check your email — Kinship',
@@ -52,13 +53,12 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
             Click the link in the email to activate your Kinship account.
           </p>
 
-          <p className="mt-6 font-body text-xs text-kinship-on-surface/50">
-            Didn&apos;t receive the email? Check your spam folder or{' '}
-            <Link href="/auth/signup" className="text-kinship-primary hover:underline">
-              try again
-            </Link>
-            .
-          </p>
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <p className="font-body text-xs text-kinship-on-surface/50">
+              Didn&apos;t receive the email? Check your spam folder or resend it.
+            </p>
+            {email !== 'your email address' && <ResendButton email={email} />}
+          </div>
         </div>
 
         {/* Footer link */}
