@@ -84,23 +84,11 @@ export function AuthForm({ mode }: AuthFormProps) {
           setServerError(error.message)
           return
         }
-        // Check if user has a household to determine redirect destination
-        const { data: userData } = await supabase.auth.getUser()
-        if (userData.user) {
-          const { data: members } = await supabase
-            .from('household_members')
-            .select('household_id')
-            .eq('user_id', userData.user.id)
-            .limit(1)
-
-          if (members && members.length > 0) {
-            router.push('/dashboard')
-          } else {
-            router.push('/onboarding')
-          }
-        } else {
-          router.push('/dashboard')
-        }
+        // Redirect to /dashboard — the dashboard Server Component uses Drizzle
+        // (bypasses RLS) to check for a household and redirects to /onboarding
+        // if needed. Querying household_members here via the browser client hits
+        // a self-referential RLS policy that returns empty results.
+        router.push('/dashboard')
       } else if (mode === 'signup') {
         const { email, password } = data as SignupFormData
         const { error } = await supabase.auth.signUp({
