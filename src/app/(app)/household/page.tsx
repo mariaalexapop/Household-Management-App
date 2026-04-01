@@ -1,11 +1,13 @@
 import { redirect } from 'next/navigation'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { householdMembers, households } from '@/lib/db/schema'
+import { activityFeed, householdMembers, households } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { MembersList } from '@/components/household/MembersList'
 import { InviteModal } from '@/components/household/InviteModal'
 import { ProfileForm } from '@/components/household/ProfileForm'
+import { ActivityFeed } from '@/components/household/ActivityFeed'
+import type { ActivityFeedItem } from '@/components/realtime/RealtimeProvider'
 
 export const metadata = {
   title: 'Household — Kinship',
@@ -17,6 +19,7 @@ export const metadata = {
  * Shows:
  *   - Members list (all members with avatars, roles, joined dates)
  *   - Invite modal (admin only)
+ *   - Activity feed (recent household events, updated in real-time)
  *   - Profile settings (display name + avatar upload)
  */
 export default async function HouseholdPage() {
@@ -70,6 +73,34 @@ export default async function HouseholdPage() {
     .where(eq(householdMembers.householdId, householdId))
     .orderBy(householdMembers.joinedAt)
 
+  // Fetch initial activity feed items (most recent 20)
+  const feedRows = await db
+    .select({
+      id: activityFeed.id,
+      householdId: activityFeed.householdId,
+      actorId: activityFeed.actorId,
+      eventType: activityFeed.eventType,
+      entityType: activityFeed.entityType,
+      entityId: activityFeed.entityId,
+      metadata: activityFeed.metadata,
+      createdAt: activityFeed.createdAt,
+    })
+    .from(activityFeed)
+    .where(eq(activityFeed.householdId, householdId))
+    .orderBy(desc(activityFeed.createdAt))
+    .limit(20)
+
+  const initialFeedItems: ActivityFeedItem[] = feedRows.map((row) => ({
+    id: row.id,
+    householdId: row.householdId,
+    actorId: row.actorId,
+    eventType: row.eventType,
+    entityType: row.entityType,
+    entityId: row.entityId ?? null,
+    metadata: (row.metadata as Record<string, unknown> | null) ?? null,
+    createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
+  }))
+
   return (
     <div className="min-h-screen bg-kinship-surface">
       {/* Header */}
@@ -95,6 +126,17 @@ export default async function HouseholdPage() {
             currentUserId={user.id}
             isAdmin={isAdmin}
           />
+        </section>
+
+        {/* Divider */}
+        <hr className="border-border" />
+
+        {/* Activity section */}
+        <section>
+          <h2 className="font-display text-xl font-semibold text-kinship-on-surface mb-4">
+            Activity
+          </h2>
+          <ActivityFeed initialItems={initialFeedItems} />
         </section>
 
         {/* Divider */}
