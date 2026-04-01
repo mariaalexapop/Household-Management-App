@@ -1,12 +1,8 @@
 /**
  * Drizzle ORM client for Kinship.
  *
- * Uses the `postgres` (node-postgres compatible) driver with the Supabase
- * direct connection URL (not the PgBouncer pooler URL — Drizzle prepared
- * statements are not compatible with transaction-mode pooling).
- *
- * { prepare: false } disables prepared statements, which is required when
- * connecting through Supabase's connection pooler in session mode.
+ * Uses a global singleton in development to survive Next.js hot reloads
+ * without exhausting the Supabase connection pool.
  */
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
@@ -18,7 +14,19 @@ if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is not set')
 }
 
-// Disable prefetch as it is not supported for "Transaction" pool mode.
-const client = postgres(connectionString, { prepare: false })
+// In development, reuse the client across hot reloads to avoid exhausting
+// the connection pool. In production each instance gets its own client.
+const globalForDb = globalThis as unknown as { _pgClient?: postgres.Sql }
+
+const client =
+  globalForDb._pgClient ??
+  postgres(connectionString, {
+    prepare: false,
+    max: 1, // single connection in dev; pooler handles concurrency in prod
+  })
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForDb._pgClient = client
+}
 
 export const db = drizzle(client, { schema })
