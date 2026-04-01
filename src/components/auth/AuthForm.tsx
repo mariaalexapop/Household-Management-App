@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 import { createClient } from '@/lib/supabase/client'
+import { emailExists } from '@/app/actions/auth'
 import {
   loginSchema,
   signupSchema,
@@ -81,7 +82,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         const { email, password } = data as LoginFormData
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) {
-          setServerError(error.message)
+          const exists = await emailExists(email)
+          if (!exists) {
+            setServerError('There is no account associated with this email. You need to sign up.')
+          } else {
+            setServerError('Incorrect password. Please try again.')
+          }
           return
         }
         // Redirect to /dashboard — the dashboard Server Component uses Drizzle
