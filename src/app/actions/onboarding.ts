@@ -54,7 +54,8 @@ export async function createHousehold(
     .limit(1)
 
   if (existing.length > 0) {
-    return { success: false, error: 'Household already exists' }
+    // User already has a household — treat as success so the client redirects to /dashboard
+    return { success: true }
   }
 
   // Atomic transaction: household → member (admin) → settings

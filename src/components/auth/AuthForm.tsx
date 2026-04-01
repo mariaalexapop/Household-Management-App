@@ -133,23 +133,11 @@ export function AuthForm({ mode }: AuthFormProps) {
           setServerError(error.message)
           return
         }
-        // After successful password update, check household and redirect
-        const { data: userData } = await supabase.auth.getUser()
-        if (userData.user) {
-          const { data: members } = await supabase
-            .from('household_members')
-            .select('household_id')
-            .eq('user_id', userData.user.id)
-            .limit(1)
-
-          if (members && members.length > 0) {
-            router.push('/dashboard')
-          } else {
-            router.push('/onboarding')
-          }
-        } else {
-          router.push('/dashboard')
-        }
+        // After successful password update, go to /dashboard.
+        // The recovery session has limited DB permissions so we cannot reliably
+        // query household_members here. The server-side layout handles the
+        // household check and will redirect to /onboarding if needed.
+        router.push('/dashboard')
       }
     } catch {
       setServerError('Something went wrong. Please try again.')
