@@ -13,6 +13,8 @@
  *   added manually to the generated migration SQL (see 0000_phase1_tables.sql).
  */
 import {
+  boolean,
+  integer,
   jsonb,
   pgPolicy,
   pgTable,
@@ -209,6 +211,115 @@ export const activityFeed = pgTable(
       withCheck: sql`household_id IN (
         SELECT household_id FROM household_members WHERE user_id = ${authUid}
       )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// chore_areas
+// ---------------------------------------------------------------------------
+export const choreAreas = pgTable(
+  'chore_areas',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    isDefault: boolean('is_default').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('chore_areas_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// tasks
+// ---------------------------------------------------------------------------
+export const tasks = pgTable(
+  'tasks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    notes: text('notes'),
+    areaId: uuid('area_id').references(() => choreAreas.id, { onDelete: 'set null' }),
+    // ownerId references household_members.id — plain uuid, FK in migration
+    ownerId: uuid('owner_id'),
+    status: text('status').notNull().default('todo'), // 'todo' | 'in_progress' | 'done'
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    isRecurring: boolean('is_recurring').notNull().default(false),
+    recurrenceRule: jsonb('recurrence_rule'),
+    // parentTaskId self-FK — plain uuid, FK added in migration
+    parentTaskId: uuid('parent_task_id'),
+    // createdBy references auth.users(id) — cross-schema, FK in migration
+    createdBy: uuid('created_by').notNull(),
+    // reminderOffsetMinutes: null = use household default (1440 = 1 day)
+    reminderOffsetMinutes: integer('reminder_offset_minutes'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('tasks_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// notifications
+// ---------------------------------------------------------------------------
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    // userId references auth.users(id) — cross-schema, FK in migration
+    userId: uuid('user_id').notNull(),
+    type: text('type').notNull(), // 'task_assigned' | 'task_reminder'
+    entityId: uuid('entity_id'),
+    message: text('message').notNull(),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('notifications_select_own', {
+      for: 'select',
+      to: authenticatedRole,
+      using: sql`user_id = ${authUid}`,
+    }),
+    pgPolicy('notifications_insert_member', {
+      for: 'insert',
+      to: authenticatedRole,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+    pgPolicy('notifications_update_own', {
+      for: 'update',
+      to: authenticatedRole,
+      using: sql`user_id = ${authUid}`,
     }),
   ]
 )

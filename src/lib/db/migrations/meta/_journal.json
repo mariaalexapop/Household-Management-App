@@ -8,6 +8,13 @@
       "when": 1774607389160,
       "tag": "0000_flaky_sage",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775140369022,
+      "tag": "0001_phase2_chores",
+      "breakpoints": true
     }
   ]
 }
