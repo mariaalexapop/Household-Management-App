@@ -52,3 +52,103 @@ export function makeTestHousehold(
     ...overrides,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Phase 2 — Chores factories
+// ---------------------------------------------------------------------------
+
+export interface TestChoreArea {
+  id: string;
+  householdId: string;
+  name: string;
+  isDefault: boolean;
+}
+
+export interface TestTask {
+  id: string;
+  householdId: string;
+  title: string;
+  notes: string | null;
+  areaId: string | null;
+  ownerId: string | null;
+  status: 'todo' | 'in_progress' | 'done';
+  startsAt: Date;
+  endsAt: Date | null;
+  isRecurring: boolean;
+  recurrenceRule: Record<string, unknown> | null;
+  parentTaskId: string | null;
+  createdBy: string;
+  reminderOffsetMinutes: number | null;
+}
+
+export interface TestNotification {
+  id: string;
+  householdId: string;
+  userId: string;
+  type: 'task_assigned' | 'task_reminder';
+  entityId: string | null;
+  message: string;
+  readAt: Date | null;
+}
+
+/**
+ * Generates a unique in-memory TestChoreArea.
+ * Does NOT create the area in the database.
+ */
+export function makeTestChoreArea(
+  overrides?: Partial<TestChoreArea>
+): TestChoreArea {
+  const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  return {
+    id: `test-area-${suffix}`,
+    householdId: `test-household-${suffix}`,
+    name: `Test Area ${suffix}`,
+    isDefault: false,
+    ...overrides,
+  };
+}
+
+/**
+ * Generates a unique in-memory TestTask.
+ * Does NOT create the task in the database.
+ */
+export function makeTestTask(overrides?: Partial<TestTask>): TestTask {
+  const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  return {
+    id: `test-task-${suffix}`,
+    householdId: `test-household-${suffix}`,
+    title: `Test Task ${suffix}`,
+    notes: null,
+    areaId: null,
+    ownerId: null,
+    status: 'todo',
+    startsAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day from now
+    endsAt: null,
+    isRecurring: false,
+    recurrenceRule: null,
+    parentTaskId: null,
+    createdBy: `test-user-${suffix}`,
+    reminderOffsetMinutes: null,
+    ...overrides,
+  };
+}
+
+/**
+ * Generates a unique in-memory TestNotification.
+ * Does NOT create the notification in the database.
+ */
+export function makeTestNotification(
+  overrides?: Partial<TestNotification>
+): TestNotification {
+  const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  return {
+    id: `test-notification-${suffix}`,
+    householdId: `test-household-${suffix}`,
+    userId: `test-user-${suffix}`,
+    type: 'task_assigned',
+    entityId: null,
+    message: `Test notification ${suffix}`,
+    readAt: null,
+    ...overrides,
+  };
+}
