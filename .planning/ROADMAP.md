@@ -24,7 +24,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Onboarding | 2/8 | In Progress|  |
-| 2. Home Chores | 1/6 | In Progress|  |
+| 2. Home Chores | 5/6 | In Progress|  |
 | 3. Kids Activities | 0/TBD | Not started | - |
 | 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
 | 5. AI Chatbot & RAG | 0/TBD | Not started | - |
@@ -199,9 +199,9 @@ Plans:
 | CHORE-05 | Phase 2 | Pending |
 | CHORE-06 | Phase 2 | Pending |
 | CHORE-07 | Phase 2 | Pending |
-| CHORE-08 | Phase 2 | Pending |
-| CHORE-09 | Phase 2 | Pending |
-| CHORE-10 | Phase 2 | Pending |
+| CHORE-08 | Phase 2 | Complete |
+| CHORE-09 | Phase 2 | Complete |
+| CHORE-10 | Phase 2 | Complete |
 | KIDS-01 | Phase 3 | Pending |
 | KIDS-02 | Phase 3 | Pending |
 | KIDS-03 | Phase 3 | Pending |

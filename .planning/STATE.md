@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-stopped_at: Completed 02-home-chores 02-01-PLAN.md
-last_updated: "2026-04-02T14:36:59.625Z"
+status: executing
+stopped_at: Completed 02-home-chores 02-05-PLAN.md
+last_updated: "2026-04-02T20:02:05Z"
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 14
-  completed_plans: 9
+  completed_plans: 13
 ---
 
 # Project State: Household Management App
 
 **Last updated:** 2026-04-02
-**Session:** Phase 02 Plan 01 — Schema foundations and Wave 0 test stubs (chore_areas, tasks, notifications)
+**Session:** Phase 02 Plan 05 — Real-time notification bell in app header and email preference toggle in settings
 
 ---
 
@@ -32,7 +32,7 @@ progress:
 ## Current Position
 
 Phase: 02 (Home Chores) — EXECUTING
-Plan: 1 of 6 complete (02-01 done; advancing to Plan 02)
+Plan: 5 of 6 complete (02-01 through 02-05 done; advancing to Plan 06)
 
 ## Performance Metrics
 
@@ -50,6 +50,8 @@ Plan: 1 of 6 complete (02-01 done; advancing to Plan 02)
 | Phase 01 P02 | 45 | 1 tasks | 15 files |
 | Phase 01 P01 | 7 | 2 tasks | 6 files |
 | Phase 02-home-chores P01 | 5 | 2 tasks | 7 files |
+| Phase 02-home-chores P02 | ~30 | 2 tasks | 7 files |
+| Phase 02-home-chores P05 | 20 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -78,6 +80,10 @@ Plan: 1 of 6 complete (02-01 done; advancing to Plan 02)
 | Accept flow redirects unauthenticated to /auth/signup?invite=token | Preserves invite token through signup flow; authenticated users with invalid tokens go to /auth/login?error=invite_invalid |
 | Vitest Wave 0 stubs use it.todo() not standalone todo() | Vitest 4.x does not export todo as a standalone function; it.todo('...') is the correct API for pending test stubs |
 | Phase 2 RLS patterns use ${authUid} directly (not wrapped in select) | Matches Phase 1 table patterns; Drizzle generates (select auth.uid()) in SQL output — consistent across all tables |
+| tasks.ts Server Actions take data: unknown (not typed input + householdId) | Plan 02-02 spec: self-contained actions that resolve householdId from auth; pre-existing stub had wrong signature |
+| seedDefaultAreas called server-side from page.tsx (not user-triggered) | Idempotent; safe to call on every /chores page load after auth is confirmed |
+| NotificationBell in fixed top-right position (not semantic header) | App layout has no explicit header bar; adding one is out of scope for Plan 02-05 |
+| NotificationToggle UI-only in Phase 2 | Email preference persistence deferred to Phase 6; Inngest always fires when RESEND_API_KEY is set |
 
 ### Architecture Flags (verify before implementation)
 
@@ -99,18 +105,15 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Completed 02-home-chores 02-01-PLAN.md
+**Stopped at:** Completed 02-home-chores 02-05-PLAN.md
 
 **Context for next session:**
 
-- Phase 01 complete (all 8 plans). Phase 02 plans ready (6 plans: 02-01 through 02-06).
-- 5 HTML mockups generated in `.planning/mockups/` covering dashboard, onboarding, chores list, add-task modal, notifications.
-- Mockups reference added to `01-CONTEXT.md` and `02-UI-SPEC.md`.
-- Key Phase 2 decisions: house areas (not categories), pre-generated recurrence occurrences, in-app + email notifications only (no web push), task list sorted by due date with status/area/date filters.
-- New tables needed: `chore_areas`, `tasks`, `notifications` — schema in 02-CONTEXT.md.
-- Run `/gsd:execute-phase 2` to execute Phase 2 plans.
+- Phase 02 Plans 01 through 05 complete. All core chores features built: schema, /chores page, CRUD actions, recurrence, Inngest notifications, realtime notification bell in header, settings toggle.
+- Plan 02-06 is the final plan for Phase 2 — check its content before executing.
+- Run `/gsd:execute-phase 2` to continue with Plan 02-06.
 
 ---
 
 *State initialised: 2026-03-19*
-*Last revised: 2026-03-24 — full concept revision*
+*Last revised: 2026-04-02 — Plan 02-05 complete*
