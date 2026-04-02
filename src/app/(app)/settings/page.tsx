@@ -4,7 +4,9 @@ import { db } from '@/lib/db'
 import { householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/household/ProfileForm'
+import { Label } from '@/components/ui/label'
 import { DeleteAccountSection } from './DeleteAccountSection'
+import { NotificationToggle } from './NotificationToggle'
 
 export const metadata = {
   title: 'Settings — Kinship',
@@ -75,6 +77,34 @@ export default async function SettingsPage() {
             initialDisplayName={member?.displayName ?? null}
             initialAvatarUrl={member?.avatarUrl ?? null}
           />
+        </section>
+
+        <hr className="border-kinship-surface-container" />
+
+        {/* Notifications */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-kinship-on-surface">
+              Notifications
+            </h2>
+            <p className="font-body text-sm text-muted-foreground">
+              Manage how you receive notifications
+            </p>
+          </div>
+          <div className="rounded-lg bg-kinship-surface-container-lowest p-4 flex items-center justify-between gap-4">
+            <div>
+              <Label
+                htmlFor="email-assign-toggle"
+                className="font-body text-sm font-medium text-kinship-on-surface"
+              >
+                Email me when I&apos;m assigned a task
+              </Label>
+              <p className="font-body text-xs text-muted-foreground mt-0.5">
+                Receive an email notification when a household member assigns a task to you.
+              </p>
+            </div>
+            <NotificationToggle defaultEnabled={true} />
+          </div>
         </section>
 
         <hr className="border-kinship-surface-container" />

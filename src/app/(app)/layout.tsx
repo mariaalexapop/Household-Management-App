@@ -5,6 +5,7 @@ import { householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { ConnectionIndicator } from '@/components/realtime/ConnectionIndicator'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 
 /**
  * Protected (app) layout.
@@ -45,8 +46,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <RealtimeProvider householdId={householdId}>
+    <RealtimeProvider householdId={householdId} userId={user.id}>
       <ConnectionIndicator />
+      <div className="fixed top-3 right-4 z-30">
+        <NotificationBell />
+      </div>
       {children}
     </RealtimeProvider>
   )
