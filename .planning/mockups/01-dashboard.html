@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinship — Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#0053dc",
+          "on-primary": "#faf8ff",
+          "primary-container": "#acbfff",
+          "on-primary-container": "#003592",
+          "secondary": "#742fe5",
+          "secondary-container": "#eaddff",
+          "tertiary": "#006b62",
+          "tertiary-container": "#83efe1",
+          "surface": "#f7f9fb",
+          "surface-bright": "#f7f9fb",
+          "surface-container": "#eaeef1",
+          "surface-container-low": "#f1f4f6",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-high": "#e3e9ec",
+          "surface-container-highest": "#dde3e7",
+          "on-surface": "#2d3337",
+          "on-surface-variant": "#596063",
+          "outline": "#757c7f",
+          "outline-variant": "#acb3b7",
+          "error": "#ac3434",
+          "error-container": "#f56965",
+          "background": "#f7f9fb",
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Public Sans"],
+          "label": ["Public Sans"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Public Sans', sans-serif; }
+  h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<div class="flex min-h-screen">
+
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-8 w-64 bg-surface-container-low z-50">
+  <div class="px-8 mb-10">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+        <span class="material-symbols-outlined text-sm">home</span>
+      </div>
+      <span class="text-2xl font-bold tracking-tight text-primary brand">Kinship</span>
+    </div>
+    <p class="text-[10px] uppercase tracking-widest text-outline mt-1 font-bold">The Harmonious Home</p>
+  </div>
+  <nav class="flex-1 px-4 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary bg-surface-container-lowest rounded-lg" href="#">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-medium">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 transition-all rounded-lg" href="#">
+      <span class="material-symbols-outlined">checklist</span>
+      <span class="font-medium">Chores</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 transition-all rounded-lg" href="#">
+      <span class="material-symbols-outlined">child_care</span>
+      <span class="font-medium">Kids</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 transition-all rounded-lg" href="#">
+      <span class="material-symbols-outlined">directions_car</span>
+      <span class="font-medium">Car</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-white/50 transition-all rounded-lg" href="#">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-medium">Settings</span>
+    </a>
+  </nav>
+  <div class="px-8 mt-auto pt-8">
+    <div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container">
+      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-sm">SJ</div>
+      <div>
+        <p class="text-sm font-bold text-on-surface">Sarah Johnson</p>
+        <p class="text-[10px] text-on-surface-variant">Admin · Johnson Family</p>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Top Nav -->
+<header class="fixed top-0 right-0 left-64 h-16 flex items-center justify-between px-8 z-40 bg-surface/80 backdrop-blur-md">
+  <div class="flex items-center gap-6 flex-1">
+    <div class="relative w-full max-w-md">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+      <input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none" placeholder="Search tasks, members, items..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="absolute top-1.5 right-1.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-[9px] text-white font-bold">3</span>
+    </button>
+    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-sm cursor-pointer">SJ</div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-1 ml-64 pt-16 bg-surface-container min-h-screen">
+  <div class="p-8">
+    <!-- Greeting -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight brand">Good morning, Sarah 👋</h1>
+      <p class="text-on-surface-variant mt-1">Here's what's happening in the Johnson household today.</p>
+    </div>
+
+    <!-- Asymmetric 2-col layout -->
+    <div class="grid grid-cols-3 gap-6">
+
+      <!-- Chores Module (spans 2 cols, tall) -->
+      <div class="col-span-2 bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(45,51,55,0.06)] overflow-hidden">
+        <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-outline-variant/10">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-sm">checklist</span>
+            </div>
+            <h2 class="text-lg font-bold brand">Home Chores</h2>
+          </div>
+          <a class="text-xs font-bold text-primary flex items-center gap-1 hover:opacity-70 transition-opacity" href="#">
+            View all <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+        </div>
+        <div class="p-6 space-y-3">
+          <!-- Task row -->
+          <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full border-2 border-outline-variant flex-shrink-0"></div>
+              <div>
+                <p class="text-sm font-medium text-on-surface">Deep clean the refrigerator</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">Kitchen · Mon, Apr 7</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-tertiary flex items-center justify-center text-[9px] text-white font-bold">MJ</div>
+              <span class="text-xs px-2 py-0.5 rounded-full border border-outline-variant text-on-surface-variant">To Do</span>
+            </div>
+          </div>
+          <!-- Task row in progress -->
+          <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full border-2 border-primary/40 bg-primary/10 flex-shrink-0"></div>
+              <div>
+                <p class="text-sm font-medium text-on-surface">Mow the lawn</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">Garden · Tue, Apr 8</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[9px] text-on-primary font-bold">SJ</div>
+              <span class="text-xs px-2 py-0.5 rounded-full border border-primary text-primary bg-primary/8" style="background-color:rgba(0,83,220,0.08)">In Progress</span>
+            </div>
+          </div>
+          <!-- Task row -->
+          <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full border-2 border-outline-variant flex-shrink-0"></div>
+              <div>
+                <p class="text-sm font-medium text-on-surface">Pay electricity bill</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">Admin · Wed, Apr 9</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[9px] text-white font-bold">EJ</div>
+              <span class="text-xs px-2 py-0.5 rounded-full border border-outline-variant text-on-surface-variant">To Do</span>
+            </div>
+          </div>
+          <button class="w-full mt-2 py-3 rounded-full bg-primary text-on-primary text-sm font-bold shadow-sm hover:shadow-md transition-all">
+            + Add a chore
+          </button>
+        </div>
+      </div>
+
+      <!-- Right column: Kids + Recent Activity stacked -->
+      <div class="col-span-1 flex flex-col gap-6">
+        <!-- Kids Module (empty state) -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(45,51,55,0.06)] overflow-hidden">
+          <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-outline-variant/10" style="background: linear-gradient(135deg, rgba(0,107,98,0.08), rgba(131,239,225,0.12))">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 bg-tertiary/10 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-tertiary text-sm">child_care</span>
+              </div>
+              <h2 class="text-lg font-bold brand">Kids</h2>
+            </div>
+          </div>
+          <div class="p-6 text-center">
+            <p class="text-sm text-on-surface-variant mb-4">Track your children's schedules and activities.</p>
+            <button class="px-5 py-2 rounded-full bg-tertiary text-[#e2fff9] text-xs font-bold shadow-sm hover:shadow-md transition-all">
+              Add your first child →
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(45,51,55,0.06)] overflow-hidden flex-1">
+          <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-outline-variant/10">
+            <h2 class="text-lg font-bold brand">Recent Activity</h2>
+            <a class="text-xs font-bold text-primary hover:opacity-70 transition-opacity" href="#">View all</a>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[8px] text-on-primary font-bold flex-shrink-0 mt-0.5">SJ</div>
+              <div>
+                <p class="text-xs text-on-surface"><strong>Sarah</strong> activated the Chores module</p>
+                <p class="text-[10px] text-on-surface-variant mt-0.5">2 minutes ago</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-tertiary flex items-center justify-center text-[8px] text-white font-bold flex-shrink-0 mt-0.5">MJ</div>
+              <div>
+                <p class="text-xs text-on-surface"><strong>Marcus</strong> joined the household</p>
+                <p class="text-[10px] text-on-surface-variant mt-0.5">Yesterday at 6:45 PM</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[8px] text-on-primary font-bold flex-shrink-0 mt-0.5">SJ</div>
+              <div>
+                <p class="text-xs text-on-surface"><strong>Sarah</strong> created the Johnson Family household</p>
+                <p class="text-[10px] text-on-surface-variant mt-0.5">2 days ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add a module section (full width, bottom) -->
+      <div class="col-span-3 mt-2">
+        <p class="text-xs uppercase tracking-widest text-outline font-bold mb-4">Add a module</p>
+        <div class="flex gap-4">
+          <div class="flex-1 flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/15">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-on-surface-variant">directions_car</span>
+              <div>
+                <p class="text-sm font-semibold">Car</p>
+                <p class="text-xs text-on-surface-variant">Track vehicles, services, insurance.</p>
+              </div>
+            </div>
+            <button class="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold shadow-sm">Activate</button>
+          </div>
+          <div class="flex-1 flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/15">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-on-surface-variant">security</span>
+              <div>
+                <p class="text-sm font-semibold">Insurance</p>
+                <p class="text-xs text-on-surface-variant">Manage policies and renewal dates.</p>
+              </div>
+            </div>
+            <button class="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold shadow-sm">Activate</button>
+          </div>
+          <div class="flex-1 flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/15">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-on-surface-variant">devices_other</span>
+              <div>
+                <p class="text-sm font-semibold">Electronics</p>
+                <p class="text-xs text-on-surface-variant">Track devices, warranties, manuals.</p>
+              </div>
+            </div>
+            <button class="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold shadow-sm">Activate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+</body>
+</html>

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed Phase 01 Plan 07 — Invite system
-last_updated: "2026-04-01T15:30:00Z"
+stopped_at: Phase 02 mockups generated — ready to execute
+last_updated: "2026-04-02T00:00:00Z"
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State: Household Management App
@@ -96,18 +96,16 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Completed Phase 01 Plan 07 — Invite system
+**Stopped at:** Phase 02 mockups generated — ready to execute
 
 **Context for next session:**
 
-- Phase 01 Plans 01–07 complete. Only Plan 08 remains to complete Phase 1.
-- Invite system (Plan 07) is fully functional: email invite via Supabase admin + Inngest/Resend, shareable link with atomic UUID token claim, member removal with activity log, household management page.
-- Key Inngest v4 pattern: `createFunction({ id, name, triggers: [{ event }] }, handler)` — NOT 3-arg form.
-- Key Zod v4 pattern: use `.issues` not `.errors` on ZodError.
-- Dialog component is now available at `src/components/ui/dialog.tsx` (base-ui backed).
-- Firefox E2E tests require `pnpm exec playwright install firefox` before running.
-- Plan 08 is the final Phase 1 plan — should complete Foundation & Onboarding phase.
-- Config is in `.planning/config.json`: mode=yolo, granularity=standard, parallelization=true
+- Phase 01 complete (all 8 plans). Phase 02 plans ready (6 plans: 02-01 through 02-06).
+- 5 HTML mockups generated in `.planning/mockups/` covering dashboard, onboarding, chores list, add-task modal, notifications.
+- Mockups reference added to `01-CONTEXT.md` and `02-UI-SPEC.md`.
+- Key Phase 2 decisions: house areas (not categories), pre-generated recurrence occurrences, in-app + email notifications only (no web push), task list sorted by due date with status/area/date filters.
+- New tables needed: `chore_areas`, `tasks`, `notifications` — schema in 02-CONTEXT.md.
+- Run `/gsd:execute-phase 2` to execute Phase 2 plans.
 
 ---
 

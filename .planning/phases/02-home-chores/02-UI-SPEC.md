@@ -298,6 +298,18 @@ Source: components.json (`"registries": {}`), RESEARCH.md (Standard Stack — no
 
 ---
 
+## Mockups
+
+Interactive HTML mockups for Phase 2 screens. Open in any browser. All tokens match this spec.
+
+| File | Screen |
+|------|--------|
+| `.planning/mockups/03-chores-list.html` | `/chores` page — task list with filter bar, task rows (To Do / In Progress / Done), empty state |
+| `.planning/mockups/04-add-task-modal.html` | Add Task dialog — name, area, starts/ends, repeat frequency, owner, notes |
+| `.planning/mockups/05-notifications.html` | Notification bell dropdown — unread state + empty state |
+
+---
+
 ## Checker Sign-Off
 
 - [x] Dimension 1 Copywriting: PASS

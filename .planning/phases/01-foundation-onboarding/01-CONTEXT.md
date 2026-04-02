@@ -156,6 +156,20 @@ stitch/screen 3.png    — marketing/landing page concept (not Phase 1 scope)
 stitch/DESIGN.md       — full design system (colours, typography, elevation, components)
 ```
 
+## Mockups
+
+Interactive HTML mockups generated from the Stitch design system. Open in any browser.
+
+| File | Screen | Phase |
+|------|--------|-------|
+| `.planning/mockups/01-dashboard.html` | Dashboard — populated state with Chores module, Kids empty state, Recent Activity, Add a Module section | 1 |
+| `.planning/mockups/02-onboarding.html` | Onboarding Step 2 — Household name + type selection (Family / Couple / Flatmates / Solo) | 1 |
+| `.planning/mockups/03-chores-list.html` | `/chores` page — task list with filter bar, status/area/sort filters, task rows (To Do / In Progress / Done) | 2 |
+| `.planning/mockups/04-add-task-modal.html` | Add Task modal — two-column form with name, area, starts/ends, repeat frequency, owner, notes | 2 |
+| `.planning/mockups/05-notifications.html` | Notification bell + dropdown — unread state with 3 notifications, empty state variant | 2 |
+
+Design system tokens match `stitch/DESIGN.md` exactly (colours, typography, elevation, no-line rule, pill buttons, rounded-lg cards).
+
 No application code exists yet — fresh repo, no scaffold.
 
 ---

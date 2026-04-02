@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinship — Add New Task (Modal)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#0053dc",
+          "on-primary": "#faf8ff",
+          "primary-container": "#acbfff",
+          "on-primary-container": "#003592",
+          "secondary": "#742fe5",
+          "tertiary": "#006b62",
+          "surface": "#f7f9fb",
+          "surface-container": "#eaeef1",
+          "surface-container-low": "#f1f4f6",
+          "surface-container-lowest": "#ffffff",
+          "on-surface": "#2d3337",
+          "on-surface-variant": "#596063",
+          "outline": "#757c7f",
+          "outline-variant": "#acb3b7",
+          "background": "#f7f9fb",
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Public Sans"],
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Public Sans', sans-serif; }
+  h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+
+<!-- Background (dimmed chores list behind modal) -->
+<div class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-0"></div>
+
+<!-- Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="bg-surface-container-lowest w-full max-w-3xl max-h-[90vh] rounded-xl shadow-[0_20px_40px_rgba(45,51,55,0.12)] overflow-hidden flex flex-col">
+
+    <!-- Modal Header -->
+    <div class="px-8 py-6 border-b border-outline-variant/10 flex items-center justify-between flex-shrink-0">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-primary brand">Add a task</h2>
+        <p class="text-sm text-on-surface-variant mt-0.5">Define a chore to keep the home harmonious.</p>
+      </div>
+      <button class="w-10 h-10 rounded-full hover:bg-surface-container-low transition-colors flex items-center justify-center text-on-surface-variant" aria-label="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="flex-1 overflow-y-auto no-scrollbar p-8">
+      <form class="grid grid-cols-2 gap-x-12 gap-y-8">
+
+        <!-- Task Name (full width) -->
+        <div class="col-span-2 space-y-2">
+          <label class="text-sm font-semibold text-on-surface block">Task Name</label>
+          <input
+            class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none"
+            placeholder="e.g., Deep clean the refrigerator"
+            type="text"
+            maxlength="200"
+          />
+        </div>
+
+        <!-- Left Column -->
+        <div class="space-y-8">
+
+          <!-- Area -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-on-surface block">Area</label>
+            <div class="relative">
+              <select class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-base appearance-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none">
+                <option>Kitchen</option>
+                <option>Bedroom</option>
+                <option>Living Room</option>
+                <option>Garden</option>
+                <option>Full House</option>
+                <option class="font-bold">Create new area...</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Starts -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-on-surface block">Starts</label>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="relative">
+                <input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none" type="date"/>
+              </div>
+              <div class="relative">
+                <input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none" type="time"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ends (Optional) -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-sm font-semibold text-on-surface">Ends (Optional)</label>
+              <span class="text-[10px] uppercase font-bold text-outline">Duration</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm outline-none opacity-50 cursor-not-allowed" type="date" placeholder="End date"/>
+              <input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm outline-none opacity-50 cursor-not-allowed" type="time"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-8">
+
+          <!-- Repeat Frequency -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-on-surface block">Repeat Frequency</label>
+            <div class="flex flex-wrap gap-2">
+              <button class="px-4 py-2 rounded-full border border-outline-variant/20 text-xs font-bold hover:bg-primary-container hover:text-on-primary-container transition-colors" type="button">Daily</button>
+              <button class="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold" type="button">Weekly</button>
+              <button class="px-4 py-2 rounded-full border border-outline-variant/20 text-xs font-bold hover:bg-primary-container hover:text-on-primary-container transition-colors" type="button">Monthly</button>
+              <button class="px-4 py-2 rounded-full border border-outline-variant/20 text-xs font-bold hover:bg-primary-container hover:text-on-primary-container transition-colors" type="button">Yearly</button>
+              <button class="px-4 py-2 rounded-full border border-outline-variant/20 text-xs font-bold hover:bg-primary-container hover:text-on-primary-container transition-colors" type="button">None</button>
+            </div>
+            <div class="flex items-center gap-3 mt-2">
+              <span class="text-xs text-on-surface-variant">Every</span>
+              <input class="w-16 bg-surface-container-low border-none rounded-lg px-3 py-2 text-center text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white outline-none" type="number" value="1" min="1"/>
+              <span class="text-xs text-on-surface-variant">week(s) on Mondays</span>
+            </div>
+          </div>
+
+          <!-- Task Owner -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-on-surface block">Task Owner</label>
+            <div class="relative">
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-[9px] text-on-primary font-bold">SJ</div>
+              </div>
+              <select class="w-full bg-surface-container-low border-none rounded-lg pl-12 pr-4 py-3 text-base appearance-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none">
+                <option selected>Sarah Johnson (Me)</option>
+                <option>Marcus Johnson</option>
+                <option>Emily Johnson</option>
+                <option>Unassigned</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-on-surface block">Notes</label>
+            <textarea
+              class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none resize-none"
+              placeholder="Add specific instructions or requirements..."
+              rows="4"
+            ></textarea>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-8 py-5 bg-surface-container-low flex items-center justify-between flex-shrink-0 border-t border-outline-variant/10">
+      <p class="text-xs text-on-surface-variant">Fields marked with * are required</p>
+      <div class="flex items-center gap-4">
+        <button class="px-8 py-2.5 rounded-full text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-all">
+          Cancel
+        </button>
+        <button class="px-10 py-2.5 rounded-full bg-primary text-on-primary font-bold text-sm shadow-[0_10px_20px_rgba(0,83,220,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+          Add Task
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

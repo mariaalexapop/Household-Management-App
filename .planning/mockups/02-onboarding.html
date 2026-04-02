@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinship — Onboarding: Set Up Your Household</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#0053dc",
+          "on-primary": "#faf8ff",
+          "primary-container": "#acbfff",
+          "on-primary-container": "#003592",
+          "secondary": "#742fe5",
+          "tertiary": "#006b62",
+          "surface": "#f7f9fb",
+          "surface-container": "#eaeef1",
+          "surface-container-low": "#f1f4f6",
+          "surface-container-lowest": "#ffffff",
+          "on-surface": "#2d3337",
+          "on-surface-variant": "#596063",
+          "outline": "#757c7f",
+          "outline-variant": "#acb3b7",
+          "background": "#f7f9fb",
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Public Sans"],
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Public Sans', sans-serif; }
+  h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .card-selected { outline: 2px solid #0053dc; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex">
+
+<!-- Left: Progress Sidebar -->
+<aside class="w-72 min-h-screen bg-surface-container-low flex flex-col py-12 px-8 flex-shrink-0">
+  <div class="mb-12">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+        <span class="material-symbols-outlined text-sm">home</span>
+      </div>
+      <span class="text-2xl font-bold tracking-tight text-primary brand">Kinship</span>
+    </div>
+    <p class="text-[10px] uppercase tracking-widest text-outline mt-1 font-bold">The Harmonious Home</p>
+  </div>
+
+  <div class="space-y-1">
+    <!-- Step 1: Complete -->
+    <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-lowest">
+      <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-on-primary text-xs" style="font-variation-settings:'FILL' 1,'wght' 700">check</span>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-primary">Step 1</p>
+        <p class="text-xs text-on-surface-variant">Create your account</p>
+      </div>
+    </div>
+    <!-- Step 2: Active -->
+    <div class="flex items-center gap-3 p-3 rounded-lg bg-primary/8" style="background-color:rgba(0,83,220,0.08)">
+      <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+        <span class="text-on-primary text-xs font-bold">2</span>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-primary">Step 2</p>
+        <p class="text-xs text-on-surface">Set up your household</p>
+      </div>
+    </div>
+    <!-- Step 3: Pending -->
+    <div class="flex items-center gap-3 p-3 rounded-lg opacity-50">
+      <div class="w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center flex-shrink-0">
+        <span class="text-on-surface-variant text-xs font-bold">3</span>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-on-surface-variant">Step 3</p>
+        <p class="text-xs text-on-surface-variant">Choose your modules</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-auto pt-8">
+    <p class="text-xs text-on-surface-variant">Having trouble? <a class="text-primary font-semibold hover:underline" href="#">Get help</a></p>
+  </div>
+</aside>
+
+<!-- Right: Form Content -->
+<div class="flex-1 flex items-center justify-center p-12">
+  <div class="w-full max-w-xl">
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight brand mb-2">Set up your household</h1>
+      <p class="text-on-surface-variant">Give your household a name and choose the type that fits your family best. You can always change these later.</p>
+    </div>
+
+    <!-- Household Name -->
+    <div class="mb-8">
+      <label class="text-sm font-semibold text-on-surface block mb-2">Household name</label>
+      <input
+        class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-base focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none"
+        placeholder="e.g. The Johnson Family"
+        type="text"
+        value="The Johnson Family"
+      />
+      <p class="text-xs text-on-surface-variant mt-1.5">This name appears in all shared views and invitations.</p>
+    </div>
+
+    <!-- Household Type -->
+    <div class="mb-10">
+      <label class="text-sm font-semibold text-on-surface block mb-3">Household type</label>
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Family (selected) -->
+        <div class="p-5 bg-surface-container-lowest rounded-xl cursor-pointer card-selected" style="outline: 2px solid #0053dc;">
+          <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-primary">family_restroom</span>
+          </div>
+          <p class="font-bold text-sm mb-1">Family</p>
+          <p class="text-xs text-on-surface-variant">Parents, children, extended family living together.</p>
+        </div>
+        <!-- Couple -->
+        <div class="p-5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container transition-colors border border-outline-variant/20">
+          <div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-on-surface-variant">favorite</span>
+          </div>
+          <p class="font-bold text-sm mb-1">Couple</p>
+          <p class="text-xs text-on-surface-variant">Two people managing a shared home together.</p>
+        </div>
+        <!-- Flatmates -->
+        <div class="p-5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container transition-colors border border-outline-variant/20">
+          <div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-on-surface-variant">group</span>
+          </div>
+          <p class="font-bold text-sm mb-1">Flatmates</p>
+          <p class="text-xs text-on-surface-variant">Housemates sharing responsibilities and bills.</p>
+        </div>
+        <!-- Solo -->
+        <div class="p-5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container transition-colors border border-outline-variant/20">
+          <div class="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center mb-3">
+            <span class="material-symbols-outlined text-on-surface-variant">person</span>
+          </div>
+          <p class="font-bold text-sm mb-1">Solo</p>
+          <p class="text-xs text-on-surface-variant">Just you, keeping everything organised on your own.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between">
+      <button class="px-8 py-3 rounded-full text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-all">
+        Back
+      </button>
+      <button class="px-10 py-3 rounded-full bg-primary text-on-primary font-bold text-sm shadow-[0_10px_20px_rgba(0,83,220,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+        Continue →
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
