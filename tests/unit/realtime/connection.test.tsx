@@ -69,7 +69,7 @@ describe('ConnectionIndicator', () => {
   })
 
   it('renders nothing when status is connected', async () => {
-    mockUseRealtime.mockReturnValue({ status: 'connected', activityItems: [] })
+    mockUseRealtime.mockReturnValue({ status: 'connected', activityItems: [], notifications: [], unreadCount: 0 })
     render(<ConnectionIndicator />)
     // No banner text should be visible
     await new Promise((r) => setTimeout(r, 0)) // flush
@@ -77,14 +77,14 @@ describe('ConnectionIndicator', () => {
   })
 
   it('renders reconnecting banner when status is disconnected', async () => {
-    mockUseRealtime.mockReturnValue({ status: 'disconnected', activityItems: [] })
+    mockUseRealtime.mockReturnValue({ status: 'disconnected', activityItems: [], notifications: [], unreadCount: 0 })
     render(<ConnectionIndicator />)
     const banner = await screen.findByText('Reconnecting...')
     expect(banner).toBeTruthy()
   })
 
   it('renders reconnecting banner when status is connecting', async () => {
-    mockUseRealtime.mockReturnValue({ status: 'connecting', activityItems: [] })
+    mockUseRealtime.mockReturnValue({ status: 'connecting', activityItems: [], notifications: [], unreadCount: 0 })
     render(<ConnectionIndicator />)
     const banner = await screen.findByText('Reconnecting...')
     expect(banner).toBeTruthy()
@@ -142,14 +142,14 @@ describe('ActivityFeed rendering', () => {
   })
 
   it('shows empty state when no items', async () => {
-    mockUseRealtime.mockReturnValue({ status: 'connected', activityItems: [] })
+    mockUseRealtime.mockReturnValue({ status: 'connected', activityItems: [], notifications: [], unreadCount: 0 })
     render(<ActivityFeed initialItems={[]} />)
     const empty = await screen.findByText('No activity yet.')
     expect(empty).toBeTruthy()
   })
 
   it('renders activity items from initialItems', async () => {
-    mockUseRealtime.mockReturnValue({ status: 'connected', activityItems: [] })
+    mockUseRealtime.mockReturnValue({ status: 'connected', activityItems: [], notifications: [], unreadCount: 0 })
     const item = makeItem('id-1', '2024-01-01T10:00:00Z')
     render(<ActivityFeed initialItems={[item]} />)
     const text = await screen.findByText('Alice joined the household')

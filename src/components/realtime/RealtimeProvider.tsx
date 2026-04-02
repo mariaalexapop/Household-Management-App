@@ -29,9 +29,22 @@ export interface ActivityFeedItem {
   createdAt: string
 }
 
+export interface NotificationItem {
+  id: string
+  householdId: string
+  userId: string
+  type: 'task_assigned' | 'task_reminder'
+  entityId?: string | null
+  message: string
+  readAt: string | null
+  createdAt: string
+}
+
 export interface RealtimeContextValue {
   status: ConnectionStatus
   activityItems: ActivityFeedItem[]
+  notifications: NotificationItem[]
+  unreadCount: number
 }
 
 // ---------------------------------------------------------------------------
@@ -41,6 +54,8 @@ export interface RealtimeContextValue {
 const ConnectionContext = createContext<RealtimeContextValue>({
   status: 'connecting',
   activityItems: [],
+  notifications: [],
+  unreadCount: 0,
 })
 
 /**
@@ -57,13 +72,15 @@ export function useRealtime(): RealtimeContextValue {
 
 interface RealtimeProviderProps {
   householdId: string
+  userId: string
   children: ReactNode
 }
 
-export function RealtimeProvider({ householdId, children }: RealtimeProviderProps) {
+export function RealtimeProvider({ householdId, userId, children }: RealtimeProviderProps) {
   const router = useRouter()
   const [status, setStatus] = useState<ConnectionStatus>('connecting')
   const [activityItems, setActivityItems] = useState<ActivityFeedItem[]>([])
+  const [notificationItems, setNotificationItems] = useState<NotificationItem[]>([])
 
   // Use a stable ref to avoid stale closure issues
   const householdIdRef = useRef(householdId)
@@ -71,6 +88,10 @@ export function RealtimeProvider({ householdId, children }: RealtimeProviderProp
 
   const prependActivity = useCallback((item: ActivityFeedItem) => {
     setActivityItems((prev) => [item, ...prev])
+  }, [])
+
+  const prependNotification = useCallback((item: NotificationItem) => {
+    setNotificationItems((prev) => [item, ...prev])
   }, [])
 
   useEffect(() => {
@@ -105,6 +126,19 @@ export function RealtimeProvider({ householdId, children }: RealtimeProviderProp
           prependActivity(newItem)
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const newNotification = payload.new as NotificationItem
+          prependNotification(newNotification)
+        }
+      )
       .subscribe((subscribeStatus) => {
         if (subscribeStatus === 'SUBSCRIBED') {
           setStatus('connected')
@@ -131,10 +165,12 @@ export function RealtimeProvider({ householdId, children }: RealtimeProviderProp
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [householdId, router, prependActivity])
+  }, [householdId, userId, router, prependActivity, prependNotification])
+
+  const unreadCount = notificationItems.filter((n) => n.readAt === null).length
 
   return (
-    <ConnectionContext.Provider value={{ status, activityItems }}>
+    <ConnectionContext.Provider value={{ status, activityItems, notifications: notificationItems, unreadCount }}>
       {children}
     </ConnectionContext.Provider>
   )
