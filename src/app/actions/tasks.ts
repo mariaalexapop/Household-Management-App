@@ -11,6 +11,13 @@ import { inngest } from '@/lib/inngest/client'
 // Zod schemas
 // ---------------------------------------------------------------------------
 
+const recurrenceRuleSchema = z.object({
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  interval: z.number().int().min(1),
+  on_day_of_month: z.number().int().min(1).max(31).optional().nullable(),
+  on_day_of_week: z.number().int().min(0).max(6).optional().nullable(),
+})
+
 const createTaskSchema = z.object({
   title: z.string().min(1, 'Task name is required').max(200, 'Task name must be 200 characters or fewer'),
   notes: z.string().optional().nullable(),
@@ -18,6 +25,8 @@ const createTaskSchema = z.object({
   ownerId: z.string().uuid().optional().nullable(),
   startsAt: z.string().datetime({ offset: true }), // ISO 8601 with timezone
   endsAt: z.string().datetime({ offset: true }).optional().nullable(),
+  isRecurring: z.boolean().optional().default(false),
+  recurrenceRule: recurrenceRuleSchema.optional().nullable(),
   reminderOffsetMinutes: z
     .number()
     .int()
@@ -87,7 +96,7 @@ export async function createTask(
   const householdId = await getHouseholdId(user.id)
   if (!householdId) return { success: false, error: 'No household found' }
 
-  const { title, notes, areaId, ownerId, startsAt, endsAt, reminderOffsetMinutes } = parsed.data
+  const { title, notes, areaId, ownerId, startsAt, endsAt, isRecurring, recurrenceRule, reminderOffsetMinutes } = parsed.data
   const resolvedOwnerId = ownerId ?? user.id
 
   const [newTask] = await db
@@ -101,8 +110,8 @@ export async function createTask(
       status: 'todo',
       startsAt: new Date(startsAt),
       endsAt: endsAt ? new Date(endsAt) : null,
-      isRecurring: false,
-      recurrenceRule: null,
+      isRecurring: isRecurring ?? false,
+      recurrenceRule: recurrenceRule ?? null,
       parentTaskId: null,
       createdBy: user.id,
       reminderOffsetMinutes: reminderOffsetMinutes ?? null,
@@ -138,6 +147,29 @@ export async function createTask(
       entityType: 'task',
       entityId: newTask.id,
       metadata: { title, ownerId: resolvedOwnerId },
+    })
+  }
+
+  // Recurring task: fire background event to generate occurrence rows
+  if (isRecurring && recurrenceRule) {
+    await inngest.send({
+      name: 'chore/task.recurring.created',
+      data: { taskId: newTask.id, householdId },
+    })
+  }
+
+  // Due-date reminder: schedule for tasks with an owner
+  if (resolvedOwnerId) {
+    await inngest.send({
+      name: 'chore/task.reminder.scheduled',
+      data: {
+        taskId: newTask.id,
+        householdId,
+        ownerId: resolvedOwnerId,
+        taskTitle: title,
+        startsAt: new Date(startsAt).toISOString(),
+        reminderOffsetMinutes: reminderOffsetMinutes ?? 1440,
+      },
     })
   }
 
