@@ -1,10 +1,11 @@
 ---
 phase: 2
 slug: home-chores
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-nova
 created: 2026-04-02
+reviewed_at: 2026-04-02
 ---
 
 # Phase 2 — UI Design Contract: Home Chores
@@ -54,9 +55,9 @@ Source: standard 8-point scale; touch target exception drawn from PLAT-03 mobile
 | Role | Font | Size | Weight | Line Height | Usage |
 |------|------|------|--------|-------------|-------|
 | Body | Public Sans (`font-body`) | 16px | 400 (regular) | 1.5 | Task notes, descriptions, form helper text |
-| Label | Public Sans (`font-body`) | 14px | 500 (medium) | 1.4 | Area badge text, filter labels, form field labels, metadata (due date, assignee) |
+| Label | Public Sans (`font-body`) | 14px | 400 (regular) | 1.4 | Area badge text, filter labels, form field labels, metadata (due date, assignee) |
 | Heading | Plus Jakarta Sans (`font-display`) | 20px | 600 (semibold) | 1.3 | Page title ("Home Chores"), dialog/drawer titles ("Add Task") |
-| Display | Plus Jakarta Sans (`font-display`) | 28px | 700 (bold) | 1.2 | Chores dashboard card section header — not used in task list |
+| Display | Plus Jakarta Sans (`font-display`) | 28px | 600 (semibold) | 1.2 | Chores dashboard card section header — not used in task list |
 
 Rules (from DESIGN.md):
 - Never use pure `#000000`; use `--color-kinship-on-surface` (`#2d3337`) for all body text.
@@ -239,7 +240,7 @@ All filters are stateful but URL-reflected (URL params) so the filtered view is 
 | Task form dialog title (new) | "Add a task" |
 | Task form dialog title (edit) | "Edit task" |
 | Task form submit (new) | "Add Task" |
-| Task form submit (edit) | "Save Changes" |
+| Task form submit (edit) | "Update Task" |
 | Empty state heading | "No tasks yet" |
 | Empty state body | "Your household has no tasks. Add your first task to get started." |
 | Empty state filtered (no results) | "No tasks match these filters." |
@@ -299,11 +300,11 @@ Source: components.json (`"registries": {}`), RESEARCH.md (Standard Stack — no
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-04-02
