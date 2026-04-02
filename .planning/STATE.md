@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 02 mockups generated — ready to execute
-last_updated: "2026-04-02T00:00:00Z"
+status: unknown
+stopped_at: Completed 02-home-chores 02-01-PLAN.md
+last_updated: "2026-04-02T14:36:59.625Z"
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 14
+  completed_plans: 9
 ---
 
 # Project State: Household Management App
 
-**Last updated:** 2026-04-01
-**Session:** Phase 01 Plan 07 — Invite system (email invite, shareable link, accept flow, member removal)
+**Last updated:** 2026-04-02
+**Session:** Phase 02 Plan 01 — Schema foundations and Wave 0 test stubs (chore_areas, tasks, notifications)
 
 ---
 
@@ -31,8 +31,8 @@ progress:
 
 ## Current Position
 
-Phase: 01 (Foundation & Onboarding) — EXECUTING
-Plan: 7 of 8 complete (01-01 through 01-07 done; advancing to Plan 08)
+Phase: 02 (Home Chores) — EXECUTING
+Plan: 1 of 6 complete (02-01 done; advancing to Plan 02)
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: 7 of 8 complete (01-01 through 01-07 done; advancing to Plan 08)
 | Phase 01 P07 | 611 | 2 tasks | 16 files |
 | Phase 01 P02 | 45 | 1 tasks | 15 files |
 | Phase 01 P01 | 7 | 2 tasks | 6 files |
+| Phase 02-home-chores P01 | 5 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ Plan: 7 of 8 complete (01-01 through 01-07 done; advancing to Plan 08)
 | Atomic invite claim via Supabase admin client (not Drizzle) | Drizzle does not expose rowsAffected for UPDATE — admin client UPDATE...RETURNING * provides atomic single-use enforcement |
 | Dialog built on @base-ui/react/dialog (not Radix) | Project uses base-ui throughout; no Radix UI dependency; base-ui/dialog provides equivalent API |
 | Accept flow redirects unauthenticated to /auth/signup?invite=token | Preserves invite token through signup flow; authenticated users with invalid tokens go to /auth/login?error=invite_invalid |
+| Vitest Wave 0 stubs use it.todo() not standalone todo() | Vitest 4.x does not export todo as a standalone function; it.todo('...') is the correct API for pending test stubs |
+| Phase 2 RLS patterns use ${authUid} directly (not wrapped in select) | Matches Phase 1 table patterns; Drizzle generates (select auth.uid()) in SQL output — consistent across all tables |
 
 ### Architecture Flags (verify before implementation)
 
@@ -96,7 +99,7 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Phase 02 mockups generated — ready to execute
+**Stopped at:** Completed 02-home-chores 02-01-PLAN.md
 
 **Context for next session:**
 

@@ -24,7 +24,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Onboarding | 2/8 | In Progress|  |
-| 2. Home Chores | 0/TBD | Not started | - |
+| 2. Home Chores | 1/6 | In Progress|  |
 | 3. Kids Activities | 0/TBD | Not started | - |
 | 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
 | 5. AI Chatbot & RAG | 0/TBD | Not started | - |
@@ -77,7 +77,7 @@ Plans:
 3. A user assigned a task receives an in-app and push notification immediately and a configurable reminder before the due date.
 4. Any household member can view, edit, and delete any task regardless of who created it.
 
-**Plans:** TBD
+**Plans:** 1/6 plans executed
 
 ---
 

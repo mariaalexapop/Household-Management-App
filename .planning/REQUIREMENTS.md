@@ -35,16 +35,16 @@
 
 ### Home Chores (CHORE)
 
-- [ ] **CHORE-01**: User can create a task with title, description, category, assignee, and due date
-- [ ] **CHORE-02**: User can assign a task to any household member (including themselves)
-- [ ] **CHORE-03**: User can mark a task as complete
-- [ ] **CHORE-04**: User can edit and delete tasks
-- [ ] **CHORE-05**: User can create recurring tasks (daily / weekly / monthly / custom frequency)
-- [ ] **CHORE-06**: Recurring tasks auto-regenerate on completion
-- [ ] **CHORE-07**: User can organise tasks into categories (e.g. Cleaning, Garden, Admin)
-- [ ] **CHORE-08**: User receives in-app and push notification when a task is assigned to them
-- [ ] **CHORE-09**: All household members can view and edit all tasks
-- [ ] **CHORE-10**: User receives a configurable reminder before a task's due date (in-app and push)
+- [x] **CHORE-01**: User can create a task with title, description, category, assignee, and due date
+- [x] **CHORE-02**: User can assign a task to any household member (including themselves)
+- [x] **CHORE-03**: User can mark a task as complete
+- [x] **CHORE-04**: User can edit and delete tasks
+- [x] **CHORE-05**: User can create recurring tasks (daily / weekly / monthly / custom frequency)
+- [x] **CHORE-06**: Recurring tasks auto-regenerate on completion
+- [x] **CHORE-07**: User can organise tasks into categories (e.g. Cleaning, Garden, Admin)
+- [x] **CHORE-08**: User receives in-app and push notification when a task is assigned to them
+- [x] **CHORE-09**: All household members can view and edit all tasks
+- [x] **CHORE-10**: User receives a configurable reminder before a task's due date (in-app and push)
 
 ### Car Maintenance (CAR)
 
@@ -192,16 +192,16 @@
 | PLAT-02 | Phase 1: Foundation & Onboarding | Pending |
 | PLAT-04 | Phase 1: Foundation & Onboarding | Complete |
 | PLAT-05 | Phase 1: Foundation & Onboarding | Pending |
-| CHORE-01 | Phase 2: Home Chores | Pending |
-| CHORE-02 | Phase 2: Home Chores | Pending |
-| CHORE-03 | Phase 2: Home Chores | Pending |
-| CHORE-04 | Phase 2: Home Chores | Pending |
-| CHORE-05 | Phase 2: Home Chores | Pending |
-| CHORE-06 | Phase 2: Home Chores | Pending |
-| CHORE-07 | Phase 2: Home Chores | Pending |
-| CHORE-08 | Phase 2: Home Chores | Pending |
-| CHORE-09 | Phase 2: Home Chores | Pending |
-| CHORE-10 | Phase 2: Home Chores | Pending |
+| CHORE-01 | Phase 2: Home Chores | Complete |
+| CHORE-02 | Phase 2: Home Chores | Complete |
+| CHORE-03 | Phase 2: Home Chores | Complete |
+| CHORE-04 | Phase 2: Home Chores | Complete |
+| CHORE-05 | Phase 2: Home Chores | Complete |
+| CHORE-06 | Phase 2: Home Chores | Complete |
+| CHORE-07 | Phase 2: Home Chores | Complete |
+| CHORE-08 | Phase 2: Home Chores | Complete |
+| CHORE-09 | Phase 2: Home Chores | Complete |
+| CHORE-10 | Phase 2: Home Chores | Complete |
 | KIDS-01 | Phase 3: Kids Activities | Pending |
 | KIDS-02 | Phase 3: Kids Activities | Pending |
 | KIDS-03 | Phase 3: Kids Activities | Pending |
