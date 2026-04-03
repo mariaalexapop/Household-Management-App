@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
@@ -74,8 +74,11 @@ export function ChoresClient({
   const router = useRouter()
   const [, startTransition] = useTransition()
 
-  // Optimistic task list
+  // Optimistic task list — sync when server refreshes with new data
   const [optimisticTasks, setOptimisticTasks] = useState<TaskItem[]>(initialTasks)
+  useEffect(() => {
+    setOptimisticTasks(initialTasks)
+  }, [initialTasks])
 
   // Dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
