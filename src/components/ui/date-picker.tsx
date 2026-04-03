@@ -42,7 +42,7 @@ export function DatePicker({
   }
 
   return (
-    <div ref={containerRef} className={`relative ${className ?? ''}`}>
+    <div ref={containerRef} className={`relative ${open ? 'z-[400]' : ''} ${className ?? ''}`}>
       {/* Trigger */}
       <button
         type="button"
