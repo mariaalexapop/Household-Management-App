@@ -26,6 +26,7 @@ export interface TaskItem {
   startsAt: Date | null
   endsAt: Date | null
   isRecurring: boolean
+  recurrenceRule: unknown
   parentTaskId: string | null
   ownerId: string | null
   areaId: string | null

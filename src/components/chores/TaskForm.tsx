@@ -9,8 +9,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
+import { RecurrenceConfig } from '@/components/chores/RecurrenceConfig'
 import { createTask, updateTask, createChoreArea } from '@/app/actions/tasks'
 import type { TaskItem, AreaItem, MemberItem } from '@/app/(app)/chores/ChoresClient'
+import type { RecurrenceRule } from '@/lib/chores/recurrence'
 
 // ---------------------------------------------------------------------------
 // Form schema
@@ -70,6 +72,10 @@ export function TaskForm({
 }: TaskFormProps) {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRecurring, setIsRecurring] = useState(editingTask?.isRecurring ?? false)
+  const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(
+    editingTask?.recurrenceRule as RecurrenceRule | null ?? null
+  )
 
   // "Create new area" inline state
   const [showNewArea, setShowNewArea] = useState(false)
@@ -159,6 +165,8 @@ export function TaskForm({
         reminderOffsetMinutes: values.reminderOffsetMinutes
           ? parseInt(values.reminderOffsetMinutes, 10)
           : null,
+        isRecurring,
+        recurrenceRule: isRecurring ? recurrenceRule : null,
       }
 
       if (editingTask) {
@@ -347,6 +355,32 @@ export function TaskForm({
           <option value="1440">1 day before</option>
           <option value="2880">2 days before</option>
         </select>
+      </div>
+
+      {/* Repeat toggle + recurrence config */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <input
+            id="isRecurring"
+            type="checkbox"
+            checked={isRecurring}
+            onChange={(e) => {
+              setIsRecurring(e.target.checked)
+              if (e.target.checked && !recurrenceRule) {
+                setRecurrenceRule({ frequency: 'weekly', interval: 1, on_day_of_week: null, on_day_of_month: null })
+              }
+            }}
+            className="h-4 w-4 rounded border-input accent-kinship-primary"
+          />
+          <Label htmlFor="isRecurring" className="font-body text-sm cursor-pointer">
+            Repeat
+          </Label>
+        </div>
+        {isRecurring && (
+          <div className="pl-7">
+            <RecurrenceConfig value={recurrenceRule} onChange={setRecurrenceRule} />
+          </div>
+        )}
       </div>
 
       {/* Server error */}

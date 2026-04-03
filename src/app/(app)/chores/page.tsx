@@ -49,6 +49,7 @@ export default async function ChoresPage({
       startsAt: tasks.startsAt,
       endsAt: tasks.endsAt,
       isRecurring: tasks.isRecurring,
+      recurrenceRule: tasks.recurrenceRule,
       parentTaskId: tasks.parentTaskId,
       ownerId: tasks.ownerId,
       areaId: tasks.areaId,
