@@ -11,7 +11,7 @@
 ## Phases
 
 - [ ] **Phase 1: Foundation & Onboarding** - Auth, household setup, onboarding wizard, module-based dashboard, real-time infrastructure, GDPR
-- [ ] **Phase 2: Home Chores** - Task management, recurring chores, assignments, due date reminders, notifications
+- [x] **Phase 2: Home Chores** - Task management, recurring chores, assignments, due date reminders, notifications
 - [ ] **Phase 3: Kids Activities** - Child profiles, activity tracking, calendar, reminders
 - [ ] **Phase 4: Tracker Modules & Calendar** - Car maintenance, insurance management, electronics registry, costs dashboard, unified calendar
 - [ ] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
@@ -24,7 +24,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Onboarding | 2/8 | In Progress|  |
-| 2. Home Chores | 5/6 | In Progress|  |
+| 2. Home Chores | 6/6 | Complete | 2026-04-03 |
 | 3. Kids Activities | 0/TBD | Not started | - |
 | 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
 | 5. AI Chatbot & RAG | 0/TBD | Not started | - |

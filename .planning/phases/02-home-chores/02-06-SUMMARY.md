@@ -24,7 +24,7 @@ decisions:
 metrics:
   duration_minutes: 15
   completed_date: "2026-04-03"
-  tasks_completed: 1
+  tasks_completed: 2
   tasks_total: 2
   files_changed: 4
 ---
@@ -37,9 +37,9 @@ metrics:
 
 ## Status
 
-**Partial — stopped at checkpoint:human-verify (Task 2)**
+**Complete — human verification approved 2026-04-03**
 
-Task 1 (auto) is complete and committed. Task 2 requires human verification of the full Phase 2 chores flow before marking Phase 2 complete.
+Task 1 (auto) complete and committed. Task 2 (human verification) approved by user.
 
 ---
 
