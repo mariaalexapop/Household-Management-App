@@ -3,10 +3,12 @@
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { addYears } from 'date-fns'
 import { db } from '@/lib/db'
 import { tasks, choreAreas, householdMembers, activityFeed } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { inngest } from '@/lib/inngest/client'
+import { generateOccurrences, type RecurrenceRule } from '@/lib/chores/recurrence'
 
 // ---------------------------------------------------------------------------
 // Zod schemas
@@ -155,12 +157,41 @@ export async function createTask(
     })
   }
 
-  // Recurring task: fire background event to generate occurrence rows
-  if (isRecurring && recurrenceRule && hasInngest) {
-    await inngest.send({
-      name: 'chore/task.recurring.created',
-      data: { taskId: newTask.id, householdId },
-    })
+  // Recurring task: generate occurrence rows inline, then optionally fire
+  // a background event for any additional processing (e.g. reminders per occurrence)
+  if (isRecurring && recurrenceRule) {
+    const startDate = new Date(startsAt)
+    const windowEnd = addYears(startDate, 1)
+    const occurrenceDates = generateOccurrences(recurrenceRule as RecurrenceRule, startDate, windowEnd)
+
+    if (occurrenceDates.length > 0) {
+      await db.insert(tasks).values(
+        occurrenceDates.map((date) => ({
+          householdId,
+          title,
+          notes: notes ?? null,
+          areaId: areaId ?? null,
+          ownerId: resolvedOwnerId,
+          status: 'todo' as const,
+          startsAt: date,
+          endsAt: endsAt
+            ? new Date(new Date(endsAt).getTime() - startDate.getTime() + date.getTime())
+            : null,
+          isRecurring: true,
+          recurrenceRule,
+          parentTaskId: newTask.id,
+          createdBy: user.id,
+          reminderOffsetMinutes: reminderOffsetMinutes ?? null,
+        }))
+      )
+    }
+
+    if (hasInngest) {
+      await inngest.send({
+        name: 'chore/task.recurring.created',
+        data: { taskId: newTask.id, householdId },
+      })
+    }
   }
 
   // Due-date reminder: schedule for tasks with an owner
