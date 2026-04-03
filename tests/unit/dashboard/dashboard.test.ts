@@ -19,6 +19,20 @@ vi.mock('@/components/ui/badge', () => ({
   badgeVariants: () => '',
 }))
 
+// Card components — mock for test isolation.
+vi.mock('@/components/ui/card', () => ({
+  Card: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    React.createElement('div', { 'data-testid': 'card', className }, children),
+  CardContent: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('div', null, children),
+  CardDescription: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('p', null, children),
+  CardHeader: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('div', null, children),
+  CardTitle: ({ children }: { children: React.ReactNode }) =>
+    React.createElement('h3', null, children),
+}))
+
 // lucide-react v1.x uses SVG internals incompatible with jsdom — mock with stubs.
 vi.mock('lucide-react', () => ({
   CheckSquare: () => React.createElement('span', { 'aria-hidden': true }, null),
@@ -33,6 +47,11 @@ vi.mock('lucide-react', () => ({
   User: () => React.createElement('span', { 'aria-hidden': true }, null),
 }))
 
+// date-fns format — mock for test isolation.
+vi.mock('date-fns', () => ({
+  format: (_date: Date, _fmt: string) => 'Mon 7 Apr',
+}))
+
 // React 19 renders asynchronously — use findBy* (async) instead of getBy* (sync).
 
 // ---------------------------------------------------------------------------
@@ -40,35 +59,55 @@ vi.mock('lucide-react', () => ({
 // ---------------------------------------------------------------------------
 
 describe('DashboardGrid', () => {
-  it('renders one ModuleCard per active module', async () => {
+  it('renders ChoresDashboardCard for chores module and ModuleCard for car', async () => {
     const modules: ModuleKey[] = ['chores', 'car']
-    render(React.createElement(DashboardGrid, { activeModules: modules }))
+    render(React.createElement(DashboardGrid, { activeModules: modules, upcomingTasks: [] }))
 
+    // ChoresDashboardCard renders its own "Home Chores" heading
     await screen.findByText('Home Chores')
+    // car still renders a ModuleCard
     await screen.findByText('Car Maintenance')
   })
 
-  it('renders exactly 2 "Coming soon" badges for 2 active modules', async () => {
+  it('renders 1 "Coming soon" badge for 2 active modules (chores uses ChoresDashboardCard)', async () => {
     const modules: ModuleKey[] = ['chores', 'car']
-    render(React.createElement(DashboardGrid, { activeModules: modules }))
+    render(React.createElement(DashboardGrid, { activeModules: modules, upcomingTasks: [] }))
 
+    // Only 'car' module shows "Coming soon"; 'chores' shows ChoresDashboardCard
     const badges = await screen.findAllByText('Coming soon')
-    expect(badges).toHaveLength(2)
+    expect(badges).toHaveLength(1)
   })
 
   it('renders EmptyModuleState when activeModules is empty', async () => {
-    render(React.createElement(DashboardGrid, { activeModules: [] }))
+    render(React.createElement(DashboardGrid, { activeModules: [], upcomingTasks: [] }))
 
     await screen.findByText('No modules activated yet')
     expect(screen.queryByText('Coming soon')).toBeNull()
   })
 
-  it('renders all 5 "Coming soon" badges when all modules are active', async () => {
+  it('renders 4 "Coming soon" badges when all 5 modules are active (chores uses ChoresDashboardCard)', async () => {
     const all: ModuleKey[] = ['chores', 'car', 'insurance', 'electronics', 'kids']
-    render(React.createElement(DashboardGrid, { activeModules: all }))
+    render(React.createElement(DashboardGrid, { activeModules: all, upcomingTasks: [] }))
 
+    // 'chores' renders ChoresDashboardCard (no "Coming soon"), other 4 show ModuleCard
     const badges = await screen.findAllByText('Coming soon')
-    expect(badges).toHaveLength(5)
+    expect(badges).toHaveLength(4)
+  })
+
+  it('renders ChoresDashboardCard empty state when upcomingTasks is empty', async () => {
+    render(React.createElement(DashboardGrid, { activeModules: ['chores'], upcomingTasks: [] }))
+
+    await screen.findByText('No upcoming tasks. Add a task to get started.')
+  })
+
+  it('renders task list in ChoresDashboardCard when tasks provided', async () => {
+    const tasks = [
+      { id: '1', title: 'Clean kitchen', areaName: 'Kitchen', startsAt: new Date('2026-04-07T10:00:00Z') },
+    ]
+    render(React.createElement(DashboardGrid, { activeModules: ['chores'], upcomingTasks: tasks }))
+
+    await screen.findByText('Clean kitchen')
+    await screen.findByText('Kitchen')
   })
 })
 
