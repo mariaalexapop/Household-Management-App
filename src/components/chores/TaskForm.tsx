@@ -182,6 +182,12 @@ export function TaskForm({
   const inputClassName =
     'flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
+  // Used inside flex rows — no w-full so flex-1 / w-32 work correctly
+  const inlineFieldClassName =
+    'h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd')
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       {/* Title */}
@@ -250,16 +256,17 @@ export function TaskForm({
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="YYYY-MM-DD"
-            className={`${inputClassName} flex-1`}
+            placeholder={todayStr}
+            className={`${inlineFieldClassName} flex-1 min-w-0`}
             {...register('startDate')}
           />
           <input
             type="time"
-            className={`${inputClassName} w-32`}
+            className={`${inlineFieldClassName} w-32 shrink-0`}
             {...register('startTime')}
           />
         </div>
+        <p className="font-body text-xs text-muted-foreground">Date format: YYYY-MM-DD (e.g. {todayStr})</p>
         {errors.startDate && (
           <p className="font-body text-xs text-destructive">{errors.startDate.message}</p>
         )}
@@ -271,13 +278,13 @@ export function TaskForm({
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="YYYY-MM-DD"
-            className={`${inputClassName} flex-1`}
+            placeholder={todayStr}
+            className={`${inlineFieldClassName} flex-1 min-w-0`}
             {...register('endDate')}
           />
           <input
             type="time"
-            className={`${inputClassName} w-32`}
+            className={`${inlineFieldClassName} w-32 shrink-0`}
             {...register('endTime')}
           />
         </div>
