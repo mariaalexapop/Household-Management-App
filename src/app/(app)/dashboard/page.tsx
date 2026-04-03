@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { eq, ne, asc, and } from 'drizzle-orm'
+import { eq, ne, asc, and, or, isNotNull } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { householdMembers, householdSettings, households, tasks as tasksTable, choreAreas } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
@@ -59,6 +59,11 @@ export default async function DashboardPage() {
         and(
           eq(tasksTable.householdId, row.householdId),
           ne(tasksTable.status, 'done'),
+          // Exclude parent template rows (recurring tasks with no parentTaskId)
+          or(
+            eq(tasksTable.isRecurring, false),
+            isNotNull(tasksTable.parentTaskId),
+          ),
         )
       )
       .orderBy(asc(tasksTable.startsAt))
