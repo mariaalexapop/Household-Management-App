@@ -259,7 +259,7 @@ export function TaskForm({
       {/* Start date + time */}
       <div className="flex flex-col gap-1">
         <Label className="font-body text-sm">
-          Start date <span className="text-destructive">*</span>
+          When? <span className="text-destructive">*</span>
         </Label>
         <div className="flex gap-2">
           <Controller

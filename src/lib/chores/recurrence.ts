@@ -5,6 +5,7 @@ export interface RecurrenceRule {
   interval: number
   on_day_of_month?: number | null
   on_day_of_week?: number | null
+  recurrence_end_date?: string | null // yyyy-MM-dd; null / absent = no end (1-year window)
 }
 
 /**

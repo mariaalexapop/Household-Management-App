@@ -1,5 +1,6 @@
 'use client'
 
+import { DatePicker } from '@/components/ui/date-picker'
 import type { RecurrenceRule } from '@/lib/chores/recurrence'
 
 interface RecurrenceConfigProps {
@@ -166,6 +167,43 @@ export function RecurrenceConfig({ value, onChange }: RecurrenceConfigProps) {
           <span className="text-sm text-[var(--text-secondary)]">of the month</span>
         </div>
       )}
+
+      {/* Ends */}
+      <div className="flex items-start gap-2">
+        <label className="text-sm font-medium text-[var(--text-secondary)] w-16 shrink-0 pt-2">
+          Ends
+        </label>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="recurrence-ends"
+              checked={value.recurrence_end_date == null}
+              onChange={() => onChange({ ...value, recurrence_end_date: null })}
+              className="accent-kinship-primary"
+            />
+            <span className="text-sm text-[var(--text-primary)]">No end date</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="recurrence-ends"
+              checked={value.recurrence_end_date != null}
+              onChange={() => onChange({ ...value, recurrence_end_date: '' })}
+              className="accent-kinship-primary"
+            />
+            <span className="text-sm text-[var(--text-primary)]">On date</span>
+          </label>
+          {value.recurrence_end_date != null && (
+            <DatePicker
+              value={value.recurrence_end_date ?? ''}
+              onChange={(date) => onChange({ ...value, recurrence_end_date: date || null })}
+              placeholder="Pick end date"
+              className="w-48"
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
 }

@@ -19,6 +19,7 @@ const recurrenceRuleSchema = z.object({
   interval: z.number().int().min(1),
   on_day_of_month: z.number().int().min(1).max(31).optional().nullable(),
   on_day_of_week: z.number().int().min(0).max(6).optional().nullable(),
+  recurrence_end_date: z.string().optional().nullable(),
 })
 
 const createTaskSchema = z.object({
@@ -161,8 +162,11 @@ export async function createTask(
   // a background event for any additional processing (e.g. reminders per occurrence)
   if (isRecurring && recurrenceRule) {
     const startDate = new Date(startsAt)
-    const windowEnd = addYears(startDate, 1)
-    const occurrenceDates = generateOccurrences(recurrenceRule as RecurrenceRule, startDate, windowEnd)
+    const rule = recurrenceRule as RecurrenceRule
+    const windowEnd = rule.recurrence_end_date
+      ? new Date(rule.recurrence_end_date + 'T23:59:59')
+      : addYears(startDate, 1)
+    const occurrenceDates = generateOccurrences(rule, startDate, windowEnd)
 
     if (occurrenceDates.length > 0) {
       await db.insert(tasks).values(
