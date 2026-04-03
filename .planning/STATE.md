@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-home-chores 02-05-PLAN.md
-last_updated: "2026-04-02T20:02:05Z"
+stopped_at: "Checkpoint:human-verify — 02-06 Task 2: Full Phase 2 chores flow verification"
+last_updated: "2026-04-03T14:29:00Z"
 progress:
   total_phases: 6
   completed_phases: 1
@@ -105,13 +105,14 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Completed 02-home-chores 02-05-PLAN.md
+**Stopped at:** Checkpoint:human-verify — 02-06 Task 2: Full Phase 2 chores flow verification
 
 **Context for next session:**
 
-- Phase 02 Plans 01 through 05 complete. All core chores features built: schema, /chores page, CRUD actions, recurrence, Inngest notifications, realtime notification bell in header, settings toggle.
-- Plan 02-06 is the final plan for Phase 2 — check its content before executing.
-- Run `/gsd:execute-phase 2` to continue with Plan 02-06.
+- Phase 02 Plans 01 through 06 in progress. Task 1 of Plan 06 complete (ChoresDashboardCard component and dashboard wiring, commit 23e0895).
+- Plan 02-06 is paused at the human-verify checkpoint (Task 2). User must verify the full chores flow in the browser.
+- After user types "approved", continue Plan 02-06 (it will be the final plan closure — no more auto tasks remain).
+- Run `/gsd:execute-phase 2` to continue after checkpoint approval.
 
 ---
 
