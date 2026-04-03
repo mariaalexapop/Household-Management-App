@@ -65,7 +65,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
 
   return (
     <Card
-      className={`relative bg-white rounded-lg p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
+      className={`relative overflow-visible bg-white rounded-lg p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
     >
       <div className="flex items-start gap-3">
         {/* Checkbox */}
@@ -73,7 +73,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
           type="button"
           onClick={handleCheckbox}
           aria-label={`Mark ${task.title} complete`}
-          className={`mt-0.5 flex min-h-[44px] min-w-[20px] items-center justify-center rounded border-2 transition-colors ${
+          className={`mt-1 h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
             isDone
               ? 'border-kinship-primary bg-kinship-primary'
               : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
