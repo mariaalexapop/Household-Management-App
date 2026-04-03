@@ -81,7 +81,12 @@ export default async function DashboardPage() {
             <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
             <p className="font-body text-sm text-kinship-on-surface/60">{row.householdName}</p>
           </div>
-          <SignOutButton />
+          <div className="flex items-center gap-4">
+            <a href="/household" className="font-body text-sm text-kinship-primary hover:underline">
+              Manage household
+            </a>
+            <SignOutButton />
+          </div>
         </div>
       </header>
 
