@@ -249,7 +249,8 @@ export function TaskForm({
         </Label>
         <div className="flex gap-2">
           <input
-            type="date"
+            type="text"
+            placeholder="YYYY-MM-DD"
             className={`${inputClassName} flex-1`}
             {...register('startDate')}
           />
@@ -269,7 +270,8 @@ export function TaskForm({
         <Label className="font-body text-sm">End date (optional)</Label>
         <div className="flex gap-2">
           <input
-            type="date"
+            type="text"
+            placeholder="YYYY-MM-DD"
             className={`${inputClassName} flex-1`}
             {...register('endDate')}
           />

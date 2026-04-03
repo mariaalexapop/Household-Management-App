@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
+import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { tasks, choreAreas, householdMembers, activityFeed } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
@@ -177,6 +178,9 @@ export async function createTask(
     })
   }
 
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
+
   return {
     success: true,
     data: {
@@ -254,6 +258,9 @@ export async function updateTask(data: unknown): Promise<ActionResult<{ id: stri
     })
   }
 
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
+
   return { success: true, data: { id } }
 }
 
@@ -271,6 +278,9 @@ export async function deleteTask(id: string): Promise<ActionResult> {
   // Delete all occurrence rows first (parentTaskId = id), then the parent
   await db.delete(tasks).where(and(eq(tasks.parentTaskId, id), eq(tasks.householdId, householdId)))
   await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.householdId, householdId)))
+
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
 
   return { success: true }
 }
@@ -312,6 +322,9 @@ export async function updateTaskStatus(
       metadata: { title: updatedTask.title },
     })
   }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
 
   return { success: true, data: { id: updatedTask.id, status: updatedTask.status } }
 }
