@@ -77,6 +77,7 @@ export function DatePicker({
           PreviousMonthButton: (props) => (
             <button
               {...props}
+              type="button"
               className="flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-kinship-surface-container text-kinship-on-surface"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -85,6 +86,7 @@ export function DatePicker({
           NextMonthButton: (props) => (
             <button
               {...props}
+              type="button"
               className="flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-kinship-surface-container text-kinship-on-surface"
             >
               <ChevronRight className="h-4 w-4" />
