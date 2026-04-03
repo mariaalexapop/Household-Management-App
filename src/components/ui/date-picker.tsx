@@ -67,6 +67,7 @@ export function DatePicker({
       ref={calendarRef}
       style={{ position: 'absolute', top: coords.top, left: coords.left, zIndex: 9999 }}
       className="w-[280px] rounded-xl border border-border bg-white p-3 shadow-xl"
+      onMouseDown={(e) => e.stopPropagation()}
     >
       <DayPicker
         mode="single"
