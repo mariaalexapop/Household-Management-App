@@ -128,18 +128,22 @@ export async function createTask(
     metadata: { title },
   })
 
+  const hasInngest = !!process.env.INNGEST_EVENT_KEY
+
   // Assignment notification (if assigned to someone other than creator)
   if (resolvedOwnerId !== user.id) {
-    await inngest.send({
-      name: 'chore/task.assigned',
-      data: {
-        taskId: newTask.id,
-        householdId,
-        ownerId: resolvedOwnerId,
-        taskTitle: title,
-        assignedBy: user.id,
-      },
-    })
+    if (hasInngest) {
+      await inngest.send({
+        name: 'chore/task.assigned',
+        data: {
+          taskId: newTask.id,
+          householdId,
+          ownerId: resolvedOwnerId,
+          taskTitle: title,
+          assignedBy: user.id,
+        },
+      })
+    }
     await db.insert(activityFeed).values({
       householdId,
       actorId: user.id,
@@ -151,7 +155,7 @@ export async function createTask(
   }
 
   // Recurring task: fire background event to generate occurrence rows
-  if (isRecurring && recurrenceRule) {
+  if (isRecurring && recurrenceRule && hasInngest) {
     await inngest.send({
       name: 'chore/task.recurring.created',
       data: { taskId: newTask.id, householdId },
@@ -159,7 +163,7 @@ export async function createTask(
   }
 
   // Due-date reminder: schedule for tasks with an owner
-  if (resolvedOwnerId) {
+  if (resolvedOwnerId && hasInngest) {
     await inngest.send({
       name: 'chore/task.reminder.scheduled',
       data: {
@@ -228,16 +232,18 @@ export async function updateTask(data: unknown): Promise<ActionResult<{ id: stri
 
   // Fire assignment event if owner changed to a different user
   if (newOwnerId && newOwnerId !== currentTask.ownerId && newOwnerId !== user.id) {
-    await inngest.send({
-      name: 'chore/task.assigned',
-      data: {
-        taskId: id,
-        householdId,
-        ownerId: newOwnerId,
-        taskTitle: title,
-        assignedBy: user.id,
-      },
-    })
+    if (process.env.INNGEST_EVENT_KEY) {
+      await inngest.send({
+        name: 'chore/task.assigned',
+        data: {
+          taskId: id,
+          householdId,
+          ownerId: newOwnerId,
+          taskTitle: title,
+          assignedBy: user.id,
+        },
+      })
+    }
     await db.insert(activityFeed).values({
       householdId,
       actorId: user.id,
