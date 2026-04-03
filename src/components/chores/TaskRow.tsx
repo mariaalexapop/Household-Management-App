@@ -67,13 +67,13 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
     <Card
       className={`relative overflow-visible bg-white rounded-lg p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         {/* Checkbox */}
         <button
           type="button"
           onClick={handleCheckbox}
           aria-label={`Mark ${task.title} complete`}
-          className={`mt-1 h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
+          className={`h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
             isDone
               ? 'border-kinship-primary bg-kinship-primary'
               : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
@@ -125,70 +125,70 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
             </p>
           )}
 
-          {/* Row 3: Owner + Status badge */}
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              {owner ? (
-                <>
-                  <Avatar size="sm">
-                    {owner.avatarUrl && <AvatarImage src={owner.avatarUrl} alt={owner.displayName ?? ''} />}
-                    <AvatarFallback>{getInitials(owner.displayName)}</AvatarFallback>
-                  </Avatar>
-                  <span className="font-body text-sm text-kinship-on-surface/70">
-                    {owner.displayName ?? 'Unknown'}
-                  </span>
-                </>
-              ) : null}
-            </div>
-            <StatusBadge status={task.status} />
+          {/* Row 3: Owner */}
+          <div className="mt-2 flex items-center gap-2">
+            {owner ? (
+              <>
+                <Avatar size="sm">
+                  {owner.avatarUrl && <AvatarImage src={owner.avatarUrl} alt={owner.displayName ?? ''} />}
+                  <AvatarFallback>{getInitials(owner.displayName)}</AvatarFallback>
+                </Avatar>
+                <span className="font-body text-sm text-kinship-on-surface/70">
+                  {owner.displayName ?? 'Unknown'}
+                </span>
+              </>
+            ) : null}
           </div>
         </div>
 
-        {/* Action menu */}
-        <div className="relative shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="min-h-[44px] min-w-[44px] p-0"
-            aria-label="Task actions"
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+        {/* Status + Action menu */}
+        <div className="flex shrink-0 items-center gap-1">
+          <StatusBadge status={task.status} />
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="min-h-[44px] min-w-[44px] p-0"
+              aria-label="Task actions"
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
 
-          {menuOpen && (
-            <>
-              {/* Backdrop */}
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setMenuOpen(false)}
-                aria-hidden="true"
-              />
-              {/* Menu */}
-              <div className="absolute right-0 top-10 z-20 min-w-[140px] rounded-lg border border-border bg-white py-1 shadow-lg">
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-left font-body text-sm text-kinship-on-surface hover:bg-kinship-surface"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    onEdit(task)
-                  }}
-                >
-                  Edit task
-                </button>
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-left font-body text-sm text-destructive hover:bg-kinship-surface"
-                  onClick={() => {
-                    setMenuOpen(false)
-                    onDelete(task.id)
-                  }}
-                >
-                  Delete task
-                </button>
-              </div>
-            </>
-          )}
+            {menuOpen && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setMenuOpen(false)}
+                  aria-hidden="true"
+                />
+                {/* Menu */}
+                <div className="absolute right-0 top-10 z-20 min-w-[140px] rounded-lg border border-border bg-white py-1 shadow-lg">
+                  <button
+                    type="button"
+                    className="w-full px-4 py-2 text-left font-body text-sm text-kinship-on-surface hover:bg-kinship-surface"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      onEdit(task)
+                    }}
+                  >
+                    Edit task
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full px-4 py-2 text-left font-body text-sm text-destructive hover:bg-kinship-surface"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      onDelete(task.id)
+                    }}
+                  >
+                    Delete task
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </Card>
