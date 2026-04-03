@@ -67,7 +67,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
     <Card
       className={`relative overflow-visible bg-white rounded-lg p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         {/* Checkbox */}
         <button
           type="button"
@@ -142,7 +142,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
         </div>
 
         {/* Status + Action menu */}
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 self-center items-center gap-1">
           <StatusBadge status={task.status} />
           <div className="relative">
             <Button
