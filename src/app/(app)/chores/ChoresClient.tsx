@@ -226,7 +226,7 @@ export function ChoresClient({
       />
 
       {/* Add / Edit Task Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} modal={false}>
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} modal={false} disablePointerDismissal>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingTask ? 'Edit task' : 'Add a task'}</DialogTitle>

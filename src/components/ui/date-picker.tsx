@@ -46,19 +46,6 @@ export function DatePicker({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
-  // Native mousedown listener on the calendar div to stop propagation before
-  // Base UI dialog's document-level dismiss handler fires. React's synthetic
-  // stopPropagation doesn't work here because the portal is outside #root.
-  useEffect(() => {
-    if (!open || !calendarRef.current) return
-    const el = calendarRef.current
-    function stopBubble(e: MouseEvent) {
-      e.stopPropagation()
-    }
-    el.addEventListener('mousedown', stopBubble)
-    return () => el.removeEventListener('mousedown', stopBubble)
-  }, [open])
-
   useEffect(() => {
     if (!open) return
     const close = () => setOpen(false)
