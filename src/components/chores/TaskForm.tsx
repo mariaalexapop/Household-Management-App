@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { DatePicker } from '@/components/ui/date-picker'
 import { createTask, updateTask, createChoreArea } from '@/app/actions/tasks'
 import type { TaskItem, AreaItem, MemberItem } from '@/app/(app)/chores/ChoresClient'
 
@@ -108,6 +109,7 @@ export function TaskForm({
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
@@ -182,11 +184,9 @@ export function TaskForm({
   const inputClassName =
     'flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
-  // Used inside flex rows — no w-full so flex-1 / w-32 work correctly
+  // Used inside flex rows — no w-full so w-32 works correctly
   const inlineFieldClassName =
     'h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-
-  const todayStr = format(new Date(), 'yyyy-MM-dd')
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -254,11 +254,17 @@ export function TaskForm({
           Start date <span className="text-destructive">*</span>
         </Label>
         <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder={todayStr}
-            className={`${inlineFieldClassName} flex-1 min-w-0`}
-            {...register('startDate')}
+          <Controller
+            control={control}
+            name="startDate"
+            render={({ field }) => (
+              <DatePicker
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                placeholder="Pick a date"
+                className="flex-1 min-w-0"
+              />
+            )}
           />
           <input
             type="time"
@@ -266,7 +272,6 @@ export function TaskForm({
             {...register('startTime')}
           />
         </div>
-        <p className="font-body text-xs text-muted-foreground">Date format: YYYY-MM-DD (e.g. {todayStr})</p>
         {errors.startDate && (
           <p className="font-body text-xs text-destructive">{errors.startDate.message}</p>
         )}
@@ -276,11 +281,17 @@ export function TaskForm({
       <div className="flex flex-col gap-1">
         <Label className="font-body text-sm">End date (optional)</Label>
         <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder={todayStr}
-            className={`${inlineFieldClassName} flex-1 min-w-0`}
-            {...register('endDate')}
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field }) => (
+              <DatePicker
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                placeholder="Pick a date (optional)"
+                className="flex-1 min-w-0"
+              />
+            )}
           />
           <input
             type="time"
