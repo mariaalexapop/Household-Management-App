@@ -110,10 +110,8 @@ export function InviteModal({ householdId }: InviteModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<button />} onClick={() => setOpen(true)}>
-        <Button variant="default" size="default">
-          Invite member
-        </Button>
+      <DialogTrigger render={<Button variant="default" size="default" />}>
+        Invite member
       </DialogTrigger>
 
       <DialogContent>
