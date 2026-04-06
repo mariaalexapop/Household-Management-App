@@ -36,7 +36,32 @@ export default async function JoinPage({ params }: Props) {
     .limit(1)
 
   if (!invite) {
-    redirect('/auth/login?error=invite_invalid')
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-kinship-surface px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-8 text-center">
+            <h1 className="font-display text-3xl font-bold text-kinship-on-surface">Kinship</h1>
+          </div>
+          <div className="rounded-lg bg-kinship-surface-container-lowest p-8 text-center [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+            <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
+              Invitation not found
+            </h2>
+            <p className="mt-3 font-body text-sm text-kinship-on-surface/70">
+              This invitation link has expired, already been used, or is invalid. Ask the household
+              admin to send you a new one.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/auth/login"
+                className={cn(buttonVariants({ variant: 'outline' }), 'w-full rounded-full')}
+              >
+                Go to sign in
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   // If already authenticated, claim the invite immediately
