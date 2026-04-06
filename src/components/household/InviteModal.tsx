@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -110,7 +110,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="default" size="default" />}>
+      <DialogTrigger className={buttonVariants({ variant: 'default', size: 'default' })}>
         Invite member
       </DialogTrigger>
 
