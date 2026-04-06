@@ -165,7 +165,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
 
             {emailResult?.success && (
               <p className="text-sm text-green-600">
-                Invite sent! They will receive a magic link to join.
+                Invite sent! They will receive a link to create their account and join.
               </p>
             )}
             {emailResult?.error && (

@@ -36,6 +36,8 @@ interface AuthFormProps {
   inviteToken?: string
   /** Pre-filled (read-only) email address from the invite */
   inviteEmail?: string
+  /** Where to redirect after successful login (e.g. /join/TOKEN for shareable invite links) */
+  nextUrl?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -59,7 +61,7 @@ function getSchema(mode: AuthMode) {
 // Component
 // ---------------------------------------------------------------------------
 
-export function AuthForm({ mode, inviteToken, inviteEmail }: AuthFormProps) {
+export function AuthForm({ mode, inviteToken, inviteEmail, nextUrl }: AuthFormProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -99,7 +101,7 @@ export function AuthForm({ mode, inviteToken, inviteEmail }: AuthFormProps) {
         // (bypasses RLS) to check for a household and redirects to /onboarding
         // if needed. Querying household_members here via the browser client hits
         // a self-referential RLS policy that returns empty results.
-        router.push('/dashboard')
+        router.push(nextUrl ?? '/dashboard')
       } else if (mode === 'signup') {
         const { email, password } = data as SignupFormData
         const callbackUrl = inviteToken

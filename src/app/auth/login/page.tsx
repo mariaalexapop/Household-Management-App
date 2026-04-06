@@ -6,7 +6,12 @@ export const metadata = {
   title: 'Sign in — Kinship',
 }
 
-export default function LoginPage() {
+interface Props {
+  searchParams: Promise<{ next?: string }>
+}
+
+export default async function LoginPage({ searchParams }: Props) {
+  const { next } = await searchParams
   return (
     <div className="flex min-h-screen items-center justify-center bg-kinship-surface px-4 py-12">
       <div className="w-full max-w-md">
@@ -20,7 +25,7 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="rounded-lg bg-kinship-surface-container-lowest p-8 [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
-          <AuthForm mode="login" />
+          <AuthForm mode="login" nextUrl={next} />
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-4">
