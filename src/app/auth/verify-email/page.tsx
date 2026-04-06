@@ -6,12 +6,13 @@ export const metadata = {
 }
 
 interface Props {
-  searchParams: Promise<{ email?: string }>
+  searchParams: Promise<{ email?: string; invite?: string }>
 }
 
 export default async function VerifyEmailPage({ searchParams }: Props) {
   const params = await searchParams
   const email = params.email ?? 'your email address'
+  const inviteToken = params.invite
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-kinship-surface px-4 py-12">
@@ -57,7 +58,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
             <p className="font-body text-xs text-kinship-on-surface/50">
               Didn&apos;t receive the email? Check your spam folder or resend it.
             </p>
-            {email !== 'your email address' && <ResendButton email={email} />}
+            {email !== 'your email address' && <ResendButton email={email} inviteToken={inviteToken} />}
           </div>
         </div>
 

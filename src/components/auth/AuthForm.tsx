@@ -32,6 +32,10 @@ type FormData = LoginFormData | SignupFormData | ResetPasswordFormData | UpdateP
 
 interface AuthFormProps {
   mode: AuthMode
+  /** Invite token from /auth/signup?invite=TOKEN — threads through the verification flow */
+  inviteToken?: string
+  /** Pre-filled (read-only) email address from the invite */
+  inviteEmail?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -55,7 +59,7 @@ function getSchema(mode: AuthMode) {
 // Component
 // ---------------------------------------------------------------------------
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode, inviteToken, inviteEmail }: AuthFormProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -70,6 +74,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   } = useForm<FormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(getSchema(mode) as any),
+    defaultValues: inviteEmail ? ({ email: inviteEmail } as Partial<FormData>) : undefined,
   })
 
   const onSubmit = async (data: FormData) => {
@@ -97,19 +102,25 @@ export function AuthForm({ mode }: AuthFormProps) {
         router.push('/dashboard')
       } else if (mode === 'signup') {
         const { email, password } = data as SignupFormData
+        const callbackUrl = inviteToken
+          ? `${window.location.origin}/api/auth/callback?invite=${inviteToken}`
+          : `${window.location.origin}/api/auth/callback`
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+            emailRedirectTo: callbackUrl,
           },
         })
         if (error) {
           setServerError(error.message)
           return
         }
-        // After signup, redirect to email verification page
-        router.push('/auth/verify-email?email=' + encodeURIComponent(email))
+        // After signup, redirect to email verification page (preserve invite token)
+        const verifyUrl = inviteToken
+          ? `/auth/verify-email?email=${encodeURIComponent(email)}&invite=${inviteToken}`
+          : `/auth/verify-email?email=${encodeURIComponent(email)}`
+        router.push(verifyUrl)
       } else if (mode === 'reset') {
         const { email } = data as ResetPasswordFormData
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -161,6 +172,8 @@ export function AuthForm({ mode }: AuthFormProps) {
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
+            readOnly={mode === 'signup' && !!inviteEmail}
+            className={mode === 'signup' && inviteEmail ? 'bg-kinship-surface-container text-kinship-on-surface/60 cursor-not-allowed' : ''}
             aria-invalid={'email' in errors && !!errors.email}
             {...register('email' as never)}
           />

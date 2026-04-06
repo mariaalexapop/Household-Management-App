@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { eq, and } from 'drizzle-orm'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { db } from '@/lib/db'
-import { householdMembers, households } from '@/lib/db/schema'
+import { householdMembers, households, householdInvites } from '@/lib/db/schema'
 import { inngest } from '@/lib/inngest/client'
 
 /**
  * POST /api/household/invite
  *
- * Admin sends an email invite to a new member via Supabase auth.admin.inviteUserByEmail.
- * An Inngest job is enqueued to send the transactional notification email via Resend.
+ * Admin sends an email invite to a new member. An invite token is stored in
+ * household_invites with the recipient email, and an Inngest job sends the
+ * branded email via Resend with a link to /auth/signup?invite=<token>.
+ *
+ * The invited user signs up with their own email+password, then the auth
+ * callback claims the invite token and links them to the household — no
+ * Supabase inviteUserByEmail (which would pre-create the account and block
+ * a subsequent signUp call on the same email).
  *
  * Body: { email: string, householdId: string }
  * Response: { success: true } | { error: string }
@@ -66,27 +71,35 @@ export async function POST(request: NextRequest) {
 
   const householdName = householdRow?.name ?? 'your household'
 
-  // Send invite via Supabase auth admin (triggers magic link email to the invitee)
-  const adminClient = createAdminClient()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const { error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
-    data: {
-      household_id: householdId,
-      invited_as: 'member',
-    },
-    redirectTo: `${appUrl}/api/auth/accept-invite`,
-  })
+  // Create invite token in household_invites (7-day expiry)
+  const expiresAt = new Date()
+  expiresAt.setDate(expiresAt.getDate() + 7)
 
-  if (inviteError) {
-    return NextResponse.json({ error: inviteError.message }, { status: 500 })
+  const [invite] = await db
+    .insert(householdInvites)
+    .values({
+      householdId,
+      email,
+      invitedBy: user.id,
+      expiresAt,
+    })
+    .returning({ token: householdInvites.token })
+
+  if (!invite) {
+    return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 })
   }
 
-  // Enqueue Inngest event to send the branded invite notification email
+  // Build the sign-up URL that the invited user will land on
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const inviteUrl = `${appUrl}/auth/signup?invite=${invite.token}`
+
+  // Enqueue Inngest event to send the branded invite email via Resend
   await inngest.send({
     name: 'household/invite.created',
     data: {
       email,
       householdName,
+      inviteUrl,
     },
   })
 

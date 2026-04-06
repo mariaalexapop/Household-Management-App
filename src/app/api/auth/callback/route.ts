@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server'
+import { eq, and, isNull, gt } from 'drizzle-orm'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
-import { householdMembers } from '@/lib/db/schema'
+import { householdMembers, householdInvites } from '@/lib/db/schema'
 
 /**
  * PKCE OAuth callback handler.
  *
- * Supabase redirects the browser here after Google OAuth or email magic-link
- * flows. This route exchanges the one-time `code` from the URL for a full
- * session cookie and then redirects the user to the correct destination:
+ * Supabase redirects the browser here after Google OAuth or email verification
+ * flows. This route exchanges the one-time `code` for a session cookie and
+ * routes the user to the correct destination:
  *
- *   - Invited user (household_id in metadata, no household yet) → link to household → /dashboard
- *   - New user (no household)                                   → /onboarding
- *   - Returning user                                            → /dashboard
- *   - Exchange failure                                          → /auth/login?error=oauth_failed
+ *   - Invited user (invite token in URL) → claim invite, link to household → /dashboard
+ *   - Returning user (already has household) → /dashboard
+ *   - New user (no household, no invite)  → /onboarding
+ *   - Exchange failure                     → /auth/login?error=oauth_failed
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const next = requestUrl.searchParams.get('next')
-  const origin = requestUrl.origin
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? origin
+  const inviteToken = requestUrl.searchParams.get('invite')
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? requestUrl.origin
 
   if (!code) {
-    // No code parameter — redirect back to login with an error
     return NextResponse.redirect(`${appUrl}/auth/login?error=oauth_failed`)
   }
 
@@ -43,38 +43,51 @@ export async function GET(request: Request) {
 
   const user = data.session.user
 
-  // Check if the user already belongs to a household
+  // --- Invite claim path ---
+  // If the signup was initiated from an invite link, claim the token and link
+  // the user to the household atomically. The token was threaded through the
+  // emailRedirectTo so it arrives here as ?invite=TOKEN.
+  if (inviteToken) {
+    const [claimedInvite] = await db
+      .update(householdInvites)
+      .set({ claimedAt: new Date(), claimedBy: user.id })
+      .where(
+        and(
+          eq(householdInvites.token, inviteToken),
+          isNull(householdInvites.claimedAt),
+          gt(householdInvites.expiresAt, new Date())
+        )
+      )
+      .returning()
+
+    if (claimedInvite) {
+      await db
+        .insert(householdMembers)
+        .values({
+          householdId: claimedInvite.householdId,
+          userId: user.id,
+          role: 'member',
+          displayName: user.email ?? user.id,
+        })
+        .onConflictDoNothing()
+
+      return NextResponse.redirect(`${appUrl}/dashboard`)
+    }
+
+    // Token expired or already claimed — continue to normal routing below
+    console.warn('[auth/callback] invite token invalid or already claimed:', inviteToken)
+  }
+
+  // --- Normal post-auth routing ---
   const { data: members } = await supabase
     .from('household_members')
     .select('household_id')
     .eq('user_id', user.id)
     .limit(1)
 
-  const hasHousehold = Array.isArray(members) && members.length > 0
-
-  if (hasHousehold) {
+  if (Array.isArray(members) && members.length > 0) {
     return NextResponse.redirect(`${appUrl}/dashboard`)
   }
 
-  // No household yet — check if they were invited (household_id in user_metadata).
-  // This covers the edge case where an invited user signed up via the email+password
-  // form instead of clicking the magic link directly.
-  const invitedHouseholdId = user.user_metadata?.household_id as string | undefined
-
-  if (invitedHouseholdId) {
-    await db
-      .insert(householdMembers)
-      .values({
-        householdId: invitedHouseholdId,
-        userId: user.id,
-        role: 'member',
-        displayName: user.email ?? user.id,
-      })
-      .onConflictDoNothing()
-
-    return NextResponse.redirect(`${appUrl}/dashboard`)
-  }
-
-  // Brand-new user with no invite — send through the onboarding wizard
   return NextResponse.redirect(`${appUrl}/onboarding`)
 }

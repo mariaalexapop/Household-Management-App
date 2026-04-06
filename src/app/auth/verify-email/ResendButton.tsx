@@ -4,13 +4,20 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
-export function ResendButton({ email }: { email: string }) {
+export function ResendButton({ email, inviteToken }: { email: string; inviteToken?: string }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   async function handleResend() {
     setStatus('sending')
     const supabase = createClient()
-    const { error } = await supabase.auth.resend({ type: 'signup', email })
+    const callbackUrl = inviteToken
+      ? `${window.location.origin}/api/auth/callback?invite=${inviteToken}`
+      : `${window.location.origin}/api/auth/callback`
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: callbackUrl },
+    })
     setStatus(error ? 'error' : 'sent')
   }
 
