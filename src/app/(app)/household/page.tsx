@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { desc, eq } from 'drizzle-orm'
+import { desc, eq, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { activityFeed, householdMembers, households } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
@@ -48,6 +48,7 @@ export default async function HouseholdPage() {
     .from(householdMembers)
     .innerJoin(households, eq(householdMembers.householdId, households.id))
     .where(eq(householdMembers.userId, user.id))
+    .orderBy(sql`CASE ${householdMembers.role} WHEN 'admin' THEN 0 ELSE 1 END`)
     .limit(1)
 
   const currentMember = memberRows[0]
