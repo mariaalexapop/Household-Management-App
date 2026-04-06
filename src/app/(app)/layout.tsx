@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { householdMembers } from '@/lib/db/schema'
@@ -6,6 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { ConnectionIndicator } from '@/components/realtime/ConnectionIndicator'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
+import { Settings } from 'lucide-react'
 
 /**
  * Protected (app) layout.
@@ -48,8 +50,15 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <RealtimeProvider householdId={householdId} userId={user.id}>
       <ConnectionIndicator />
-      <div className="fixed top-3 right-4 z-30">
+      <div className="fixed top-3 right-4 z-30 flex items-center gap-2">
         <NotificationBell />
+        <Link
+          href="/settings"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-kinship-surface-container hover:text-kinship-on-surface"
+          aria-label="Settings"
+        >
+          <Settings className="h-5 w-5" />
+        </Link>
       </div>
       {children}
     </RealtimeProvider>

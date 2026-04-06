@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { format, parseISO, isValid } from 'date-fns'
 import { DayPicker } from 'react-day-picker'
 import { CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import type { ChevronProps } from 'react-day-picker'
 
 interface DatePickerProps {
   value: string // yyyy-MM-dd
@@ -74,24 +75,12 @@ export function DatePicker({
         onSelect={handleSelect}
         defaultMonth={selected ?? new Date()}
         components={{
-          PreviousMonthButton: (props) => (
-            <button
-              {...props}
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-kinship-surface-container text-kinship-on-surface"
-            >
+          Chevron: ({ orientation }: ChevronProps) =>
+            orientation === 'left' ? (
               <ChevronLeft className="h-4 w-4" />
-            </button>
-          ),
-          NextMonthButton: (props) => (
-            <button
-              {...props}
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-kinship-surface-container text-kinship-on-surface"
-            >
+            ) : (
               <ChevronRight className="h-4 w-4" />
-            </button>
-          ),
+            ),
         }}
         classNames={{
           root: 'w-full',
@@ -100,6 +89,8 @@ export function DatePicker({
           month_caption: 'relative flex items-center justify-center py-1',
           caption_label: 'font-display text-sm font-semibold text-kinship-on-surface',
           nav: 'absolute inset-x-0 top-0 flex items-center justify-between',
+          button_previous: 'flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-kinship-surface-container text-kinship-on-surface',
+          button_next: 'flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-kinship-surface-container text-kinship-on-surface',
           month_grid: 'w-full border-collapse',
           weekdays: 'flex',
           weekday: 'flex-1 text-center font-body text-xs text-muted-foreground py-1',
