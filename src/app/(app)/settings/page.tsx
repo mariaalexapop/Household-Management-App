@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -54,18 +55,18 @@ export default async function SettingsPage() {
       <main className="mx-auto max-w-3xl px-6 py-8 space-y-10">
         {/* Navigation links */}
         <nav className="flex gap-4 text-sm font-medium">
-          <a
+          <Link
             href="/settings"
             className="text-kinship-primary border-b-2 border-kinship-primary pb-1"
           >
             Profile
-          </a>
-          <a
+          </Link>
+          <Link
             href="/settings/modules"
             className="text-kinship-on-surface/60 hover:text-kinship-on-surface pb-1"
           >
             Modules
-          </a>
+          </Link>
         </nav>
 
         {/* Profile section */}

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -65,6 +66,22 @@ export default async function ModulesSettingsPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-8">
+        {/* Navigation links */}
+        <nav className="flex gap-4 text-sm font-medium mb-10">
+          <Link
+            href="/settings"
+            className="text-kinship-on-surface/60 hover:text-kinship-on-surface pb-1"
+          >
+            Profile
+          </Link>
+          <Link
+            href="/settings/modules"
+            className="text-kinship-primary border-b-2 border-kinship-primary pb-1"
+          >
+            Modules
+          </Link>
+        </nav>
+
         <div className="mb-6">
           <h2 className="font-display text-2xl font-semibold text-kinship-on-surface">
             Household Modules
