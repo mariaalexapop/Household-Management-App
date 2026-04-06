@@ -46,9 +46,19 @@ export default async function SettingsPage() {
   return (
     <div className="min-h-screen bg-kinship-surface">
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
-        <div className="mx-auto max-w-3xl">
-          <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-          <p className="font-body text-sm text-kinship-on-surface/60">Settings</p>
+        <div className="mx-auto max-w-3xl flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface/60">Settings</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">
+              Dashboard
+            </Link>
+            <Link href="/household" className="font-body text-sm text-kinship-primary hover:underline">
+              Manage household
+            </Link>
+          </div>
         </div>
       </header>
 
