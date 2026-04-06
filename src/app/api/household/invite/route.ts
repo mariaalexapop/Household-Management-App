@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       household_id: householdId,
       invited_as: 'member',
     },
-    redirectTo: `${appUrl}/auth/accept-invite`,
+    redirectTo: `${appUrl}/api/auth/accept-invite`,
   })
 
   if (inviteError) {
