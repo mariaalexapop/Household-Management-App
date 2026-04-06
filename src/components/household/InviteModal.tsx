@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -109,9 +109,13 @@ export function InviteModal({ householdId }: InviteModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button variant="default" size="default" onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className={buttonVariants({ variant: 'default', size: 'default' })}
+        onClick={() => setOpen(true)}
+      >
         Invite member
-      </Button>
+      </button>
 
       <DialogContent>
         <DialogHeader>
