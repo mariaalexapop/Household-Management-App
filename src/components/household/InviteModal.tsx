@@ -3,12 +3,11 @@
 import React, { useState } from 'react'
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -110,9 +109,9 @@ export function InviteModal({ householdId }: InviteModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className={buttonVariants({ variant: 'default', size: 'default' })}>
+      <Button variant="default" size="default" onClick={() => setOpen(true)}>
         Invite member
-      </DialogTrigger>
+      </Button>
 
       <DialogContent>
         <DialogHeader>
