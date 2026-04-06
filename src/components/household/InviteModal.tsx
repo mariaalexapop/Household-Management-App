@@ -108,7 +108,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       <button
         type="button"
         className={buttonVariants({ variant: 'default', size: 'default' })}
@@ -117,7 +117,8 @@ export function InviteModal({ householdId }: InviteModalProps) {
         Invite member
       </button>
 
-      <DialogContent>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite a member</DialogTitle>
         </DialogHeader>
@@ -250,7 +251,8 @@ export function InviteModal({ householdId }: InviteModalProps) {
             )}
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
