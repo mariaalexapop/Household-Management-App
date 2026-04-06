@@ -46,26 +46,39 @@ export default async function JoinPage({ params }: Props) {
   } = await supabase.auth.getUser()
 
   if (user) {
-    await db
-      .update(householdInvites)
-      .set({ claimedAt: new Date(), claimedBy: user.id })
+    // If already a member of this household, just redirect — don't add a duplicate row
+    const [existingMember] = await db
+      .select({ id: householdMembers.id })
+      .from(householdMembers)
       .where(
         and(
-          eq(householdInvites.token, token),
-          isNull(householdInvites.claimedAt),
-          gt(householdInvites.expiresAt, new Date())
+          eq(householdMembers.householdId, invite.householdId),
+          eq(householdMembers.userId, user.id)
         )
       )
+      .limit(1)
 
-    await db
-      .insert(householdMembers)
-      .values({
-        householdId: invite.householdId,
-        userId: user.id,
-        role: 'member',
-        displayName: user.email ?? user.id,
-      })
-      .onConflictDoNothing()
+    if (!existingMember) {
+      await db
+        .update(householdInvites)
+        .set({ claimedAt: new Date(), claimedBy: user.id })
+        .where(
+          and(
+            eq(householdInvites.token, token),
+            isNull(householdInvites.claimedAt),
+            gt(householdInvites.expiresAt, new Date())
+          )
+        )
+
+      await db
+        .insert(householdMembers)
+        .values({
+          householdId: invite.householdId,
+          userId: user.id,
+          role: 'member',
+          displayName: user.email ?? user.id,
+        })
+    }
 
     redirect('/dashboard')
   }

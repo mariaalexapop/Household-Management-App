@@ -60,8 +60,8 @@ export default async function HouseholdPage() {
   const { householdId, householdName } = currentMember
   const isAdmin = currentMember.memberRole === 'admin'
 
-  // Fetch all members of this household, deduplicated by userId (admin row wins)
-  const rawMembers = await db
+  // Fetch all members of this household
+  const allMembers = await db
     .select({
       id: householdMembers.id,
       userId: householdMembers.userId,
@@ -73,13 +73,6 @@ export default async function HouseholdPage() {
     .from(householdMembers)
     .where(eq(householdMembers.householdId, householdId))
     .orderBy(sql`CASE ${householdMembers.role} WHEN 'admin' THEN 0 ELSE 1 END`, householdMembers.joinedAt)
-
-  const seenUserIds = new Set<string>()
-  const allMembers = rawMembers.filter((m) => {
-    if (seenUserIds.has(m.userId)) return false
-    seenUserIds.add(m.userId)
-    return true
-  })
 
   // Fetch initial activity feed items (most recent 20)
   const feedRows = await db

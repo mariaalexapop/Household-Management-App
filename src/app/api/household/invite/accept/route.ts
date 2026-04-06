@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sql } from 'drizzle-orm'
-import { redirect } from 'next/navigation'
+import { eq, and } from 'drizzle-orm'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { db } from '@/lib/db'
@@ -70,18 +69,28 @@ export async function GET(request: NextRequest) {
 
   const invite = claimedRows[0]
 
-  // Insert household_members row for the new member
-  // Use Drizzle with an ON CONFLICT DO NOTHING to prevent duplicate inserts
-  // if the user somehow hits this endpoint twice after claiming.
-  await db
-    .insert(householdMembers)
-    .values({
-      householdId: invite.household_id,
-      userId: user.id,
-      role: 'member',
-      displayName: user.email ?? user.id,
-    })
-    .onConflictDoNothing()
+  // Only insert if not already a member (prevents duplicate rows)
+  const [existingMember] = await db
+    .select({ id: householdMembers.id })
+    .from(householdMembers)
+    .where(
+      and(
+        eq(householdMembers.householdId, invite.household_id),
+        eq(householdMembers.userId, user.id)
+      )
+    )
+    .limit(1)
+
+  if (!existingMember) {
+    await db
+      .insert(householdMembers)
+      .values({
+        householdId: invite.household_id,
+        userId: user.id,
+        role: 'member',
+        displayName: user.email ?? user.id,
+      })
+  }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   return NextResponse.redirect(new URL('/dashboard', appUrl))
