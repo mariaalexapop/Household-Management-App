@@ -65,8 +65,8 @@ export async function DELETE(
     return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 })
   }
 
-  // Prevent self-deletion if caller is the only admin
-  if (targetMember.userId === user.id) {
+  // Prevent removing your own admin row if you are the only admin
+  if (targetMember.userId === user.id && targetMember.role === 'admin') {
     const adminMembers = await db
       .select({ id: householdMembers.id })
       .from(householdMembers)

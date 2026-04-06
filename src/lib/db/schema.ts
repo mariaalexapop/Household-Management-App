@@ -20,6 +20,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
@@ -69,7 +70,8 @@ export const householdMembers = pgTable(
     avatarUrl: text('avatar_url'),
     joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow(),
   },
-  () => [
+  (t) => [
+    unique('household_members_household_id_user_id_unique').on(t.householdId, t.userId),
     pgPolicy('household_members_select_own_household', {
       for: 'select',
       to: authenticatedRole,

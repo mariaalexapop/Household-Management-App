@@ -78,7 +78,7 @@ export function MembersList({ members, currentUserId, isAdmin }: MembersListProp
                 {member.role === 'admin' ? 'Admin' : 'Member'}
               </Badge>
 
-              {isAdmin && !isSelf && (
+              {isAdmin && !(isSelf && member.role === 'admin') && (
                 <RemoveMemberButton memberId={member.id} memberName={member.displayName} />
               )}
             </div>
