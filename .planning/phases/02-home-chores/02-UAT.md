@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 02-home-chores
 source: [02-01-SUMMARY.md, 02-02-SUMMARY.md, 02-03-SUMMARY.md, 02-04-SUMMARY.md, 02-05-SUMMARY.md, 02-06-SUMMARY.md]
 started: 2026-04-06T00:00:00Z
@@ -80,9 +80,12 @@ skipped: 0
   reason: "User reported: I cannot access notification section settings"
   severity: major
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "No navigation link to /settings exists anywhere in the app UI. The route and NotificationToggle component are correctly built, but src/app/(app)/layout.tsx has no settings link — users cannot reach /settings without typing the URL directly."
+  artifacts:
+    - path: "src/app/(app)/layout.tsx"
+      issue: "No link to /settings in app layout or any page header"
+  missing:
+    - "Add a settings nav link (gear icon or user avatar) to the app layout so users can navigate to /settings"
   debug_session: ""
 
 - truth: "DatePicker prev/next month buttons are fully clickable within their visible icon area"
@@ -90,7 +93,10 @@ skipped: 0
   reason: "User reported: the input areas for navigating to previous / next month do not match the buttons icon area"
   severity: minor
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "DayPicker v9 PreviousMonthButton/NextMonthButton components receive positioning props via {...props} spread. The nav container uses 'absolute inset-x-0 top-0' spanning full width, causing the button's actual click boundary to differ from where the ChevronLeft/ChevronRight icon visually appears. The h-7 w-7 constraint on the button conflicts with DayPicker's internal button sizing/positioning."
+  artifacts:
+    - path: "src/components/ui/date-picker.tsx"
+      issue: "Custom PreviousMonthButton/NextMonthButton components: hit area does not match visual icon bounds"
+  missing:
+    - "Replace components override with classNames-only approach for nav buttons, or fix button sizing so click area matches the visible icon"
   debug_session: ""
