@@ -12,8 +12,8 @@
 
 - [ ] **Phase 1: Foundation & Onboarding** - Auth, household setup, onboarding wizard, module-based dashboard, real-time infrastructure, GDPR
 - [x] **Phase 2: Home Chores** - Task management, recurring chores, assignments, due date reminders, notifications
-- [ ] **Phase 3: Kids Activities** - Child profiles, activity tracking, calendar, reminders
-- [ ] **Phase 4: Tracker Modules & Calendar** - Car maintenance, insurance management, electronics registry, costs dashboard, unified calendar
+- [ ] **Phase 3: Kids Activities** - Child profiles, activity tracking, unified calendar (CAL-01–04 pulled forward from Phase 4), reminders
+- [ ] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
 - [ ] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
 - [ ] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA, camera UX, performance audit
 
@@ -25,8 +25,8 @@
 |-------|----------------|--------|-----------|
 | 1. Foundation & Onboarding | 2/8 | In Progress|  |
 | 2. Home Chores | 6/6 | Complete | 2026-04-03 |
-| 3. Kids Activities | 0/TBD | Not started | - |
-| 4. Tracker Modules & Calendar | 0/TBD | Not started | - |
+| 3. Kids Activities | 0/6 | Not started | - |
+| 4. Tracker Modules | 0/TBD | Not started | - |
 | 5. AI Chatbot & RAG | 0/TBD | Not started | - |
 | 6. Platform & Polish | 0/TBD | Not started | - |
 
@@ -83,36 +83,46 @@ Plans:
 
 ### Phase 3: Kids Activities
 
-**Goal:** Parents can track all activities and commitments for their children in one place, with a shared calendar and timely reminders — without children needing their own accounts.
+**Goal:** Parents can track all activities and commitments for their children in one place, with a shared unified calendar (chores + kids) and timely reminders — without children needing their own accounts.
 
 **Depends on:** Phase 1 (household context, notifications), Phase 2 (notifications infrastructure proven).
 
-**Requirements:** KIDS-01, KIDS-02, KIDS-03, KIDS-04, KIDS-05, KIDS-06, KIDS-07, KIDS-08
+**Note:** CAL-01 to CAL-04 (unified calendar) are delivered in this phase, not Phase 4. The calendar is built with Phase 4 extension points — Phase 4 adds car/insurance/electronics data to the existing component.
+
+**Requirements:** KIDS-01, KIDS-02, KIDS-03, KIDS-04, KIDS-05, KIDS-06, KIDS-07, KIDS-08, CAL-01, CAL-02, CAL-03, CAL-04
 
 **Success Criteria:**
-1. A user can add child profiles (name, date of birth) — no account required for children.
-2. A user can add an activity for a child with title, date/time, location, category, and responsible parent; the activity is visible to all household members immediately.
-3. A user receives a configurable reminder before a child's activity.
-4. A user can view a calendar showing all kids' activities across all children.
+1. A user can add child profiles (name only — no account required for children).
+2. A user can add an activity for a child with title, date/time, location, category, and assignee; the activity is visible to all household members immediately.
+3. A user receives a configurable reminder before a child's activity (assignee only).
+4. A user can view a unified calendar showing chores and kids activities, in month or week view, with each module in a distinct colour.
 
-**Plans:** TBD
+**Plans:** 6 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Schema + migration (children + kid_activities tables, RLS) — Wave 1
+- [ ] 03-02-PLAN.md — Server Actions (createChild, createActivity, updateActivity, deleteActivity) — Wave 2
+- [ ] 03-03-PLAN.md — Inngest jobs (generate-activity-recurrence, send-activity-reminder) — Wave 2
+- [ ] 03-04-PLAN.md — Kids UI (/kids page, KidsClient, ActivityList, ActivityForm, ChildTabs) — Wave 3
+- [ ] 03-05-PLAN.md — Calendar types + data layer (CalendarEvent type, /calendar page, parallel queries) — Wave 3
+- [ ] 03-06-PLAN.md — Calendar UI + dashboard card (UnifiedCalendar, month/week views, KidsDashboardCard) — Wave 4
 
 ---
 
-### Phase 4: Tracker Modules & Calendar
+### Phase 4: Tracker Modules
 
-**Goal:** The household can track cars, insurance policies, and electronics — with document uploads, cost logging, key date reminders, and a unified calendar aggregating all date-tied items across every module.
+**Goal:** The household can track cars, insurance policies, and electronics — with document uploads, cost logging, key date reminders, and those events integrated into the existing Phase 3 calendar.
 
-**Depends on:** Phase 1 (household, storage, notifications), Phase 2 and 3 (calendar must aggregate chore due dates and kids activities too).
+**Depends on:** Phase 1 (household, storage, notifications), Phase 3 (calendar component built and extensible).
 
-**Requirements:** CAR-01, CAR-02, CAR-03, CAR-04, CAR-05, CAR-06, INS-01, INS-02, INS-03, INS-04, INS-05, INS-06, ELEC-01, ELEC-02, ELEC-03, ELEC-04, ELEC-06, COST-01, COST-02, COST-03, CAL-01, CAL-02, CAL-03, CAL-04
+**Requirements:** CAR-01, CAR-02, CAR-03, CAR-04, CAR-05, CAR-06, INS-01, INS-02, INS-03, INS-04, INS-05, INS-06, ELEC-01, ELEC-02, ELEC-03, ELEC-04, ELEC-06, COST-01, COST-02, COST-03
 
 **Success Criteria:**
 1. A user can add multiple cars with service history, set MOT/tax/service reminders, and receive reminders before key dates.
 2. A user can add insurance policies with uploaded PDFs, premium cost schedules, and receives reminders before expiry and payment dates.
 3. A user can add electronics items with warranty documents, receives a 30-day expiry reminder, and can upload user manuals.
 4. A user can view a basic costs dashboard showing costs across car services, insurance premiums, and electronics — broken down by section and period.
-5. A user can view a unified calendar showing all date-tied items across all activated modules, each in a distinct colour, and can click any item to navigate to it.
+5. Car, insurance, and electronics events appear in the existing unified calendar component (orange, purple, teal).
 
 **Plans:** TBD
 
@@ -210,6 +220,10 @@ Plans:
 | KIDS-06 | Phase 3 | Pending |
 | KIDS-07 | Phase 3 | Pending |
 | KIDS-08 | Phase 3 | Pending |
+| CAL-01 | Phase 3 | Pending |
+| CAL-02 | Phase 3 | Pending |
+| CAL-03 | Phase 3 | Pending |
+| CAL-04 | Phase 3 | Pending |
 | CAR-01 | Phase 4 | Pending |
 | CAR-02 | Phase 4 | Pending |
 | CAR-03 | Phase 4 | Pending |
@@ -230,10 +244,6 @@ Plans:
 | COST-01 | Phase 4 | Pending |
 | COST-02 | Phase 4 | Pending |
 | COST-03 | Phase 4 | Pending |
-| CAL-01 | Phase 4 | Pending |
-| CAL-02 | Phase 4 | Pending |
-| CAL-03 | Phase 4 | Pending |
-| CAL-04 | Phase 4 | Pending |
 | AI-01 | Phase 5 | Pending |
 | AI-02 | Phase 5 | Pending |
 | AI-03 | Phase 5 | Pending |
@@ -257,3 +267,4 @@ Plans:
 *Replaces prior roadmap created 2026-03-19 — full concept revision*
 *Phase 1 plans created: 2026-03-24*
 *Phase 1 revised: 2026-03-24 — fixed plan checker blockers, split 01-05 into wizard (01-05) + dashboard (01-06), renumbered invite→01-07 and realtime→01-08, total plans 7→8*
+*Phase 3 plans created: 2026-04-07 — CAL-01–04 pulled forward from Phase 4 per 03-CONTEXT.md; 6 plans across 4 waves*
