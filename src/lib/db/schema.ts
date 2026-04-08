@@ -325,3 +325,76 @@ export const notifications = pgTable(
     }),
   ]
 )
+
+// ---------------------------------------------------------------------------
+// children
+// ---------------------------------------------------------------------------
+export const children = pgTable(
+  'children',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('children_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// kid_activities
+// ---------------------------------------------------------------------------
+export const kidActivities = pgTable(
+  'kid_activities',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    childId: uuid('child_id')
+      .notNull()
+      .references(() => children.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    // 'school' | 'medical' | 'sport' | 'hobby' | 'social'
+    category: text('category').notNull(),
+    location: text('location'),
+    // assigneeId references household_members.id — plain uuid, FK added in migration
+    assigneeId: uuid('assignee_id'),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    notes: text('notes'),
+    // null = use default (1 day = 1440 minutes)
+    reminderOffsetMinutes: integer('reminder_offset_minutes'),
+    isRecurring: boolean('is_recurring').notNull().default(false),
+    recurrenceRule: jsonb('recurrence_rule'),
+    // parentActivityId self-FK — plain uuid, FK added in migration
+    parentActivityId: uuid('parent_activity_id'),
+    // createdBy references auth.users(id) — cross-schema, FK added in migration
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('kid_activities_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)

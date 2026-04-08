@@ -15,6 +15,13 @@
       "when": 1775140369022,
       "tag": "0001_phase2_chores",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775636207868,
+      "tag": "0002_lucky_sway",
+      "breakpoints": true
     }
   ]
 }
