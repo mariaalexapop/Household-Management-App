@@ -219,7 +219,7 @@ export function ActivityForm({
     'h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
 
       {/* Child */}
       <div className="flex flex-col gap-1">
@@ -338,9 +338,9 @@ export function ActivityForm({
               />
             )}
           />
-          <input
+          <Input
             type="time"
-            className={`${inlineFieldClassName} w-32 shrink-0`}
+            className="w-32 shrink-0"
             {...register('startTime')}
           />
         </div>
@@ -365,9 +365,9 @@ export function ActivityForm({
               />
             )}
           />
-          <input
+          <Input
             type="time"
-            className={`${inlineFieldClassName} w-32 shrink-0`}
+            className="w-32 shrink-0"
             {...register('endTime')}
           />
         </div>
