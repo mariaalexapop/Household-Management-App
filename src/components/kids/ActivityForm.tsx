@@ -299,6 +299,21 @@ export function ActivityForm({
         )}
       </div>
 
+      {/* Location */}
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="location" className="font-body text-sm">
+          Location (optional)
+        </Label>
+        <Input
+          id="location"
+          placeholder="e.g. Community sports centre"
+          {...register('location')}
+        />
+        {errors.location && (
+          <p className="font-body text-xs text-destructive">{errors.location.message}</p>
+        )}
+      </div>
+
       {/* Start date + time */}
       <div className="flex flex-col gap-1">
         <Label className="font-body text-sm">
@@ -352,37 +367,6 @@ export function ActivityForm({
         </div>
       </div>
 
-      {/* Location */}
-      <div className="flex flex-col gap-1">
-        <Label htmlFor="location" className="font-body text-sm">
-          Location (optional)
-        </Label>
-        <Input
-          id="location"
-          placeholder="e.g. Community sports centre"
-          {...register('location')}
-        />
-        {errors.location && (
-          <p className="font-body text-xs text-destructive">{errors.location.message}</p>
-        )}
-      </div>
-
-      {/* Assignee */}
-      <div className="flex flex-col gap-1">
-        <Label htmlFor="assigneeId" className="font-body text-sm">
-          Assigned to
-        </Label>
-        <select id="assigneeId" className={inputClassName} {...register('assigneeId')}>
-          <option value="">Unassigned</option>
-          {members.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.displayName ?? 'Member'}
-              {member.userId === currentUserId ? ' (you)' : ''}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Repeat toggle + recurrence config */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
@@ -407,6 +391,22 @@ export function ActivityForm({
             <RecurrenceConfig value={recurrenceRule} onChange={setRecurrenceRule} />
           </div>
         )}
+      </div>
+
+      {/* Assignee */}
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="assigneeId" className="font-body text-sm">
+          Assigned to
+        </Label>
+        <select id="assigneeId" className={inputClassName} {...register('assigneeId')}>
+          <option value="">Unassigned</option>
+          {members.map((member) => (
+            <option key={member.id} value={member.id}>
+              {member.displayName ?? 'Member'}
+              {member.userId === currentUserId ? ' (you)' : ''}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Reminder */}
