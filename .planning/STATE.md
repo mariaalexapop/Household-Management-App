@@ -3,19 +3,19 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 3 Plan 06 — complete"
+stopped_at: "Phase 4 Plan 01 — complete"
 last_updated: "2026-04-09T00:00:00Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 29
+  completed_plans: 21
 ---
 
 # Project State: Household Management App
 
 **Last updated:** 2026-04-09
-**Session:** Phase 03 Plans 04 + 06 — Kids UI and Calendar UI complete
+**Session:** Phase 04 Plan 01 — Tracker Module Schema complete
 
 ---
 
@@ -33,6 +33,7 @@ progress:
 
 Phase: 02 (Home Chores) — COMPLETE (approved 2026-04-03)
 Phase: 03 (Kids Activities) — COMPLETE (all 6 plans executed, 2026-04-09)
+Phase: 04 (Tracker Modules) — IN PROGRESS (Plan 01 of 9 complete)
 
 ## Performance Metrics
 
@@ -41,8 +42,8 @@ Phase: 03 (Kids Activities) — COMPLETE (all 6 plans executed, 2026-04-09)
 | Phases total | 6 |
 | Requirements total (v1) | 75 |
 | Requirements mapped | 75/75 |
-| Plans created | 20 |
-| Plans complete | 20 |
+| Plans created | 29 |
+| Plans complete | 21 |
 | Phases complete | 2 |
 
 ---
@@ -54,6 +55,7 @@ Phase: 03 (Kids Activities) — COMPLETE (all 6 plans executed, 2026-04-09)
 | Phase 02-home-chores P05 | 20 | 2 tasks | 8 files |
 | Phase 03-kids-activities P04 | 20 | 2 tasks | 6 files |
 | Phase 03-kids-activities P06 | 25 | 2 tasks | 11 files |
+| Phase 04-tracker-modules P01 | 129 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -88,6 +90,8 @@ Phase: 03 (Kids Activities) — COMPLETE (all 6 plans executed, 2026-04-09)
 | NotificationToggle UI-only in Phase 2 | Email preference persistence deferred to Phase 6; Inngest always fires when RESEND_API_KEY is set |
 | react-day-picker v9 uses Day not DayDate for custom cell rendering | DayDate is not in v9 CustomComponents API; Day receives day + modifiers + HTMLAttributes and is the correct cell override |
 | Zod .default() on enum causes zodResolver type mismatch | Remove .default() from schema; provide defaults in useForm defaultValues instead — keeps TypeScript types exact |
+| Polymorphic documents table with module + entityId | Avoids per-module document tables; single table handles insurance and electronics PDFs with module discriminator |
+| Storage bucket RLS uses household folder path convention | Files stored as {householdId}/... ; RLS policy checks folder name against household_members for access control |
 
 ### Architecture Flags (verify before implementation)
 
@@ -109,16 +113,17 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Phase 3 (Kids Activities) — all 6 plans complete
+**Stopped at:** Phase 4 Plan 01 (Tracker Module Schema) — complete
 
 **Context for next session:**
 
-- Phase 03 complete. All 6 plans done: schema, server actions, Inngest jobs, Kids UI, calendar types/data, calendar UI.
-- /kids route: activity list with child tab filter, category badges, add/edit/delete dialog.
-- /calendar route: UnifiedCalendar with month grid (DayPicker custom Day cells, event dots, +N more popover) and week view (time-slot grid).
-- Dashboard KidsDashboardCard shows 3 nearest upcoming activities.
-- Requirements fulfilled: KIDS-01 to KIDS-08, CAL-01 to CAL-04.
-- Phase 04 (Tracker Modules) is next. Plans TBD — run `/gsd:plan-phase 4`.
+- Phase 04 Plan 01 complete. 5 new tables in schema.ts: cars, serviceRecords, insurancePolicies, electronics, documents.
+- All tables have RLS policies scoped to household members.
+- Cost fields use integer cents (costCents, premiumCents) per COST-01.
+- Documents table is polymorphic (module + entityId) for insurance and electronics PDFs.
+- Supabase Storage bucket 'documents' created: private, 10MB, PDF-only.
+- Migration applied via drizzle-kit push. Migration file: 0003_chilly_silverclaw.sql.
+- Phase 04 Plan 02 (Car Server Actions) is next.
 
 ---
 
