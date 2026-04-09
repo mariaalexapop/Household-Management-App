@@ -9,8 +9,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DatePicker } from '@/components/ui/date-picker'
+import { RecurrenceConfig } from '@/components/chores/RecurrenceConfig'
 import { createActivity, updateActivity } from '@/app/actions/kids'
 import type { ActivityItem, ChildItem, MemberItem } from '@/app/(app)/kids/KidsClient'
+import type { RecurrenceRule } from '@/lib/chores/recurrence'
 
 // ---------------------------------------------------------------------------
 // Form schema
@@ -28,8 +30,6 @@ const formSchema = z.object({
   assigneeId: z.string().optional(),
   notes: z.string().optional(),
   reminderOffsetMinutes: z.string().optional(),
-  repeat: z.enum(['none', 'daily', 'weekly', 'monthly']),
-  interval: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -81,6 +81,10 @@ export function ActivityForm({
 }: ActivityFormProps) {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRecurring, setIsRecurring] = useState(activity?.isRecurring ?? false)
+  const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | null>(
+    activity?.recurrenceRule as RecurrenceRule | null ?? null
+  )
 
   // Inline "add new child" state
   const [showNewChild, setShowNewChild] = useState(false)
@@ -90,16 +94,6 @@ export function ActivityForm({
 
   // Find default assignee (member whose userId === currentUserId)
   const defaultAssignee = members.find((m) => m.userId === currentUserId)
-
-  // Derive default repeat value from existing activity
-  function getDefaultRepeat(a?: ActivityItem): 'none' | 'daily' | 'weekly' | 'monthly' {
-    if (!a?.isRecurring || !a.recurrenceRule) return 'none'
-    const rule = a.recurrenceRule as { frequency?: string }
-    if (rule.frequency === 'daily') return 'daily'
-    if (rule.frequency === 'weekly') return 'weekly'
-    if (rule.frequency === 'monthly') return 'monthly'
-    return 'none'
-  }
 
   const defaultValues: FormValues = activity
     ? {
@@ -116,11 +110,6 @@ export function ActivityForm({
         reminderOffsetMinutes: activity.reminderOffsetMinutes
           ? String(activity.reminderOffsetMinutes)
           : '1440',
-        repeat: getDefaultRepeat(activity),
-        interval: (() => {
-          const rule = activity.recurrenceRule as { interval?: number } | null
-          return rule?.interval ? String(rule.interval) : '1'
-        })(),
       }
     : {
         childId: localChildList[0]?.id ?? '',
@@ -134,8 +123,6 @@ export function ActivityForm({
         assigneeId: defaultAssignee?.id ?? '',
         notes: '',
         reminderOffsetMinutes: '1440',
-        repeat: 'none',
-        interval: '1',
       }
 
   const {
@@ -151,7 +138,6 @@ export function ActivityForm({
   })
 
   const watchedChildId = watch('childId')
-  const watchedRepeat = watch('repeat')
 
   // ---------------------------------------------------------------------------
   // "Add new child" inline handler
@@ -188,13 +174,7 @@ export function ActivityForm({
       const startsAt = toISOWithOffset(values.startDate, values.startTime ?? '')
       const endsAt = values.endDate ? toISOWithOffset(values.endDate, values.endTime ?? '') : null
 
-      const isRecurring = values.repeat !== 'none'
-      const recurrenceRule = isRecurring
-        ? {
-            frequency: values.repeat as 'daily' | 'weekly' | 'monthly',
-            interval: values.interval ? parseInt(values.interval, 10) : 1,
-          }
-        : null
+      const recurring = isRecurring && recurrenceRule != null
 
       const payload = {
         childId: values.childId,
@@ -208,8 +188,8 @@ export function ActivityForm({
         reminderOffsetMinutes: values.reminderOffsetMinutes
           ? parseInt(values.reminderOffsetMinutes, 10)
           : null,
-        isRecurring,
-        recurrenceRule,
+        isRecurring: recurring,
+        recurrenceRule: recurring ? recurrenceRule : null,
       }
 
       if (mode === 'edit' && activity) {
@@ -403,37 +383,30 @@ export function ActivityForm({
         </select>
       </div>
 
-      {/* Repeat */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="repeat" className="font-body text-sm">
-          Repeat
-        </Label>
+      {/* Repeat toggle + recurrence config */}
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <select id="repeat" className={`${inputClassName} flex-1`} {...register('repeat')}>
-            <option value="none">None</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-          {watchedRepeat !== 'none' && (
-            <div className="flex shrink-0 items-center gap-2">
-              <Label className="whitespace-nowrap font-body text-sm">Every</Label>
-              <input
-                type="number"
-                min={1}
-                className={`${inlineFieldClassName} w-16`}
-                {...register('interval')}
-              />
-              <span className="font-body text-sm text-kinship-on-surface-variant">
-                {watchedRepeat === 'daily'
-                  ? 'day(s)'
-                  : watchedRepeat === 'weekly'
-                    ? 'week(s)'
-                    : 'month(s)'}
-              </span>
-            </div>
-          )}
+          <input
+            id="isRecurring"
+            type="checkbox"
+            checked={isRecurring}
+            onChange={(e) => {
+              setIsRecurring(e.target.checked)
+              if (e.target.checked && !recurrenceRule) {
+                setRecurrenceRule({ frequency: 'weekly', interval: 1, on_day_of_week: null, on_day_of_month: null })
+              }
+            }}
+            className="h-4 w-4 rounded border-input accent-kinship-primary"
+          />
+          <Label htmlFor="isRecurring" className="font-body text-sm cursor-pointer">
+            Repeat
+          </Label>
         </div>
+        {isRecurring && (
+          <div className="pl-7">
+            <RecurrenceConfig value={recurrenceRule} onChange={setRecurrenceRule} />
+          </div>
+        )}
       </div>
 
       {/* Reminder */}
