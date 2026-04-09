@@ -151,14 +151,41 @@ export async function createActivity(
     })
     .returning({ id: kidActivities.id })
 
-  const hasInngest = !!process.env.INNGEST_EVENT_KEY
+  // Generate recurring occurrences synchronously so they appear immediately
+  if (parsed.data.isRecurring && parsed.data.recurrenceRule) {
+    const rule = parsed.data.recurrenceRule as RecurrenceRule
+    const startDate = new Date(parsed.data.startsAt)
+    const windowEnd = rule.recurrence_end_date
+      ? new Date(rule.recurrence_end_date)
+      : addYears(startDate, 1)
+    const occurrenceDates = generateOccurrences(rule, startDate, windowEnd)
 
-  if (parsed.data.isRecurring && hasInngest) {
-    await inngest.send({
-      name: 'kids/activity.recurring.created',
-      data: { activityId: newActivity.id, householdId: memberRow.householdId },
-    })
+    if (occurrenceDates.length > 0) {
+      const occurrenceRows = occurrenceDates.map((date) => ({
+        householdId: memberRow.householdId,
+        childId: parsed.data.childId,
+        title: parsed.data.title,
+        category: parsed.data.category,
+        location: parsed.data.location ?? null,
+        assigneeId: parsed.data.assigneeId ?? null,
+        startsAt: date,
+        endsAt: parsed.data.endsAt
+          ? new Date(new Date(parsed.data.endsAt).getTime() - startDate.getTime() + date.getTime())
+          : null,
+        notes: parsed.data.notes ?? null,
+        reminderOffsetMinutes: parsed.data.reminderOffsetMinutes ?? null,
+        isRecurring: true,
+        recurrenceRule: parsed.data.recurrenceRule,
+        parentActivityId: newActivity.id,
+        createdBy: user.id,
+      }))
+
+      await db.insert(kidActivities).values(occurrenceRows)
+    }
   }
+
+  // Fire Inngest reminder if configured (non-blocking, best-effort)
+  const hasInngest = !!process.env.INNGEST_EVENT_KEY
 
   if (hasInngest) {
     await inngest.send({
@@ -256,7 +283,9 @@ export async function updateActivity(data: unknown): Promise<ActionResult<{ id: 
   if (becameRecurring && parsed.data.recurrenceRule) {
     const rule = parsed.data.recurrenceRule as RecurrenceRule
     const startDate = new Date(parsed.data.startsAt)
-    const windowEnd = addYears(startDate, 1)
+    const windowEnd = rule.recurrence_end_date
+      ? new Date(rule.recurrence_end_date)
+      : addYears(startDate, 1)
     const occurrenceDates = generateOccurrences(rule, startDate, windowEnd)
 
     if (occurrenceDates.length > 0) {
