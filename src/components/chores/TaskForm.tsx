@@ -246,7 +246,7 @@ export function TaskForm({
               onChange={(e) => setNewAreaName(e.target.value)}
               className="flex-1"
             />
-            <Button type="button" onClick={handleCreateArea} variant="outline">
+            <Button type="button" onClick={handleCreateArea} variant="outline" className="rounded-lg border-kinship-outline">
               Create Area
             </Button>
           </div>
@@ -390,13 +390,13 @@ export function TaskForm({
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+        <Button type="button" variant="outline" className="rounded-lg border-kinship-outline" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-kinship-primary text-white hover:bg-kinship-primary/90"
+          className="rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
         >
           {isSubmitting ? 'Saving...' : editingTask ? 'Update Task' : 'Add Task'}
         </Button>

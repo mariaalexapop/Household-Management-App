@@ -61,8 +61,8 @@ export default async function ModulesSettingsPage() {
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
         <div className="mx-auto max-w-3xl flex items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface/60">Module Settings</p>
+            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface-variant">Module Settings</p>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">
@@ -80,7 +80,7 @@ export default async function ModulesSettingsPage() {
         <nav className="flex gap-4 text-sm font-medium mb-10">
           <Link
             href="/settings"
-            className="text-kinship-on-surface/60 hover:text-kinship-on-surface pb-1"
+            className="text-kinship-on-surface-variant hover:text-kinship-on-surface pb-1"
           >
             Profile
           </Link>
@@ -96,7 +96,7 @@ export default async function ModulesSettingsPage() {
           <h2 className="font-display text-2xl font-semibold text-kinship-on-surface">
             Household Modules
           </h2>
-          <p className="mt-1 text-sm text-kinship-on-surface/60">
+          <p className="mt-1 text-sm text-kinship-on-surface-variant">
             Enable or disable modules to customise your household dashboard.
           </p>
         </div>

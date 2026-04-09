@@ -84,7 +84,7 @@ export function ActivityFeed({ initialItems }: ActivityFeedProps) {
 
   if (mergedItems.length === 0) {
     return (
-      <p className="text-sm text-kinship-on-surface/50">No activity yet.</p>
+      <p className="text-sm text-kinship-on-surface-variant">No activity yet.</p>
     )
   }
 
@@ -95,7 +95,7 @@ export function ActivityFeed({ initialItems }: ActivityFeedProps) {
           <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-kinship-primary/40" />
           <div className="min-w-0 flex-1">
             <p className="text-sm text-kinship-on-surface">{getEventText(item)}</p>
-            <p className="text-xs text-kinship-on-surface/50" suppressHydrationWarning>
+            <p className="text-xs text-kinship-on-surface-variant" suppressHydrationWarning>
               {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
             </p>
           </div>

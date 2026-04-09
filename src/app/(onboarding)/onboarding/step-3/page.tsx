@@ -69,27 +69,27 @@ export default function Step3Page() {
 
       <div className="flex flex-col gap-4">
         <div className="rounded-lg bg-kinship-surface-container p-4">
-          <p className="font-body text-xs font-medium uppercase tracking-wide text-kinship-on-surface/50">
+          <p className="font-body text-xs font-medium uppercase tracking-wide text-kinship-on-surface-variant">
             Household name
           </p>
           <p className="mt-1 font-display text-base font-semibold text-kinship-on-surface">
-            {householdName || <span className="text-kinship-on-surface/40">Not set</span>}
+            {householdName || <span className="text-kinship-placeholder">Not set</span>}
           </p>
         </div>
 
         <div className="rounded-lg bg-kinship-surface-container p-4">
-          <p className="font-body text-xs font-medium uppercase tracking-wide text-kinship-on-surface/50">
+          <p className="font-body text-xs font-medium uppercase tracking-wide text-kinship-on-surface-variant">
             Type
           </p>
           <p className="mt-1 font-display text-base font-semibold text-kinship-on-surface">
             {householdType
               ? TYPE_LABELS[householdType]
-              : <span className="text-kinship-on-surface/40">Not set</span>}
+              : <span className="text-kinship-placeholder">Not set</span>}
           </p>
         </div>
 
         <div className="rounded-lg bg-kinship-surface-container p-4">
-          <p className="font-body text-xs font-medium uppercase tracking-wide text-kinship-on-surface/50">
+          <p className="font-body text-xs font-medium uppercase tracking-wide text-kinship-on-surface-variant">
             Modules
           </p>
           {activeModules.length > 0 ? (
@@ -101,7 +101,7 @@ export default function Step3Page() {
               ))}
             </ul>
           ) : (
-            <p className="mt-1 font-body text-sm text-kinship-on-surface/40">None selected</p>
+            <p className="mt-1 font-body text-sm text-kinship-placeholder">None selected</p>
           )}
         </div>
       </div>

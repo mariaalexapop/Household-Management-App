@@ -18,7 +18,7 @@ export function CalendarEventDot({ event, onClick }: CalendarEventDotProps) {
         className="w-2 h-2 rounded-full flex-shrink-0"
         style={{ backgroundColor: event.colour }}
       />
-      <span className="truncate text-kinship-on-surface">
+      <span className="truncate text-kinship-on-surface font-body">
         {event.label ?? event.title.slice(0, 16)}
       </span>
     </button>

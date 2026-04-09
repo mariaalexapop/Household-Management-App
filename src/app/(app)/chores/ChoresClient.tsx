@@ -205,14 +205,14 @@ export function ChoresClient({
   return (
     <div className="flex flex-col gap-4">
       {/* Filter bar + Add Task button */}
-      <div className="flex flex-col gap-3 rounded-lg bg-kinship-surface-container p-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 bg-kinship-surface-container rounded-xl p-4 sm:flex-row sm:items-end sm:justify-between">
         <TaskFilters areas={areas} filters={filters} onFiltersChange={handleFiltersChange} />
         <Button
           onClick={() => {
             setEditingTask(null)
             setIsAddDialogOpen(true)
           }}
-          className="min-h-[44px] shrink-0 bg-kinship-primary text-white hover:bg-kinship-primary/90"
+          className="min-h-[44px] shrink-0 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
         >
           Add Task
         </Button>
@@ -229,10 +229,10 @@ export function ChoresClient({
       />
 
       {/* Add / Edit Task Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} modal={false} disablePointerDismissal>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto bg-white rounded-2xl ring-miro p-8">
           <DialogHeader>
-            <DialogTitle>{editingTask ? 'Edit task' : 'Add a task'}</DialogTitle>
+            <DialogTitle className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">{editingTask ? 'Edit task' : 'Add a task'}</DialogTitle>
           </DialogHeader>
           <TaskForm
             areas={areas}
@@ -250,16 +250,17 @@ export function ChoresClient({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white rounded-2xl ring-miro p-8">
           <DialogHeader>
-            <DialogTitle>Delete task?</DialogTitle>
+            <DialogTitle className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Delete task?</DialogTitle>
           </DialogHeader>
-          <p className="font-body text-base text-kinship-on-surface/70">
+          <p className="font-body text-base text-kinship-on-surface-variant">
             Are you sure you want to delete &ldquo;{deletingTaskTitle}&rdquo;? This cannot be undone.
           </p>
           <div className="mt-4 flex justify-end gap-2">
             <Button
               variant="outline"
+              className="rounded-lg border-kinship-outline"
               onClick={() => {
                 setIsDeleteDialogOpen(false)
                 setDeletingTaskId(null)
@@ -269,7 +270,7 @@ export function ChoresClient({
             </Button>
             <Button
               onClick={handleDeleteConfirm}
-              className="bg-destructive text-white hover:bg-destructive/90"
+              className="rounded-full bg-destructive text-white hover:bg-destructive/90"
             >
               Delete task
             </Button>

@@ -62,11 +62,11 @@ export function MembersList({ members, currentUserId, isAdmin }: MembersListProp
                 <span className="font-body text-sm font-medium text-foreground">
                   {member.displayName ?? member.userId}
                   {isSelf && (
-                    <span className="ml-1 text-xs text-muted-foreground">(you)</span>
+                    <span className="ml-1 text-xs text-kinship-on-surface-variant">(you)</span>
                   )}
                 </span>
                 {joinedDate && (
-                  <span className="font-body text-xs text-muted-foreground">
+                  <span className="font-body text-xs text-kinship-on-surface-variant">
                     Joined {joinedDate}
                   </span>
                 )}
@@ -87,7 +87,7 @@ export function MembersList({ members, currentUserId, isAdmin }: MembersListProp
       })}
 
       {members.length === 0 && (
-        <p className="font-body text-sm text-muted-foreground py-4 text-center">
+        <p className="font-body text-sm text-kinship-on-surface-variant py-4 text-center">
           No members found.
         </p>
       )}

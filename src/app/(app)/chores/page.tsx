@@ -102,8 +102,8 @@ export default async function ChoresPage({
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface/60">Home Chores</p>
+            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface-variant">Home Chores</p>
           </div>
           <div className="flex items-center gap-4">
             <a href="/household" className="font-body text-sm text-kinship-primary hover:underline">
@@ -117,8 +117,8 @@ export default async function ChoresPage({
       </header>
       <main className="mx-auto max-w-4xl px-6 py-8">
         <div className="mb-6">
-          <h2 className="font-display text-xl font-semibold text-kinship-on-surface">Home Chores</h2>
-          <p className="font-body text-base text-kinship-on-surface/70">
+          <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-module-chores-dark pl-3">Home Chores</h2>
+          <p className="font-body text-base text-kinship-on-surface-variant">
             {dueThisWeek} {dueThisWeek === 1 ? 'task' : 'tasks'} due this week
           </p>
         </div>

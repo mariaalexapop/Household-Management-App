@@ -65,7 +65,7 @@ export function ModuleSelector({ selected, onToggle }: ModuleSelectorProps) {
             <Icon
               className={[
                 'h-5 w-5 shrink-0',
-                isSelected ? 'text-kinship-primary' : 'text-kinship-on-surface/50',
+                isSelected ? 'text-kinship-primary' : 'text-kinship-on-surface-variant',
               ].join(' ')}
             />
             <div className="flex-1">
@@ -77,7 +77,7 @@ export function ModuleSelector({ selected, onToggle }: ModuleSelectorProps) {
               >
                 {label}
               </p>
-              <p className="font-body text-xs text-kinship-on-surface/60">{description}</p>
+              <p className="font-body text-xs text-kinship-on-surface-variant">{description}</p>
             </div>
             {isSelected && (
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-kinship-primary">

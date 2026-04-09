@@ -41,7 +41,7 @@ export function TaskFilters({ areas, filters, onFiltersChange }: TaskFiltersProp
     <div className="flex flex-wrap items-center gap-2">
       {/* Status multi-select buttons */}
       <div className="flex items-center gap-1">
-        <span className="font-body text-sm text-kinship-on-surface/60 mr-1">Status:</span>
+        <span className="font-body text-sm text-kinship-on-surface-variant mr-1">Status:</span>
         {STATUS_OPTIONS.map(({ value, label }) => (
           <button
             key={value}
@@ -49,8 +49,8 @@ export function TaskFilters({ areas, filters, onFiltersChange }: TaskFiltersProp
             onClick={() => toggleStatus(value)}
             className={`rounded-md border px-3 py-1 font-body text-sm transition-colors min-h-[36px] ${
               isStatusActive(value)
-                ? 'border-[#0053dc] text-[#0053dc] bg-[#0053dc]/8'
-                : 'border-border text-kinship-on-surface/70 hover:border-kinship-on-surface/40'
+                ? 'bg-kinship-primary-surface text-kinship-primary border-kinship-primary'
+                : 'border-border text-kinship-on-surface-variant hover:border-kinship-on-surface/40'
             }`}
           >
             {label}
@@ -77,14 +77,14 @@ export function TaskFilters({ areas, filters, onFiltersChange }: TaskFiltersProp
       <button
         type="button"
         onClick={toggleSort}
-        className="rounded-md border border-border px-3 py-1 font-body text-sm text-kinship-on-surface/70 hover:border-kinship-on-surface/40 min-h-[36px]"
+        className="rounded-md border border-border px-3 py-1 font-body text-sm text-kinship-on-surface-variant hover:border-kinship-on-surface/40 min-h-[36px]"
         aria-label="Toggle sort direction"
       >
         {filters.sortDir === 'asc' ? '↑ Date' : '↓ Date'}
       </button>
 
       {/* Hide done toggle */}
-      <label className="flex cursor-pointer items-center gap-2 font-body text-sm text-kinship-on-surface/70">
+      <label className="flex cursor-pointer items-center gap-2 font-body text-sm text-kinship-on-surface-variant">
         <input
           type="checkbox"
           checked={filters.hideDone}

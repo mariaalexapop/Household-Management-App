@@ -5,13 +5,54 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Kinship brand colour tokens */
-  --color-kinship-primary: #0053dc;
-  --color-kinship-surface: #f7f9fb;
-  --color-kinship-surface-container: #eaeef1;
+  /* === Miro-inspired Kinship tokens === */
+
+  /* Core surface */
+  --color-kinship-canvas: #ffffff;
+  --color-kinship-surface: #f5f5f7;
+  --color-kinship-surface-container: #f0f0f2;
+  --color-kinship-surface-container-low: #e8e8ec;
   --color-kinship-surface-container-lowest: #ffffff;
-  --color-kinship-on-surface: #2d3337;
-  --color-kinship-outline-variant: #acb3b7;
+  --color-kinship-on-surface: #1c1c1e;
+  --color-kinship-on-surface-variant: #555a6a;
+  --color-kinship-outline: #c7cad5;
+  --color-kinship-outline-variant: #e0e2e8;
+
+  /* Primary interactive — Blue 450 */
+  --color-kinship-primary: #5b76fe;
+  --color-kinship-primary-pressed: #2a41b6;
+  --color-kinship-primary-surface: #eef0ff;
+  --color-kinship-on-primary: #ffffff;
+
+  /* Semantic */
+  --color-kinship-success: #00b473;
+  --color-kinship-success-surface: #d6f5eb;
+  --color-kinship-destructive: #e53e3e;
+  --color-kinship-destructive-surface: #fbd4d4;
+
+  /* Placeholder / muted */
+  --color-kinship-placeholder: #a5a8b5;
+
+  /* Module accents — Miro pastel pairs */
+  --color-module-chores-light: #c3faf5;
+  --color-module-chores-dark: #187574;
+  --color-module-chores-dot: #187574;
+  --color-module-kids-light: #ffc6c6;
+  --color-module-kids-dark: #600000;
+  --color-module-kids-dot: #e05252;
+  --color-module-calendar-light: #ffd8f4;
+  --color-module-calendar-dark: #7a1060;
+  --color-module-calendar-dot: #b34a9c;
+
+  /* Category accents (kids activities) */
+  --color-category-school-light: #c3faf5;
+  --color-category-school-dark: #187574;
+  --color-category-medical-light: #ffc6c6;
+  --color-category-medical-dark: #600000;
+  --color-category-sport-light: #ffe6cd;
+  --color-category-sport-dark: #7a4000;
+  --color-category-hobby-light: #ffd8f4;
+  --color-category-hobby-dark: #7a1060;
 
   /* Kinship typography — references CSS vars set by next/font in layout.tsx */
   --font-display: var(--font-display);
@@ -51,49 +92,49 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-sm: calc(var(--radius) * 0.625);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) * 1.5);
+  --radius-xl: calc(var(--radius) * 2);
+  --radius-2xl: calc(var(--radius) * 3);
+  --radius-3xl: calc(var(--radius) * 5);
+  --radius-4xl: calc(var(--radius) * 6.25);
 }
 
 :root {
-  /* Kinship brand palette mapped to shadcn tokens */
-  --background: #f7f9fb;
-  --foreground: #2d3337;
+  /* Miro palette mapped to shadcn tokens */
+  --background: #f5f5f7;
+  --foreground: #1c1c1e;
   --card: #ffffff;
-  --card-foreground: #2d3337;
+  --card-foreground: #1c1c1e;
   --popover: #ffffff;
-  --popover-foreground: #2d3337;
-  --primary: #0053dc;
+  --popover-foreground: #1c1c1e;
+  --primary: #5b76fe;
   --primary-foreground: #ffffff;
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --secondary: #f0f0f2;
+  --secondary-foreground: #1c1c1e;
+  --muted: #f0f0f2;
+  --muted-foreground: #555a6a;
+  --accent: #eef0ff;
+  --accent-foreground: #5b76fe;
+  --destructive: #e53e3e;
+  --border: #e0e2e8;
+  --input: #e0e2e8;
+  --ring: #5b76fe;
+  --chart-1: #5b76fe;
+  --chart-2: #187574;
+  --chart-3: #e05252;
+  --chart-4: #b34a9c;
+  --chart-5: #7a4000;
+  --radius: 0.5rem;
+  --sidebar: rgba(255, 255, 255, 0.72);
+  --sidebar-foreground: #1c1c1e;
+  --sidebar-primary: #5b76fe;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef0ff;
+  --sidebar-accent-foreground: #5b76fe;
+  --sidebar-border: #e0e2e8;
+  --sidebar-ring: #5b76fe;
 }
 
 .dark {
@@ -140,4 +181,26 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Miro ring shadow utility */
+@layer utilities {
+  .ring-miro {
+    box-shadow: rgb(224, 226, 232) 0px 0px 0px 1px;
+  }
+  .shadow-float {
+    box-shadow: 0 20px 40px rgba(28, 28, 30, 0.06);
+  }
+}
+
+/* OpenType features for display font (Space Grotesk — Roobert PRO substitute) */
+.font-display,
+[class*="font-display"] {
+  font-feature-settings: "cv03", "cv04", "cv09", "cv11";
+}
+
+/* Body font OpenType features (Noto Sans — Miro stylistic sets) */
+.font-body,
+[class*="font-body"] {
+  font-feature-settings: "liga" 0, "ss01", "ss04", "ss05";
 }

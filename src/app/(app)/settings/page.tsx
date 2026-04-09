@@ -48,8 +48,8 @@ export default async function SettingsPage() {
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
         <div className="mx-auto max-w-3xl flex items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface/60">Settings</p>
+            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface-variant">Settings</p>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">
@@ -73,7 +73,7 @@ export default async function SettingsPage() {
           </Link>
           <Link
             href="/settings/modules"
-            className="text-kinship-on-surface/60 hover:text-kinship-on-surface pb-1"
+            className="text-kinship-on-surface-variant hover:text-kinship-on-surface pb-1"
           >
             Modules
           </Link>
@@ -98,7 +98,7 @@ export default async function SettingsPage() {
             <h2 className="font-display text-lg font-semibold text-kinship-on-surface">
               Notifications
             </h2>
-            <p className="font-body text-sm text-muted-foreground">
+            <p className="font-body text-sm text-kinship-on-surface-variant">
               Manage how you receive notifications
             </p>
           </div>
@@ -110,7 +110,7 @@ export default async function SettingsPage() {
               >
                 Email me when I&apos;m assigned a task
               </Label>
-              <p className="font-body text-xs text-muted-foreground mt-0.5">
+              <p className="font-body text-xs text-kinship-on-surface-variant mt-0.5">
                 Receive an email notification when a household member assigns a task to you.
               </p>
             </div>
@@ -125,7 +125,7 @@ export default async function SettingsPage() {
           <h2 className="font-display text-xl font-semibold text-red-600 mb-2">
             Danger Zone
           </h2>
-          <p className="text-sm text-kinship-on-surface/60 mb-4">
+          <p className="font-body text-sm text-kinship-on-surface-variant mb-4">
             Permanently delete your account and all associated household data.
             This action cannot be undone.
           </p>

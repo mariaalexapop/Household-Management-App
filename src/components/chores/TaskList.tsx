@@ -24,7 +24,7 @@ export function TaskList({
     return (
       <div className="py-16 text-center">
         <p className="font-display text-lg font-semibold text-kinship-on-surface">No tasks yet</p>
-        <p className="font-body text-base text-muted-foreground">
+        <p className="font-body text-base text-kinship-on-surface-variant">
           Your household has no tasks. Add your first task to get started.
         </p>
       </div>

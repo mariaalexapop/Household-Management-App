@@ -26,14 +26,14 @@ function getInitials(name: string | null): string {
 function StatusBadge({ status }: { status: string }) {
   if (status === 'in_progress') {
     return (
-      <Badge className="border border-[#0053dc] bg-[#0053dc]/8 text-[#0053dc]">In Progress</Badge>
+      <Badge className="bg-kinship-primary-surface text-kinship-primary border-0">In Progress</Badge>
     )
   }
   if (status === 'done') {
-    return <Badge variant="secondary">Done</Badge>
+    return <Badge className="bg-kinship-success-surface text-kinship-success border-0">Done</Badge>
   }
   // todo
-  return <Badge variant="outline">To Do</Badge>
+  return <Badge variant="secondary">To Do</Badge>
 }
 
 // ---------------------------------------------------------------------------
@@ -65,7 +65,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
 
   return (
     <Card
-      className={`relative overflow-visible bg-white rounded-lg p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
+      className={`relative overflow-visible bg-white rounded-xl ring-miro border-0 p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
     >
       <div className="flex items-start gap-3">
         {/* Checkbox */}
@@ -102,17 +102,17 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
           {/* Row 1: Title + Area badge + Due date */}
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`font-body text-base font-medium text-kinship-on-surface ${isDone ? 'line-through' : ''}`}
+              className={`font-display text-base font-semibold text-kinship-on-surface ${isDone ? 'line-through' : ''}`}
             >
               {task.title}
             </span>
             {task.areaName && (
-              <Badge variant="outline" className="shrink-0">
+              <Badge className="shrink-0 bg-module-chores-light text-module-chores-dark border-0 rounded-md px-2 py-1 text-sm">
                 {task.areaName}
               </Badge>
             )}
             {task.startsAt && (
-              <span className="font-body text-sm text-kinship-on-surface/60">
+              <span className="font-body text-sm text-kinship-on-surface-variant">
                 {format(task.startsAt, 'EEE, d MMM')}
               </span>
             )}
@@ -120,7 +120,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
 
           {/* Row 2: Notes excerpt */}
           {task.notes && (
-            <p className="mt-1 font-body text-sm text-kinship-on-surface/60 line-clamp-1">
+            <p className="mt-1 font-body text-sm text-kinship-on-surface-variant line-clamp-1">
               {task.notes}
             </p>
           )}
@@ -133,7 +133,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
                   {owner.avatarUrl && <AvatarImage src={owner.avatarUrl} alt={owner.displayName ?? ''} />}
                   <AvatarFallback>{getInitials(owner.displayName)}</AvatarFallback>
                 </Avatar>
-                <span className="font-body text-sm text-kinship-on-surface/70">
+                <span className="font-body text-sm text-kinship-on-surface-variant">
                   {owner.displayName ?? 'Unknown'}
                 </span>
               </>
@@ -164,7 +164,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
                   aria-hidden="true"
                 />
                 {/* Menu */}
-                <div className="absolute right-0 top-10 z-20 min-w-[140px] rounded-lg border border-border bg-white py-1 shadow-lg">
+                <div className="absolute right-0 top-10 z-20 min-w-[140px] rounded-xl bg-white py-1 ring-miro shadow-float">
                   <button
                     type="button"
                     className="w-full px-4 py-2 text-left font-body text-sm text-kinship-on-surface hover:bg-kinship-surface"

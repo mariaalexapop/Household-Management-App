@@ -70,8 +70,8 @@ export default async function KidsPage() {
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface/60">Kids Activities</p>
+            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface-variant">Kids Activities</p>
           </div>
           <div className="flex items-center gap-4">
             <a href="/calendar" className="font-body text-sm text-kinship-primary hover:underline">

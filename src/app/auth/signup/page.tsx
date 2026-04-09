@@ -46,16 +46,16 @@ export default async function SignupPage({ searchParams }: Props) {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-kinship-on-surface">
+          <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
             Kinship
           </h1>
-          <p className="mt-2 font-body text-kinship-on-surface/70">
+          <p className="mt-2 font-body text-kinship-on-surface-variant">
             {householdName ? `You've been invited to join ${householdName}` : 'Create your account'}
           </p>
         </div>
 
         {/* Card */}
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-8 [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+        <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 ring-miro">
           <AuthForm mode="signup" inviteToken={inviteToken} inviteEmail={inviteEmail} />
 
           {/* Only show OAuth for non-invited sign-ups */}
@@ -63,7 +63,7 @@ export default async function SignupPage({ searchParams }: Props) {
             <>
               <div className="my-6 flex items-center gap-4">
                 <div className="h-px flex-1 bg-kinship-surface-container" />
-                <span className="font-body text-sm text-kinship-on-surface/50">or</span>
+                <span className="font-body text-sm text-kinship-on-surface-variant">or</span>
                 <div className="h-px flex-1 bg-kinship-surface-container" />
               </div>
               <OAuthButton />
@@ -72,7 +72,7 @@ export default async function SignupPage({ searchParams }: Props) {
         </div>
 
         {/* Footer link */}
-        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface/70">
+        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface-variant">
           Already have an account?{' '}
           <Link
             href="/auth/login"

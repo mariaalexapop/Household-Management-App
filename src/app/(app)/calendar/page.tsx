@@ -106,8 +106,8 @@ export default async function CalendarPage() {
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface/60">Calendar</p>
+            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface-variant">Calendar</p>
           </div>
           <div className="flex items-center gap-4">
             <a href="/kids" className="font-body text-sm text-kinship-primary hover:underline">Kids</a>

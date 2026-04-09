@@ -19,13 +19,13 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-kinship-on-surface">
+          <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
             Kinship
           </h1>
         </div>
 
         {/* Card */}
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-8 text-center [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+        <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 text-center ring-miro">
           {/* Mail icon */}
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-kinship-surface-container">
             <svg
@@ -48,14 +48,14 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
           <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
             Check your inbox
           </h2>
-          <p className="mt-3 font-body text-sm text-kinship-on-surface/70">
+          <p className="mt-3 font-body text-sm text-kinship-on-surface-variant">
             We sent a verification link to{' '}
             <strong className="text-kinship-on-surface">{email}</strong>.
             Click the link in the email to activate your Kinship account.
           </p>
 
           <div className="mt-6 flex flex-col items-center gap-3">
-            <p className="font-body text-xs text-kinship-on-surface/50">
+            <p className="font-body text-xs text-kinship-on-surface-variant">
               Didn&apos;t receive the email? Check your spam folder or resend it.
             </p>
             {email !== 'your email address' && <ResendButton email={email} inviteToken={inviteToken} />}
@@ -63,7 +63,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
         </div>
 
         {/* Footer link */}
-        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface/70">
+        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface-variant">
           <Link
             href="/auth/login"
             className="font-medium text-kinship-primary hover:underline"

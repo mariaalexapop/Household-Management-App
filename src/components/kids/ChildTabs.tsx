@@ -15,7 +15,7 @@ export function ChildTabs({ children, selectedChildId, onSelect }: ChildTabsProp
         onClick={() => onSelect(null)}
         className={`rounded-full px-4 py-1.5 text-sm font-body transition-colors ${
           selectedChildId === null
-            ? 'bg-kinship-primary text-white'
+            ? 'bg-module-kids-light text-module-kids-dark font-semibold'
             : 'bg-kinship-surface-container text-kinship-on-surface hover:bg-kinship-surface-container/80'
         }`}
       >
@@ -27,7 +27,7 @@ export function ChildTabs({ children, selectedChildId, onSelect }: ChildTabsProp
           onClick={() => onSelect(child.id)}
           className={`rounded-full px-4 py-1.5 text-sm font-body transition-colors ${
             selectedChildId === child.id
-              ? 'bg-kinship-primary text-white'
+              ? 'bg-module-kids-light text-module-kids-dark font-semibold'
               : 'bg-kinship-surface-container text-kinship-on-surface hover:bg-kinship-surface-container/80'
           }`}
         >

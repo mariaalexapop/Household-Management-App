@@ -40,13 +40,13 @@ export default async function JoinPage({ params }: Props) {
       <div className="flex min-h-screen items-center justify-center bg-kinship-surface px-4 py-12">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <h1 className="font-display text-3xl font-bold text-kinship-on-surface">Kinship</h1>
+            <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Kinship</h1>
           </div>
-          <div className="rounded-lg bg-kinship-surface-container-lowest p-8 text-center [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+          <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 text-center ring-miro">
             <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
               Invitation not found
             </h2>
-            <p className="mt-3 font-body text-sm text-kinship-on-surface/70">
+            <p className="mt-3 font-body text-sm text-kinship-on-surface-variant">
               This invitation link has expired, already been used, or is invalid. Ask the household
               admin to send you a new one.
             </p>
@@ -113,14 +113,14 @@ export default async function JoinPage({ params }: Props) {
     <div className="flex min-h-screen items-center justify-center bg-kinship-surface px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-kinship-on-surface">Kinship</h1>
+          <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Kinship</h1>
         </div>
 
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-8 text-center [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+        <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 text-center ring-miro">
           <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
             You&apos;ve been invited
           </h2>
-          <p className="mt-3 font-body text-sm text-kinship-on-surface/70">
+          <p className="mt-3 font-body text-sm text-kinship-on-surface-variant">
             Join <strong className="text-kinship-on-surface">{invite.householdName}</strong> on
             Kinship to manage your household together.
           </p>

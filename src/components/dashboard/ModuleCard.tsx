@@ -60,7 +60,7 @@ export function ModuleCard({ moduleKey }: ModuleCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <CardDescription className="font-body text-sm text-kinship-on-surface/60">
+        <CardDescription className="font-body text-sm text-kinship-on-surface-variant">
           {description}
         </CardDescription>
       </CardContent>

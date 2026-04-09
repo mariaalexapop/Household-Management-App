@@ -424,7 +424,7 @@ export function ActivityForm({
                 className={`${inlineFieldClassName} w-16`}
                 {...register('interval')}
               />
-              <span className="font-body text-sm text-kinship-on-surface/60">
+              <span className="font-body text-sm text-kinship-on-surface-variant">
                 {watchedRepeat === 'daily'
                   ? 'day(s)'
                   : watchedRepeat === 'weekly'
@@ -476,13 +476,13 @@ export function ActivityForm({
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting} className="rounded-lg border-kinship-outline">
           Cancel
         </Button>
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-kinship-primary text-white hover:bg-kinship-primary/90"
+          className="rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
         >
           {isSubmitting ? 'Saving...' : mode === 'edit' ? 'Update Activity' : 'Add Activity'}
         </Button>

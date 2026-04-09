@@ -22,7 +22,7 @@ export function KidsDashboardCard({ activities }: KidsDashboardCardProps) {
       </div>
 
       {activities.length === 0 ? (
-        <p className="font-body text-sm text-muted-foreground">
+        <p className="font-body text-sm text-kinship-on-surface-variant">
           No upcoming activities. Add one to get started.
         </p>
       ) : (
@@ -34,12 +34,12 @@ export function KidsDashboardCard({ activities }: KidsDashboardCardProps) {
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 {activity.childName && (
-                  <span className="font-body text-xs text-muted-foreground">
+                  <span className="font-body text-xs text-kinship-on-surface-variant">
                     {activity.childName}
                   </span>
                 )}
                 {activity.startsAt && (
-                  <span className="font-body text-xs text-muted-foreground">
+                  <span className="font-body text-xs text-kinship-on-surface-variant">
                     {format(new Date(activity.startsAt), 'MMM d')}
                   </span>
                 )}

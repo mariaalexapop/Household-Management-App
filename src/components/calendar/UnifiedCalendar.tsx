@@ -22,7 +22,7 @@ export function UnifiedCalendar({ events, defaultView = 'month' }: UnifiedCalend
       <div className="flex justify-end mb-4 gap-1">
         <button
           onClick={() => setView('month')}
-          className={`p-2 rounded text-sm font-body transition-colors ${
+          className={`p-2 rounded-lg text-sm font-body transition-colors ${
             view === 'month'
               ? 'bg-kinship-primary text-white'
               : 'hover:bg-kinship-surface-container text-kinship-on-surface'
@@ -34,7 +34,7 @@ export function UnifiedCalendar({ events, defaultView = 'month' }: UnifiedCalend
         </button>
         <button
           onClick={() => setView('week')}
-          className={`p-2 rounded text-sm font-body transition-colors ${
+          className={`p-2 rounded-lg text-sm font-body transition-colors ${
             view === 'week'
               ? 'bg-kinship-primary text-white'
               : 'hover:bg-kinship-surface-container text-kinship-on-surface'
@@ -46,19 +46,21 @@ export function UnifiedCalendar({ events, defaultView = 'month' }: UnifiedCalend
         </button>
       </div>
 
-      {view === 'month' ? (
-        <CalendarMonthView
-          events={events}
-          currentMonth={currentMonth}
-          onMonthChange={setCurrentMonth}
-        />
-      ) : (
-        <CalendarWeekView
-          events={events}
-          currentWeek={currentWeek}
-          onWeekChange={setCurrentWeek}
-        />
-      )}
+      <div className="bg-white rounded-2xl ring-miro p-6">
+        {view === 'month' ? (
+          <CalendarMonthView
+            events={events}
+            currentMonth={currentMonth}
+            onMonthChange={setCurrentMonth}
+          />
+        ) : (
+          <CalendarWeekView
+            events={events}
+            currentWeek={currentWeek}
+            onWeekChange={setCurrentWeek}
+          />
+        )}
+      </div>
     </div>
   )
 }

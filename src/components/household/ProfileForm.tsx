@@ -87,7 +87,7 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl }: ProfileFor
           />
         </div>
         {uploadPending && (
-          <p className="text-xs text-muted-foreground">Uploading...</p>
+          <p className="text-xs text-kinship-on-surface-variant">Uploading...</p>
         )}
       </div>
 

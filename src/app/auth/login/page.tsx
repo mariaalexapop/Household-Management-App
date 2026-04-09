@@ -43,10 +43,10 @@ export default async function LoginPage({ searchParams }: Props) {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-kinship-on-surface">
+          <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
             Kinship
           </h1>
-          <p className="mt-2 font-body text-kinship-on-surface/70">
+          <p className="mt-2 font-body text-kinship-on-surface-variant">
             {householdName ? `Sign in to join ${householdName}` : 'Welcome back'}
           </p>
         </div>
@@ -58,7 +58,7 @@ export default async function LoginPage({ searchParams }: Props) {
               You&apos;ve been invited to join{' '}
               <strong className="font-semibold">{householdName}</strong>. Sign in to accept the invitation.
             </p>
-            <p className="mt-1 font-body text-xs text-kinship-on-surface/60">
+            <p className="mt-1 font-body text-xs text-kinship-on-surface-variant">
               New to Kinship?{' '}
               <Link href={`/join/${inviteToken}`} className="font-medium text-kinship-primary hover:underline">
                 Create an account instead
@@ -77,13 +77,13 @@ export default async function LoginPage({ searchParams }: Props) {
         )}
 
         {/* Card */}
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-8 [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+        <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 ring-miro">
           <AuthForm mode="login" nextUrl={next} />
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-4">
             <div className="h-px flex-1 bg-kinship-surface-container" />
-            <span className="font-body text-sm text-kinship-on-surface/50">or</span>
+            <span className="font-body text-sm text-kinship-on-surface-variant">or</span>
             <div className="h-px flex-1 bg-kinship-surface-container" />
           </div>
 
@@ -91,7 +91,7 @@ export default async function LoginPage({ searchParams }: Props) {
         </div>
 
         {/* Footer link */}
-        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface/70">
+        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface-variant">
           Don&apos;t have an account?{' '}
           <Link
             href={inviteToken ? `/join/${inviteToken}` : '/auth/signup'}

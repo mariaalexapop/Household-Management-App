@@ -175,7 +175,7 @@ export function AuthForm({ mode, inviteToken, inviteEmail, nextUrl }: AuthFormPr
             autoComplete="email"
             placeholder="you@example.com"
             readOnly={mode === 'signup' && !!inviteEmail}
-            className={mode === 'signup' && inviteEmail ? 'bg-kinship-surface-container text-kinship-on-surface/60 cursor-not-allowed' : ''}
+            className={mode === 'signup' && inviteEmail ? 'bg-kinship-surface-container text-kinship-on-surface-variant cursor-not-allowed' : ''}
             aria-invalid={'email' in errors && !!errors.email}
             {...register('email' as never)}
           />

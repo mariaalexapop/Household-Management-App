@@ -108,8 +108,8 @@ export default async function HouseholdPage() {
       <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface/60">{householdName}</p>
+            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
+            <p className="font-body text-sm text-kinship-on-surface-variant">{householdName}</p>
           </div>
           <a href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">
             Dashboard

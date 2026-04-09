@@ -33,13 +33,13 @@ function EventCell({ dayProps, events, popoverDate, onOpenPopover, onClosePopove
   return (
     <td
       {...restProps}
-      className={`align-top border border-kinship-surface-container/40 p-1 relative ${
+      className={`align-top border border-kinship-outline-variant p-1 relative ${
         modifiers.outside ? 'opacity-40' : ''
       }`}
     >
       <span
         className={`w-7 h-7 rounded-full text-sm font-body flex items-center justify-center mx-auto mb-0.5 ${
-          modifiers.today ? 'font-bold text-kinship-primary' : 'text-kinship-on-surface'
+          modifiers.today ? 'bg-kinship-primary-surface text-kinship-primary font-semibold' : 'text-kinship-on-surface'
         } ${modifiers.selected ? 'bg-kinship-primary text-white' : ''}`}
       >
         {date.getDate()}
@@ -94,12 +94,12 @@ export function CalendarMonthView({ events, currentMonth, onMonthChange }: Calen
           month: 'w-full',
           month_grid: 'w-full border-collapse',
           weekdays: '',
-          weekday: 'text-center font-body text-xs text-kinship-on-surface/60 py-2',
+          weekday: 'text-center font-body text-xs text-kinship-on-surface-variant py-2',
           weeks: '',
           week: '',
           nav: 'flex justify-between mb-3 items-center',
-          button_previous: 'p-1 hover:bg-kinship-surface-container rounded font-body text-kinship-on-surface',
-          button_next: 'p-1 hover:bg-kinship-surface-container rounded font-body text-kinship-on-surface',
+          button_previous: 'p-1 hover:bg-kinship-surface-container rounded-lg font-body text-kinship-on-surface',
+          button_next: 'p-1 hover:bg-kinship-surface-container rounded-lg font-body text-kinship-on-surface',
           month_caption: 'flex justify-center mb-2',
           caption_label: 'font-display font-semibold text-kinship-on-surface',
         }}

@@ -21,7 +21,7 @@ export function NotificationToggle({ defaultEnabled }: NotificationToggleProps) 
       aria-checked={enabled}
       onClick={() => setEnabled((v) => !v)}
       className={`relative inline-flex h-6 w-11 min-w-[44px] items-center rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-kinship-primary ${
-        enabled ? 'bg-[#0053dc]' : 'bg-kinship-surface-container'
+        enabled ? 'bg-kinship-primary' : 'bg-kinship-surface-container'
       }`}
     >
       <span

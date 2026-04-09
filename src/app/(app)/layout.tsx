@@ -54,7 +54,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <NotificationBell />
         <Link
           href="/settings"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-kinship-surface-container hover:text-kinship-on-surface"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-kinship-on-surface"
           aria-label="Settings"
         >
           <Settings className="h-5 w-5" />

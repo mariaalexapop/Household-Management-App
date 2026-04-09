@@ -29,7 +29,7 @@ export default function Step2Page() {
       <h2 className="mb-2 font-display text-xl font-semibold text-kinship-on-surface">
         Which modules do you need?
       </h2>
-      <p className="mb-6 font-body text-sm text-kinship-on-surface/60">
+      <p className="mb-6 font-body text-sm text-kinship-on-surface-variant">
         Select everything that applies. You can change this later.
       </p>
 

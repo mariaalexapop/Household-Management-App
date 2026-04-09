@@ -6,7 +6,7 @@ export function EmptyModuleState() {
       <p className="font-display text-base font-semibold text-kinship-on-surface">
         No modules activated yet
       </p>
-      <p className="mt-2 font-body text-sm text-kinship-on-surface/60">
+      <p className="mt-2 font-body text-sm text-kinship-on-surface-variant">
         Activate modules to start tracking your household.
       </p>
       <Link

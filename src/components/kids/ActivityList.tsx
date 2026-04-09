@@ -30,9 +30,9 @@ export function ActivityList({ activities, childList, members, onEdit, onDelete 
         selectedChildId={selectedChildId}
         onSelect={setSelectedChildId}
       />
-      <div className="rounded-lg bg-kinship-surface-container-lowest px-4">
+      <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
-          <p className="py-8 text-center font-body text-kinship-on-surface/60">
+          <p className="py-8 text-center font-body text-kinship-on-surface-variant">
             No activities yet. Add one to get started.
           </p>
         ) : (

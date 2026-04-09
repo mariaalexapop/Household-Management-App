@@ -131,7 +131,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               activeTab === 'email'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-kinship-on-surface-variant hover:text-foreground'
             }`}
           >
             Invite by email
@@ -142,7 +142,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               activeTab === 'link'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-kinship-on-surface-variant hover:text-foreground'
             }`}
           >
             Share link
@@ -190,7 +190,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
         {/* Link tab */}
         {activeTab === 'link' && (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-kinship-on-surface-variant">
               Generate a shareable invite link. Anyone with this link can join your household.
               Links expire after 7 days.
             </p>
@@ -225,7 +225,7 @@ export function InviteModal({ householdId }: InviteModalProps) {
                     {copied ? 'Copied!' : 'Copy'}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-kinship-on-surface-variant">
                   Share this link with anyone you want to invite. It expires in 7 days.
                 </p>
                 <div className="flex justify-end gap-2">

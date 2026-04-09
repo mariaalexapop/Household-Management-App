@@ -29,12 +29,12 @@ export function WizardLayout({
       <div className="w-full max-w-lg">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-kinship-on-surface">Kinship</h1>
-          <p className="mt-2 font-body text-kinship-on-surface/70">Set up your household</p>
+          <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Kinship</h1>
+          <p className="mt-2 font-body text-kinship-on-surface-variant">Set up your household</p>
         </div>
 
         {/* Card */}
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-8 [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
+        <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 ring-miro">
           {/* Step indicator */}
           <div className="mb-8 flex items-center gap-2">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
@@ -46,7 +46,7 @@ export function WizardLayout({
                       ? 'bg-kinship-primary text-white'
                       : s === step
                         ? 'bg-kinship-primary text-white ring-2 ring-kinship-primary/30'
-                        : 'bg-kinship-surface-container text-kinship-on-surface/40',
+                        : 'bg-kinship-surface-container text-kinship-on-surface-variant',
                   ].join(' ')}
                 >
                   {s}
@@ -61,7 +61,7 @@ export function WizardLayout({
                 )}
               </div>
             ))}
-            <span className="ml-2 font-body text-sm text-kinship-on-surface/60">
+            <span className="ml-2 font-body text-sm text-kinship-on-surface-variant">
               Step {step} of {totalSteps}
             </span>
           </div>
@@ -76,7 +76,7 @@ export function WizardLayout({
                 type="button"
                 variant="ghost"
                 onClick={onBack}
-                className="flex items-center gap-1 text-kinship-on-surface/70"
+                className="flex items-center gap-1 text-kinship-on-surface-variant"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Back

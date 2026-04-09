@@ -26,13 +26,15 @@ export function CalendarWeekView({ events, currentWeek, onWeekChange }: Calendar
     onWeekChange(addWeeks(currentWeek, 1))
   }
 
+  const today = new Date()
+
   return (
     <div className="w-full">
       {/* Navigation */}
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={handlePrev}
-          className="p-1 hover:bg-kinship-surface-container rounded text-kinship-on-surface"
+          className="p-1 hover:bg-kinship-surface-container rounded-lg text-kinship-on-surface"
           aria-label="Previous week"
         >
           <ChevronLeft size={18} />
@@ -42,7 +44,7 @@ export function CalendarWeekView({ events, currentWeek, onWeekChange }: Calendar
         </span>
         <button
           onClick={handleNext}
-          className="p-1 hover:bg-kinship-surface-container rounded text-kinship-on-surface"
+          className="p-1 hover:bg-kinship-surface-container rounded-lg text-kinship-on-surface"
           aria-label="Next week"
         >
           <ChevronRight size={18} />
@@ -54,14 +56,21 @@ export function CalendarWeekView({ events, currentWeek, onWeekChange }: Calendar
         <div className="grid grid-cols-8 min-w-[600px]">
           {/* Header row */}
           <div className="col-span-1" />
-          {days.map((day) => (
-            <div
-              key={day.toISOString()}
-              className="text-center font-body text-xs font-semibold text-kinship-on-surface/80 py-2 border-b border-kinship-surface-container"
-            >
-              {format(day, 'EEE d')}
-            </div>
-          ))}
+          {days.map((day) => {
+            const isToday = isSameDay(day, today)
+            return (
+              <div
+                key={day.toISOString()}
+                className={`text-center font-body text-xs font-semibold py-2 border-b border-kinship-outline-variant ${
+                  isToday
+                    ? 'bg-kinship-primary-surface text-kinship-primary'
+                    : 'text-kinship-on-surface-variant'
+                }`}
+              >
+                {format(day, 'EEE d')}
+              </div>
+            )
+          })}
 
           {/* Time rows */}
           {HOURS.map((hour) => (
@@ -69,7 +78,7 @@ export function CalendarWeekView({ events, currentWeek, onWeekChange }: Calendar
               {/* Time label */}
               <div
                 key={`label-${hour}`}
-                className="h-12 flex items-start justify-end pr-2 pt-1 font-body text-xs text-kinship-on-surface/50"
+                className="h-12 flex items-start justify-end pr-2 pt-1 font-body text-xs text-kinship-on-surface-variant"
               >
                 {`${String(hour).padStart(2, '0')}:00`}
               </div>
@@ -82,13 +91,13 @@ export function CalendarWeekView({ events, currentWeek, onWeekChange }: Calendar
                 return (
                   <div
                     key={`${day.toISOString()}-${hour}`}
-                    className="h-12 border-b border-l border-kinship-surface-container/50 p-0.5 relative"
+                    className="h-12 border-b border-l border-kinship-outline-variant p-0.5 relative"
                   >
                     {cellEvents.map((event) => (
                       <button
                         key={event.id}
                         onClick={() => { window.location.href = event.href }}
-                        className="rounded px-1 py-0.5 text-xs text-white truncate cursor-pointer w-full text-left mb-0.5 block"
+                        className="rounded-md px-1 py-0.5 text-xs text-white truncate cursor-pointer w-full text-left mb-0.5 block"
                         style={{ backgroundColor: event.colour }}
                         title={event.title}
                       >

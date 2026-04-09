@@ -11,22 +11,22 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-kinship-on-surface">
+          <h1 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
             Kinship
           </h1>
-          <p className="mt-2 font-body text-kinship-on-surface/70">Reset your password</p>
+          <p className="mt-2 font-body text-kinship-on-surface-variant">Reset your password</p>
         </div>
 
         {/* Card */}
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-8 [box-shadow:0_20px_40px_rgba(45,51,55,0.06)]">
-          <p className="mb-6 font-body text-sm text-kinship-on-surface/70">
+        <div className="rounded-2xl bg-kinship-surface-container-lowest p-8 ring-miro">
+          <p className="mb-6 font-body text-sm text-kinship-on-surface-variant">
             Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
           <AuthForm mode="reset" />
         </div>
 
         {/* Footer link */}
-        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface/70">
+        <p className="mt-6 text-center font-body text-sm text-kinship-on-surface-variant">
           <Link
             href="/auth/login"
             className="font-medium text-kinship-primary hover:underline"

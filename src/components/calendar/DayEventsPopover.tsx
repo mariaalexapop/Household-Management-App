@@ -28,7 +28,7 @@ export function DayEventsPopover({ events, date, onClose }: DayEventsPopoverProp
   return (
     <div
       ref={ref}
-      className="absolute z-50 bg-kinship-surface-container-lowest rounded-lg shadow-lg p-3 min-w-48 border border-kinship-surface-container"
+      className="absolute z-50 bg-white rounded-xl shadow-float ring-miro p-3 min-w-48"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="font-body text-xs font-semibold text-kinship-on-surface">
@@ -36,7 +36,7 @@ export function DayEventsPopover({ events, date, onClose }: DayEventsPopoverProp
         </span>
         <button
           onClick={onClose}
-          className="p-0.5 rounded hover:bg-kinship-surface-container text-kinship-on-surface/60"
+          className="p-0.5 rounded-lg hover:bg-kinship-surface-container text-kinship-on-surface-variant"
           aria-label="Close"
         >
           <X size={12} />

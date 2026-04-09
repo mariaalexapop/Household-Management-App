@@ -104,13 +104,13 @@ export function KidsClient({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-display text-2xl font-bold text-kinship-on-surface">Kids Activities</h2>
+        <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Kids Activities</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setView('list')}
-            className={`rounded p-2 ${
+            className={`rounded-lg p-2 ${
               view === 'list'
-                ? 'bg-kinship-primary text-white'
+                ? 'bg-module-kids-light text-module-kids-dark'
                 : 'hover:bg-kinship-surface-container text-kinship-on-surface'
             }`}
             aria-label="List view"
@@ -119,9 +119,9 @@ export function KidsClient({
           </button>
           <button
             onClick={() => setView('calendar')}
-            className={`rounded p-2 ${
+            className={`rounded-lg p-2 ${
               view === 'calendar'
-                ? 'bg-kinship-primary text-white'
+                ? 'bg-module-kids-light text-module-kids-dark'
                 : 'hover:bg-kinship-surface-container text-kinship-on-surface'
             }`}
             aria-label="Calendar view"
@@ -146,7 +146,7 @@ export function KidsClient({
           onDelete={handleDelete}
         />
       ) : (
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-4">
+        <div className="bg-white rounded-2xl ring-miro p-6">
           <UnifiedCalendar
             events={optimisticActivities
               .filter((a) => a.startsAt !== null)

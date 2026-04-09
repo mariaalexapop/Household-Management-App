@@ -78,7 +78,7 @@ export function DeleteAccountSection() {
           </DialogHeader>
 
           <div className="space-y-3 py-2">
-            <p className="text-sm text-kinship-on-surface/80">
+            <p className="text-sm text-kinship-on-surface">
               Type <strong>{CONFIRM_PHRASE}</strong> to confirm deletion:
             </p>
             <Input

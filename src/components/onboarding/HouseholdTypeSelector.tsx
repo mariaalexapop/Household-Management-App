@@ -60,7 +60,7 @@ export function HouseholdTypeSelector({ selected, onSelect }: HouseholdTypeSelec
             <Icon
               className={[
                 'h-5 w-5',
-                isSelected ? 'text-kinship-primary' : 'text-kinship-on-surface/50',
+                isSelected ? 'text-kinship-primary' : 'text-kinship-on-surface-variant',
               ].join(' ')}
             />
             <div>
@@ -72,7 +72,7 @@ export function HouseholdTypeSelector({ selected, onSelect }: HouseholdTypeSelec
               >
                 {label}
               </p>
-              <p className="font-body text-xs text-kinship-on-surface/60">{description}</p>
+              <p className="font-body text-xs text-kinship-on-surface-variant">{description}</p>
             </div>
           </button>
         )
