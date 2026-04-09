@@ -3,10 +3,12 @@
 import { z } from 'zod'
 import { eq, and, gte } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { addYears } from 'date-fns'
 import { db } from '@/lib/db'
 import { children, kidActivities, householdMembers, activityFeed } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { inngest } from '@/lib/inngest/client'
+import { generateOccurrences, type RecurrenceRule } from '@/lib/chores/recurrence'
 
 // ---------------------------------------------------------------------------
 // Zod schemas
@@ -248,15 +250,37 @@ export async function updateActivity(data: unknown): Promise<ActionResult<{ id: 
       )
   }
 
-  // If recurrence was just enabled, fire Inngest to generate occurrence rows
-  const hasInngest = !!process.env.INNGEST_EVENT_KEY
+  // If recurrence was just enabled, generate occurrence rows synchronously
   const becameRecurring = parsed.data.isRecurring && !existingActivity.isRecurring
 
-  if (becameRecurring && hasInngest) {
-    await inngest.send({
-      name: 'kids/activity.recurring.created',
-      data: { activityId: parsed.data.id, householdId: memberRow.householdId },
-    })
+  if (becameRecurring && parsed.data.recurrenceRule) {
+    const rule = parsed.data.recurrenceRule as RecurrenceRule
+    const startDate = new Date(parsed.data.startsAt)
+    const windowEnd = addYears(startDate, 1)
+    const occurrenceDates = generateOccurrences(rule, startDate, windowEnd)
+
+    if (occurrenceDates.length > 0) {
+      const occurrenceRows = occurrenceDates.map((date) => ({
+        householdId: memberRow.householdId,
+        childId: parsed.data.childId,
+        title: parsed.data.title,
+        category: parsed.data.category,
+        location: parsed.data.location ?? null,
+        assigneeId: parsed.data.assigneeId ?? null,
+        startsAt: date,
+        endsAt: parsed.data.endsAt
+          ? new Date(new Date(parsed.data.endsAt).getTime() - startDate.getTime() + date.getTime())
+          : null,
+        notes: parsed.data.notes ?? null,
+        reminderOffsetMinutes: parsed.data.reminderOffsetMinutes ?? null,
+        isRecurring: true,
+        recurrenceRule: parsed.data.recurrenceRule,
+        parentActivityId: parsed.data.id,
+        createdBy: user.id,
+      }))
+
+      await db.insert(kidActivities).values(occurrenceRows)
+    }
   }
 
   await db.insert(activityFeed).values({
