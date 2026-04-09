@@ -23,7 +23,7 @@ export function CalendarEventDot({ event, onClick }: CalendarEventDotProps) {
       </span>
       {event.childName && (
         <span
-          className="rounded-full px-1.5 py-0 text-[10px] font-semibold text-white shrink-0 leading-[16px]"
+          className="rounded-full px-1 text-[9px] leading-[14px] font-semibold text-white shrink-0"
           style={{ backgroundColor: event.childColour ?? event.colour }}
         >
           {event.childName}
