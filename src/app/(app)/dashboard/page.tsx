@@ -13,6 +13,7 @@ import {
 import { createClient } from '@/lib/supabase/server'
 import { DashboardGrid } from '@/components/dashboard/DashboardGrid'
 import { SignOutButton } from '@/components/dashboard/SignOutButton'
+import { registerChildren } from '@/lib/kids/child-colours'
 import type { ModuleKey } from '@/stores/onboarding'
 import type { UpcomingTask } from '@/components/dashboard/ChoresDashboardCard'
 import type { UpcomingActivity } from '@/components/dashboard/KidsDashboardCard'
@@ -108,6 +109,14 @@ export default async function DashboardPage() {
       .limit(3)
 
     upcomingActivities = activityRows
+
+    // Register all children so colours match the kids page
+    const allChildren = await db
+      .select({ id: children.id })
+      .from(children)
+      .where(eq(children.householdId, row.householdId))
+      .orderBy(asc(children.name))
+    registerChildren(allChildren.map((c) => c.id))
   }
 
   return (

@@ -1,41 +1,36 @@
 /**
- * Rotating highlight colours for children — Miro pastel palette.
- * Each entry has a hex (for inline styles) and Tailwind classes (for borders/bg).
+ * Rotating highlight colours for children — 6 visually distinct colours.
+ *
+ * Colours are assigned by position in a sorted child list, not by hash,
+ * to guarantee no two children share the same colour (up to 6 children).
  */
 const CHILD_PALETTE = [
-  { hex: '#e05252', border: 'border-l-[#e05252]', bg: 'bg-[#ffc6c6]' },   // coral
-  { hex: '#187574', border: 'border-l-[#187574]', bg: 'bg-[#c3faf5]' },   // teal
-  { hex: '#7a4000', border: 'border-l-[#7a4000]', bg: 'bg-[#ffe6cd]' },   // orange
-  { hex: '#7a1060', border: 'border-l-[#7a1060]', bg: 'bg-[#ffd8f4]' },   // rose
-  { hex: '#746019', border: 'border-l-[#746019]', bg: 'bg-[#fffacd]' },   // yellow
-  { hex: '#5b76fe', border: 'border-l-[#5b76fe]', bg: 'bg-[#eef0ff]' },   // blue
+  '#5b76fe', // blue
+  '#00b473', // green
+  '#e05252', // coral
+  '#b34a9c', // purple
+  '#ea8c00', // amber
+  '#187574', // teal
 ]
 
-function hashId(id: string): number {
-  let h = 0
-  for (let i = 0; i < id.length; i++) {
-    h = (h * 31 + id.charCodeAt(i)) | 0
-  }
-  return Math.abs(h)
+// Runtime registry: call registerChildren() with the full sorted child list,
+// then childHex() returns a deterministic colour per child ID.
+const childIndexMap = new Map<string, number>()
+
+/** Call once with the full sorted child list to assign colours by position. */
+export function registerChildren(childIds: string[]): void {
+  childIndexMap.clear()
+  childIds.forEach((id, i) => childIndexMap.set(id, i))
 }
 
-export function childColourIndex(childId: string): number {
-  return hashId(childId) % CHILD_PALETTE.length
-}
-
-/** Hex colour for a child (useful for inline styles, calendar dots, etc.) */
+/** Hex colour for a child. Falls back to position-based modulo if registered,
+ *  or uses last 4 hex chars of the UUID for a stable fallback. */
 export function childHex(childId: string): string {
-  return CHILD_PALETTE[childColourIndex(childId)].hex
-}
-
-/** Tailwind border-l class for a child */
-export function childBorderClass(childId: string): string {
-  return CHILD_PALETTE[childColourIndex(childId)].border
-}
-
-/** Tailwind bg class for a child (light pastel) */
-export function childBgClass(childId: string): string {
-  return CHILD_PALETTE[childColourIndex(childId)].bg
+  const idx = childIndexMap.get(childId)
+  if (idx !== undefined) return CHILD_PALETTE[idx % CHILD_PALETTE.length]
+  // Fallback: use last 4 hex chars of UUID for stable distribution
+  const tail = parseInt(childId.replace(/-/g, '').slice(-4), 16)
+  return CHILD_PALETTE[tail % CHILD_PALETTE.length]
 }
 
 export { CHILD_PALETTE }

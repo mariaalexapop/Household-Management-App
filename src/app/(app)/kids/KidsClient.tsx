@@ -15,6 +15,7 @@ import { ActivityForm } from '@/components/kids/ActivityForm'
 import { UnifiedCalendar } from '@/components/calendar/UnifiedCalendar'
 import { MODULE_COLOURS, type CalendarEvent } from '@/lib/calendar/types'
 import { createChild, deleteChild, deleteActivity } from '@/app/actions/kids'
+import { registerChildren } from '@/lib/kids/child-colours'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -77,6 +78,11 @@ export function KidsClient({
   useEffect(() => {
     setOptimisticActivities(initialActivities)
   }, [initialActivities])
+
+  // Register child colour assignments whenever the list changes
+  useEffect(() => {
+    registerChildren(localChildList.map((c) => c.id))
+  }, [localChildList])
 
   function handleAdd() {
     setSelectedActivity(null)

@@ -6,7 +6,7 @@ import { tasks, kidActivities, children, householdMembers } from '@/lib/db/schem
 import { createClient } from '@/lib/supabase/server'
 import { CalendarClient } from './CalendarClient'
 import { MODULE_COLOURS, toCalendarLabel, type CalendarEvent } from '@/lib/calendar/types'
-import { childHex } from '@/lib/kids/child-colours'
+import { childHex, registerChildren } from '@/lib/kids/child-colours'
 
 export const metadata = { title: 'Calendar — Kinship' }
 
@@ -72,6 +72,7 @@ export default async function CalendarPage() {
 
   // Map to CalendarEvent[]
   const childMap = new Map(childRows.map((c) => [c.id, c.name]))
+  registerChildren([...childRows].sort((a, b) => a.name.localeCompare(b.name)).map((c) => c.id))
 
   const choreEvents: CalendarEvent[] = choreRows.map((t) => ({
     id: t.id,
