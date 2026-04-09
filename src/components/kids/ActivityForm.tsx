@@ -256,6 +256,12 @@ export function ActivityForm({
               placeholder="Child's name"
               value={newChildName}
               onChange={(e) => setNewChildName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleCreateChild()
+                }
+              }}
               className="flex-1"
             />
             <Button type="button" onClick={handleCreateChild} variant="outline">
