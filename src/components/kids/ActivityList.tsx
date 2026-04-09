@@ -14,10 +14,10 @@ interface ActivityListProps {
 }
 
 export function ActivityList({ activities, childList, members, onEdit, onDelete }: ActivityListProps) {
-  const [selectedChildId, setSelectedChildId] = useState<string | null>(null)
+  const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set())
 
-  const filtered = selectedChildId
-    ? activities.filter((a) => a.childId === selectedChildId)
+  const filtered = selectedChildIds.size > 0
+    ? activities.filter((a) => selectedChildIds.has(a.childId))
     : activities
 
   const childMap = new Map(childList.map((c) => [c.id, c]))
@@ -27,8 +27,16 @@ export function ActivityList({ activities, childList, members, onEdit, onDelete 
     <div>
       <ChildTabs
         children={childList}
-        selectedChildId={selectedChildId}
-        onSelect={setSelectedChildId}
+        selectedChildIds={selectedChildIds}
+        onToggle={(id) => {
+          setSelectedChildIds((prev) => {
+            const next = new Set(prev)
+            if (next.has(id)) next.delete(id)
+            else next.add(id)
+            return next
+          })
+        }}
+        onSelectAll={() => setSelectedChildIds(new Set())}
       />
       <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
