@@ -6,6 +6,7 @@ import { tasks, kidActivities, children, householdMembers } from '@/lib/db/schem
 import { createClient } from '@/lib/supabase/server'
 import { CalendarClient } from './CalendarClient'
 import { MODULE_COLOURS, toCalendarLabel, type CalendarEvent } from '@/lib/calendar/types'
+import { childHex } from '@/lib/kids/child-colours'
 
 export const metadata = { title: 'Calendar — Kinship' }
 
@@ -83,16 +84,20 @@ export default async function CalendarPage() {
     label: toCalendarLabel(t.title),
   }))
 
-  const kidsEvents: CalendarEvent[] = activityRows.map((a) => ({
-    id: a.id,
-    title: `${a.title}${childMap.get(a.childId) ? ` · ${childMap.get(a.childId)}` : ''}`,
-    startsAt: a.startsAt,
-    endsAt: a.endsAt ?? null,
-    module: 'kids' as const,
-    href: '/kids',
-    colour: MODULE_COLOURS.kids,
-    label: toCalendarLabel(a.title),
-  }))
+  const kidsEvents: CalendarEvent[] = activityRows.map((a) => {
+    const childName = childMap.get(a.childId)
+    const labelWithChild = childName ? `${a.title} · ${childName}` : a.title
+    return {
+      id: a.id,
+      title: labelWithChild,
+      startsAt: a.startsAt,
+      endsAt: a.endsAt ?? null,
+      module: 'kids' as const,
+      href: '/kids',
+      colour: childHex(a.childId),
+      label: toCalendarLabel(labelWithChild),
+    }
+  })
 
   const allEvents: CalendarEvent[] = [...choreEvents, ...kidsEvents].sort(
     (a, b) => a.startsAt.getTime() - b.startsAt.getTime()

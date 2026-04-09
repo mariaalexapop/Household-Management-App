@@ -1,11 +1,13 @@
 import { CalendarHeart } from 'lucide-react'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
+import { childHex } from '@/lib/kids/child-colours'
 
 export interface UpcomingActivity {
   id: string
   title: string
   childName: string | null
+  childId: string | null
   startsAt: Date | null
 }
 
@@ -29,9 +31,17 @@ export function KidsDashboardCard({ activities }: KidsDashboardCardProps) {
         <ul className="flex flex-col gap-2">
           {activities.map((activity) => (
             <li key={activity.id} className="flex items-center justify-between gap-2">
-              <span className="font-body text-sm text-kinship-on-surface truncate">
-                {activity.title}
-              </span>
+              <div className="flex items-center gap-2 min-w-0">
+                {activity.childId && (
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: childHex(activity.childId) }}
+                  />
+                )}
+                <span className="font-body text-sm text-kinship-on-surface truncate">
+                  {activity.title}
+                </span>
+              </div>
               <div className="flex items-center gap-2 shrink-0">
                 {activity.childName && (
                   <span className="font-body text-xs text-kinship-on-surface-variant">

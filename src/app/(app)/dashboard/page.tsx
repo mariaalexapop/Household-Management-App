@@ -90,6 +90,7 @@ export default async function DashboardPage() {
         id: kidActivities.id,
         title: kidActivities.title,
         childName: children.name,
+        childId: kidActivities.childId,
         startsAt: kidActivities.startsAt,
       })
       .from(kidActivities)
