@@ -398,3 +398,188 @@ export const kidActivities = pgTable(
     }),
   ]
 )
+
+// ---------------------------------------------------------------------------
+// cars
+// ---------------------------------------------------------------------------
+export const cars = pgTable(
+  'cars',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    make: text('make').notNull(),
+    model: text('model').notNull(),
+    year: integer('year').notNull(),
+    plate: text('plate').notNull(),
+    colour: text('colour'),
+    motDueDate: timestamp('mot_due_date', { withTimezone: true }),
+    taxDueDate: timestamp('tax_due_date', { withTimezone: true }),
+    nextServiceDate: timestamp('next_service_date', { withTimezone: true }),
+    motReminderDays: integer('mot_reminder_days').default(30),
+    taxReminderDays: integer('tax_reminder_days').default(30),
+    serviceReminderDays: integer('service_reminder_days').default(14),
+    // createdBy references auth.users(id) — cross-schema, FK added in migration
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('cars_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// service_records
+// ---------------------------------------------------------------------------
+export const serviceRecords = pgTable(
+  'service_records',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    carId: uuid('car_id')
+      .notNull()
+      .references(() => cars.id, { onDelete: 'cascade' }),
+    serviceDate: timestamp('service_date', { withTimezone: true }).notNull(),
+    serviceType: text('service_type').notNull(), // 'full_service' | 'mot' | 'repair' | 'tyre' | 'other'
+    mileage: integer('mileage'),
+    garage: text('garage'),
+    costCents: integer('cost_cents'), // COST-01: cost in cents
+    notes: text('notes'),
+    // createdBy references auth.users(id) — cross-schema, FK added in migration
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('service_records_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// insurance_policies
+// ---------------------------------------------------------------------------
+export const insurancePolicies = pgTable(
+  'insurance_policies',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    policyType: text('policy_type').notNull(), // 'home' | 'car' | 'health' | 'life' | 'travel' | 'other'
+    insurer: text('insurer').notNull(),
+    policyNumber: text('policy_number'),
+    expiryDate: timestamp('expiry_date', { withTimezone: true }).notNull(),
+    renewalContactName: text('renewal_contact_name'),
+    renewalContactPhone: text('renewal_contact_phone'),
+    renewalContactEmail: text('renewal_contact_email'),
+    paymentSchedule: text('payment_schedule'), // 'annual' | 'quarterly' | 'monthly'
+    premiumCents: integer('premium_cents'), // COST-01: premium per period in cents
+    nextPaymentDate: timestamp('next_payment_date', { withTimezone: true }),
+    expiryReminderDays: integer('expiry_reminder_days').default(30),
+    paymentReminderDays: integer('payment_reminder_days').default(7),
+    // createdBy references auth.users(id) — cross-schema, FK added in migration
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('insurance_policies_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// electronics
+// ---------------------------------------------------------------------------
+export const electronics = pgTable(
+  'electronics',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    brand: text('brand'),
+    modelNumber: text('model_number'),
+    purchaseDate: timestamp('purchase_date', { withTimezone: true }),
+    costCents: integer('cost_cents'), // COST-01: purchase cost in cents
+    warrantyExpiryDate: timestamp('warranty_expiry_date', { withTimezone: true }),
+    coverageSummary: text('coverage_summary'), // free-text warranty coverage
+    // createdBy references auth.users(id) — cross-schema, FK added in migration
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('electronics_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// documents (shared polymorphic table for PDF uploads)
+// ---------------------------------------------------------------------------
+export const documents = pgTable(
+  'documents',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    module: text('module').notNull(), // 'insurance' | 'electronics'
+    entityId: uuid('entity_id').notNull(), // points to insurancePolicies.id or electronics.id
+    documentType: text('document_type').notNull(), // 'policy' | 'warranty' | 'manual'
+    fileName: text('file_name').notNull(),
+    storagePath: text('storage_path').notNull(), // path in Supabase Storage 'documents' bucket
+    fileSizeBytes: integer('file_size_bytes'),
+    // uploadedBy references auth.users(id) — cross-schema, FK added in migration
+    uploadedBy: uuid('uploaded_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('documents_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
