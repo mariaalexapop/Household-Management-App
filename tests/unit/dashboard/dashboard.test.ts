@@ -45,6 +45,7 @@ vi.mock('lucide-react', () => ({
   Heart: () => React.createElement('span', { 'aria-hidden': true }, null),
   Home: () => React.createElement('span', { 'aria-hidden': true }, null),
   User: () => React.createElement('span', { 'aria-hidden': true }, null),
+  CalendarHeart: () => React.createElement('span', { 'aria-hidden': true }, null),
 }))
 
 // date-fns format — mock for test isolation.
@@ -61,7 +62,7 @@ vi.mock('date-fns', () => ({
 describe('DashboardGrid', () => {
   it('renders ChoresDashboardCard for chores module and ModuleCard for car', async () => {
     const modules: ModuleKey[] = ['chores', 'car']
-    render(React.createElement(DashboardGrid, { activeModules: modules, upcomingTasks: [] }))
+    render(React.createElement(DashboardGrid, { activeModules: modules, upcomingTasks: [], upcomingActivities: [] }))
 
     // ChoresDashboardCard renders its own "Home Chores" heading
     await screen.findByText('Home Chores')
@@ -71,7 +72,7 @@ describe('DashboardGrid', () => {
 
   it('renders 1 "Coming soon" badge for 2 active modules (chores uses ChoresDashboardCard)', async () => {
     const modules: ModuleKey[] = ['chores', 'car']
-    render(React.createElement(DashboardGrid, { activeModules: modules, upcomingTasks: [] }))
+    render(React.createElement(DashboardGrid, { activeModules: modules, upcomingTasks: [], upcomingActivities: [] }))
 
     // Only 'car' module shows "Coming soon"; 'chores' shows ChoresDashboardCard
     const badges = await screen.findAllByText('Coming soon')
@@ -79,23 +80,23 @@ describe('DashboardGrid', () => {
   })
 
   it('renders EmptyModuleState when activeModules is empty', async () => {
-    render(React.createElement(DashboardGrid, { activeModules: [], upcomingTasks: [] }))
+    render(React.createElement(DashboardGrid, { activeModules: [], upcomingTasks: [], upcomingActivities: [] }))
 
     await screen.findByText('No modules activated yet')
     expect(screen.queryByText('Coming soon')).toBeNull()
   })
 
-  it('renders 4 "Coming soon" badges when all 5 modules are active (chores uses ChoresDashboardCard)', async () => {
+  it('renders 3 "Coming soon" badges when all 5 modules are active (chores and kids use dashboard cards)', async () => {
     const all: ModuleKey[] = ['chores', 'car', 'insurance', 'electronics', 'kids']
-    render(React.createElement(DashboardGrid, { activeModules: all, upcomingTasks: [] }))
+    render(React.createElement(DashboardGrid, { activeModules: all, upcomingTasks: [], upcomingActivities: [] }))
 
-    // 'chores' renders ChoresDashboardCard (no "Coming soon"), other 4 show ModuleCard
+    // 'chores' renders ChoresDashboardCard, 'kids' renders KidsDashboardCard — car/insurance/electronics show ModuleCard
     const badges = await screen.findAllByText('Coming soon')
-    expect(badges).toHaveLength(4)
+    expect(badges).toHaveLength(3)
   })
 
   it('renders ChoresDashboardCard empty state when upcomingTasks is empty', async () => {
-    render(React.createElement(DashboardGrid, { activeModules: ['chores'], upcomingTasks: [] }))
+    render(React.createElement(DashboardGrid, { activeModules: ['chores'], upcomingTasks: [], upcomingActivities: [] }))
 
     await screen.findByText('No upcoming tasks. Add a task to get started.')
   })
@@ -104,7 +105,7 @@ describe('DashboardGrid', () => {
     const tasks = [
       { id: '1', title: 'Clean kitchen', areaName: 'Kitchen', startsAt: new Date('2026-04-07T10:00:00Z') },
     ]
-    render(React.createElement(DashboardGrid, { activeModules: ['chores'], upcomingTasks: tasks }))
+    render(React.createElement(DashboardGrid, { activeModules: ['chores'], upcomingTasks: tasks, upcomingActivities: [] }))
 
     await screen.findByText('Clean kitchen')
     await screen.findByText('Kitchen')

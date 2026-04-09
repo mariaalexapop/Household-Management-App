@@ -1,12 +1,21 @@
 import { redirect } from 'next/navigation'
 import { eq, ne, asc, and, or, isNotNull } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { householdMembers, householdSettings, households, tasks as tasksTable, choreAreas } from '@/lib/db/schema'
+import {
+  householdMembers,
+  householdSettings,
+  households,
+  tasks as tasksTable,
+  choreAreas,
+  kidActivities,
+  children,
+} from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardGrid } from '@/components/dashboard/DashboardGrid'
 import { SignOutButton } from '@/components/dashboard/SignOutButton'
 import type { ModuleKey } from '@/stores/onboarding'
 import type { UpcomingTask } from '@/components/dashboard/ChoresDashboardCard'
+import type { UpcomingActivity } from '@/components/dashboard/KidsDashboardCard'
 
 export const metadata = {
   title: 'Dashboard — Kinship',
@@ -72,6 +81,34 @@ export default async function DashboardPage() {
     upcomingTasks = taskRows
   }
 
+  // Fetch upcoming activities for the Kids dashboard card
+  let upcomingActivities: UpcomingActivity[] = []
+
+  if (activeModules.includes('kids')) {
+    const activityRows = await db
+      .select({
+        id: kidActivities.id,
+        title: kidActivities.title,
+        childName: children.name,
+        startsAt: kidActivities.startsAt,
+      })
+      .from(kidActivities)
+      .leftJoin(children, eq(kidActivities.childId, children.id))
+      .where(
+        and(
+          eq(kidActivities.householdId, row.householdId),
+          or(
+            eq(kidActivities.isRecurring, false),
+            isNotNull(kidActivities.parentActivityId),
+          ),
+        )
+      )
+      .orderBy(asc(kidActivities.startsAt))
+      .limit(3)
+
+    upcomingActivities = activityRows
+  }
+
   return (
     <div className="min-h-screen bg-kinship-surface">
       {/* Header */}
@@ -95,7 +132,11 @@ export default async function DashboardPage() {
         <h2 className="mb-6 font-display text-2xl font-semibold text-kinship-on-surface">
           Your household
         </h2>
-        <DashboardGrid activeModules={activeModules} upcomingTasks={upcomingTasks} />
+        <DashboardGrid
+          activeModules={activeModules}
+          upcomingTasks={upcomingTasks}
+          upcomingActivities={upcomingActivities}
+        />
       </main>
     </div>
   )

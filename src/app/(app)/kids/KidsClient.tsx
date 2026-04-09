@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/dialog'
 import { ActivityList } from '@/components/kids/ActivityList'
 import { ActivityForm } from '@/components/kids/ActivityForm'
+import { UnifiedCalendar } from '@/components/calendar/UnifiedCalendar'
+import { MODULE_COLOURS, type CalendarEvent } from '@/lib/calendar/types'
 import { createChild, deleteActivity } from '@/app/actions/kids'
 
 // ---------------------------------------------------------------------------
@@ -144,10 +146,22 @@ export function KidsClient({
           onDelete={handleDelete}
         />
       ) : (
-        <div className="rounded-lg bg-kinship-surface-container-lowest p-6">
-          <p className="font-body text-center text-kinship-on-surface/60">
-            Calendar view — implemented in Plan 06
-          </p>
+        <div className="rounded-lg bg-kinship-surface-container-lowest p-4">
+          <UnifiedCalendar
+            events={optimisticActivities
+              .filter((a) => a.startsAt !== null)
+              .map((a): CalendarEvent => ({
+                id: a.id,
+                title: a.title,
+                startsAt: a.startsAt as Date,
+                endsAt: a.endsAt,
+                module: 'kids',
+                href: '/kids',
+                colour: MODULE_COLOURS.kids,
+                label: a.title.slice(0, 20),
+              }))}
+            defaultView="month"
+          />
         </div>
       )}
 
