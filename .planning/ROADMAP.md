@@ -26,7 +26,7 @@
 | 1. Foundation & Onboarding | 2/8 | In Progress|  |
 | 2. Home Chores | 6/6 | Complete | 2026-04-03 |
 | 3. Kids Activities | 6/6 | Complete | 2026-04-09 |
-| 4. Tracker Modules | 0/TBD | Not started | - |
+| 4. Tracker Modules | 0/9 | Not started | - |
 | 5. AI Chatbot & RAG | 0/TBD | Not started | - |
 | 6. Platform & Polish | 0/TBD | Not started | - |
 
@@ -124,7 +124,18 @@ Plans:
 4. A user can view a basic costs dashboard showing costs across car services, insurance premiums, and electronics — broken down by section and period.
 5. Car, insurance, and electronics events appear in the existing unified calendar component (orange, purple, teal).
 
-**Plans:** TBD
+**Plans:** 9 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Schema + migration (cars, service_records, insurance_policies, electronics, documents tables + Storage bucket) — Wave 1
+- [ ] 04-02-PLAN.md — Shared components + document actions (FileUploadZone, DocumentList, ReminderConfig, upload/download server actions, cost format utility) — Wave 2
+- [ ] 04-03-PLAN.md — Car server actions + Inngest car reminder (CRUD cars + service records, send-car-reminder) — Wave 2
+- [ ] 04-04-PLAN.md — Insurance server actions + Inngest insurance reminders (CRUD policies, expiry + payment reminders) — Wave 2
+- [ ] 04-05-PLAN.md — Electronics server actions + Inngest warranty reminder (CRUD items, send-warranty-reminder) — Wave 2
+- [ ] 04-06-PLAN.md — Car UI (/cars page, CarsClient, service history timeline) — Wave 3
+- [ ] 04-07-PLAN.md — Insurance UI (/insurance page, InsuranceClient, policy document upload) — Wave 3
+- [ ] 04-08-PLAN.md — Electronics UI (/electronics page, ElectronicsClient, warranty + manual uploads) — Wave 3
+- [ ] 04-09-PLAN.md — Calendar extension + costs dashboard + dashboard cards (integrate all modules) — Wave 4
 
 ---
 
@@ -266,5 +277,6 @@ Plans:
 *Roadmap created: 2026-03-24*
 *Replaces prior roadmap created 2026-03-19 — full concept revision*
 *Phase 1 plans created: 2026-03-24*
-*Phase 1 revised: 2026-03-24 — fixed plan checker blockers, split 01-05 into wizard (01-05) + dashboard (01-06), renumbered invite→01-07 and realtime→01-08, total plans 7→8*
-*Phase 3 plans created: 2026-04-07 — CAL-01–04 pulled forward from Phase 4 per 03-CONTEXT.md; 6 plans across 4 waves*
+*Phase 1 revised: 2026-03-24 — fixed plan checker blockers, split 01-05 into wizard (01-05) + dashboard (01-06), renumbered invite->01-07 and realtime->01-08, total plans 7->8*
+*Phase 3 plans created: 2026-04-07 — CAL-01-04 pulled forward from Phase 4 per 03-CONTEXT.md; 6 plans across 4 waves*
+*Phase 4 plans created: 2026-04-09 — 9 plans across 4 waves; 20 requirements covered*
