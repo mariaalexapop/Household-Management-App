@@ -32,22 +32,19 @@ export function KidsDashboardCard({ activities }: KidsDashboardCardProps) {
           {activities.map((activity) => (
             <li key={activity.id} className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                {activity.childId && (
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: childHex(activity.childId) }}
-                  />
-                )}
                 <span className="font-body text-sm text-kinship-on-surface truncate">
                   {activity.title}
                 </span>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {activity.childName && (
-                  <span className="font-body text-xs text-kinship-on-surface-variant">
+                {activity.childId && activity.childName && (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[11px] font-body font-semibold text-white shrink-0"
+                    style={{ backgroundColor: childHex(activity.childId) }}
+                  >
                     {activity.childName}
                   </span>
                 )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
                 {activity.startsAt && (
                   <span className="font-body text-xs text-kinship-on-surface-variant">
                     {format(new Date(activity.startsAt), 'MMM d')}

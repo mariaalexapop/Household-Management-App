@@ -85,17 +85,18 @@ export default async function CalendarPage() {
   }))
 
   const kidsEvents: CalendarEvent[] = activityRows.map((a) => {
-    const childName = childMap.get(a.childId)
-    const labelWithChild = childName ? `${a.title} · ${childName}` : a.title
+    const cName = childMap.get(a.childId) ?? null
     return {
       id: a.id,
-      title: labelWithChild,
+      title: a.title,
       startsAt: a.startsAt,
       endsAt: a.endsAt ?? null,
       module: 'kids' as const,
       href: '/kids',
       colour: childHex(a.childId),
-      label: toCalendarLabel(labelWithChild),
+      label: toCalendarLabel(a.title),
+      childName: cName,
+      childColour: childHex(a.childId),
     }
   })
 

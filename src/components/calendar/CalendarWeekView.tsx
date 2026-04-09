@@ -97,11 +97,16 @@ export function CalendarWeekView({ events, currentWeek, onWeekChange }: Calendar
                       <button
                         key={event.id}
                         onClick={() => { window.location.href = event.href }}
-                        className="rounded-md px-1 py-0.5 text-xs text-white truncate cursor-pointer w-full text-left mb-0.5 block"
+                        className="rounded-md px-1 py-0.5 text-xs text-white cursor-pointer w-full text-left mb-0.5 flex items-center gap-1"
                         style={{ backgroundColor: event.colour }}
-                        title={event.title}
+                        title={event.childName ? `${event.title} · ${event.childName}` : event.title}
                       >
-                        {event.label ?? event.title.slice(0, 16)}
+                        <span className="truncate">{event.label ?? event.title.slice(0, 16)}</span>
+                        {event.childName && (
+                          <span className="rounded-full bg-white/30 px-1 text-[10px] font-semibold shrink-0">
+                            {event.childName}
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>

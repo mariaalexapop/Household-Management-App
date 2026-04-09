@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ActivityItem, ChildItem, MemberItem } from '@/app/(app)/kids/KidsClient'
-import { childBorderClass } from '@/lib/kids/child-colours'
+import { childHex } from '@/lib/kids/child-colours'
 
 const CATEGORY_COLOURS: Record<string, string> = {
   school:  'bg-category-school-light text-category-school-dark',
@@ -24,7 +24,7 @@ interface ActivityRowProps {
 
 export function ActivityRow({ activity, child, assignee, onEdit, onDelete }: ActivityRowProps) {
   return (
-    <div className={`bg-white rounded-xl ring-miro p-4 flex items-center justify-between border-l-4 ${child ? childBorderClass(child.id) : 'border-l-transparent'}`}>
+    <div className="bg-white rounded-xl ring-miro p-4 flex items-center justify-between">
       <div className="flex min-w-0 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate font-display text-base font-semibold text-kinship-on-surface">{activity.title}</span>
@@ -36,7 +36,10 @@ export function ActivityRow({ activity, child, assignee, onEdit, onDelete }: Act
             {activity.category}
           </span>
           {child && (
-            <span className="font-body text-xs font-semibold text-kinship-on-surface-variant">
+            <span
+              className="rounded-full px-2.5 py-0.5 text-xs font-body font-semibold text-white"
+              style={{ backgroundColor: childHex(child.id) }}
+            >
               {child.name}
             </span>
           )}

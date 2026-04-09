@@ -12,7 +12,7 @@ export function CalendarEventDot({ event, onClick }: CalendarEventDotProps) {
     <button
       onClick={onClick}
       className="flex items-center gap-1 text-xs hover:opacity-80 cursor-pointer w-full text-left truncate"
-      title={event.title}
+      title={event.childName ? `${event.title} · ${event.childName}` : event.title}
     >
       <span
         className="w-2 h-2 rounded-full flex-shrink-0"
@@ -21,6 +21,14 @@ export function CalendarEventDot({ event, onClick }: CalendarEventDotProps) {
       <span className="truncate text-kinship-on-surface font-body">
         {event.label ?? event.title.slice(0, 16)}
       </span>
+      {event.childName && (
+        <span
+          className="rounded-full px-1.5 py-0 text-[10px] font-semibold text-white shrink-0 leading-[16px]"
+          style={{ backgroundColor: event.childColour ?? event.colour }}
+        >
+          {event.childName}
+        </span>
+      )}
     </button>
   )
 }

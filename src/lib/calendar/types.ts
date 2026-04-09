@@ -14,6 +14,8 @@ export interface CalendarEvent {
   href: string   // navigates to source item in its module section
   colour: string // hex from MODULE_COLOURS
   label?: string // truncated title for month grid cells (max 20 chars)
+  childName?: string | null  // for kids events — child name pill label
+  childColour?: string | null // hex for child pill background
 }
 
 /**
