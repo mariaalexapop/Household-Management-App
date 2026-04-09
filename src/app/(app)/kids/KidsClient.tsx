@@ -14,7 +14,7 @@ import { ActivityList } from '@/components/kids/ActivityList'
 import { ActivityForm } from '@/components/kids/ActivityForm'
 import { UnifiedCalendar } from '@/components/calendar/UnifiedCalendar'
 import { MODULE_COLOURS, type CalendarEvent } from '@/lib/calendar/types'
-import { createChild, deleteActivity } from '@/app/actions/kids'
+import { createChild, deleteChild, deleteActivity } from '@/app/actions/kids'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -101,6 +101,13 @@ export function KidsClient({
     return newChild
   }
 
+  async function handleDeleteChild(childId: string): Promise<void> {
+    const result = await deleteChild({ id: childId })
+    if (!result.success) throw new Error(result.error ?? 'Failed to delete child')
+    setLocalChildList((prev) => prev.filter((c) => c.id !== childId))
+    router.refresh()
+  }
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
@@ -184,6 +191,7 @@ export function KidsClient({
             }}
             onCancel={() => setDialogOpen(false)}
             onCreateChild={handleCreateChild}
+            onDeleteChild={handleDeleteChild}
           />
         </DialogContent>
       </Dialog>

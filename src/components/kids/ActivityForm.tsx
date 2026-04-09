@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { format } from 'date-fns'
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -63,6 +64,7 @@ interface ActivityFormProps {
   onSuccess: () => void
   onCancel: () => void
   onCreateChild: (name: string) => Promise<ChildItem>
+  onDeleteChild: (childId: string) => Promise<void>
 }
 
 // ---------------------------------------------------------------------------
@@ -78,6 +80,7 @@ export function ActivityForm({
   onSuccess,
   onCancel,
   onCreateChild,
+  onDeleteChild,
 }: ActivityFormProps) {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -249,6 +252,32 @@ export function ActivityForm({
           ))}
           <option value="__new__">Add new child...</option>
         </select>
+
+        {localChildList.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {localChildList.map((child) => (
+              <span
+                key={child.id}
+                className="inline-flex items-center gap-1 rounded-full bg-kinship-surface-container px-2 py-0.5 text-xs font-body text-kinship-on-surface"
+              >
+                {child.name}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (confirm(`Remove ${child.name}? This will also delete their activities.`)) {
+                      await onDeleteChild(child.id)
+                      if (watchedChildId === child.id) setValue('childId', '')
+                    }
+                  }}
+                  className="rounded-full p-0.5 hover:bg-kinship-surface-container-low text-kinship-on-surface-variant hover:text-destructive"
+                  aria-label={`Remove ${child.name}`}
+                >
+                  <X size={10} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
 
         {showNewChild && (
           <div className="mt-2 flex gap-2">

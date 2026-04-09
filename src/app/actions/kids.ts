@@ -113,6 +113,39 @@ export async function createChild(data: unknown): Promise<ActionResult<{ id: str
   return { success: true, data: { id: newChild.id, name: newChild.name } }
 }
 
+export async function deleteChild(data: unknown): Promise<ActionResult> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) return { success: false, error: 'Not authenticated' }
+
+  const memberRow = await getMemberRow(user.id)
+  if (!memberRow) return { success: false, error: 'No household found' }
+
+  const parsed = z.object({ id: z.string().uuid() }).safeParse(data)
+  if (!parsed.success) return { success: false, error: 'Invalid child ID' }
+
+  // Verify child belongs to this household
+  const [child] = await db
+    .select({ id: children.id })
+    .from(children)
+    .where(and(eq(children.id, parsed.data.id), eq(children.householdId, memberRow.householdId)))
+    .limit(1)
+
+  if (!child) return { success: false, error: 'Child not found' }
+
+  // Delete all activities for this child first, then the child
+  await db.delete(kidActivities).where(eq(kidActivities.childId, parsed.data.id))
+  await db.delete(children).where(eq(children.id, parsed.data.id))
+
+  revalidatePath('/kids')
+  revalidatePath('/calendar')
+
+  return { success: true }
+}
+
 export async function createActivity(
   data: unknown
 ): Promise<ActionResult<{ id: string }>> {
