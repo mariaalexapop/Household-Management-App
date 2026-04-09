@@ -12,7 +12,7 @@
 
 - [ ] **Phase 1: Foundation & Onboarding** - Auth, household setup, onboarding wizard, module-based dashboard, real-time infrastructure, GDPR
 - [x] **Phase 2: Home Chores** - Task management, recurring chores, assignments, due date reminders, notifications
-- [ ] **Phase 3: Kids Activities** - Child profiles, activity tracking, unified calendar (CAL-01–04 pulled forward from Phase 4), reminders
+- [x] **Phase 3: Kids Activities** - Child profiles, activity tracking, unified calendar (CAL-01–04 pulled forward from Phase 4), reminders
 - [ ] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
 - [ ] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
 - [ ] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA, camera UX, performance audit
@@ -25,7 +25,7 @@
 |-------|----------------|--------|-----------|
 | 1. Foundation & Onboarding | 2/8 | In Progress|  |
 | 2. Home Chores | 6/6 | Complete | 2026-04-03 |
-| 3. Kids Activities | 0/6 | Not started | - |
+| 3. Kids Activities | 6/6 | Complete | 2026-04-09 |
 | 4. Tracker Modules | 0/TBD | Not started | - |
 | 5. AI Chatbot & RAG | 0/TBD | Not started | - |
 | 6. Platform & Polish | 0/TBD | Not started | - |
@@ -100,12 +100,12 @@ Plans:
 **Plans:** 6 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Schema + migration (children + kid_activities tables, RLS) — Wave 1
-- [ ] 03-02-PLAN.md — Server Actions (createChild, createActivity, updateActivity, deleteActivity) — Wave 2
-- [ ] 03-03-PLAN.md — Inngest jobs (generate-activity-recurrence, send-activity-reminder) — Wave 2
-- [ ] 03-04-PLAN.md — Kids UI (/kids page, KidsClient, ActivityList, ActivityForm, ChildTabs) — Wave 3
-- [ ] 03-05-PLAN.md — Calendar types + data layer (CalendarEvent type, /calendar page, parallel queries) — Wave 3
-- [ ] 03-06-PLAN.md — Calendar UI + dashboard card (UnifiedCalendar, month/week views, KidsDashboardCard) — Wave 4
+- [x] 03-01-PLAN.md — Schema + migration (children + kid_activities tables, RLS) — Wave 1
+- [x] 03-02-PLAN.md — Server Actions (createChild, createActivity, updateActivity, deleteActivity) — Wave 2
+- [x] 03-03-PLAN.md — Inngest jobs (generate-activity-recurrence, send-activity-reminder) — Wave 2
+- [x] 03-04-PLAN.md — Kids UI (/kids page, KidsClient, ActivityList, ActivityForm, ChildTabs) — Wave 3
+- [x] 03-05-PLAN.md — Calendar types + data layer (CalendarEvent type, /calendar page, parallel queries) — Wave 3
+- [x] 03-06-PLAN.md — Calendar UI + dashboard card (UnifiedCalendar, month/week views, KidsDashboardCard) — Wave 4
 
 ---
 
@@ -212,18 +212,18 @@ Plans:
 | CHORE-08 | Phase 2 | Complete |
 | CHORE-09 | Phase 2 | Complete |
 | CHORE-10 | Phase 2 | Complete |
-| KIDS-01 | Phase 3 | Pending |
-| KIDS-02 | Phase 3 | Pending |
-| KIDS-03 | Phase 3 | Pending |
-| KIDS-04 | Phase 3 | Pending |
-| KIDS-05 | Phase 3 | Pending |
-| KIDS-06 | Phase 3 | Pending |
-| KIDS-07 | Phase 3 | Pending |
-| KIDS-08 | Phase 3 | Pending |
-| CAL-01 | Phase 3 | Pending |
-| CAL-02 | Phase 3 | Pending |
-| CAL-03 | Phase 3 | Pending |
-| CAL-04 | Phase 3 | Pending |
+| KIDS-01 | Phase 3 | Complete |
+| KIDS-02 | Phase 3 | Complete |
+| KIDS-03 | Phase 3 | Complete |
+| KIDS-04 | Phase 3 | Complete |
+| KIDS-05 | Phase 3 | Complete |
+| KIDS-06 | Phase 3 | Complete |
+| KIDS-07 | Phase 3 | Complete |
+| KIDS-08 | Phase 3 | Complete |
+| CAL-01 | Phase 3 | Complete |
+| CAL-02 | Phase 3 | Complete |
+| CAL-03 | Phase 3 | Complete |
+| CAL-04 | Phase 3 | Complete |
 | CAR-01 | Phase 4 | Pending |
 | CAR-02 | Phase 4 | Pending |
 | CAR-03 | Phase 4 | Pending |

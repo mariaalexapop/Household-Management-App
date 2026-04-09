@@ -3,19 +3,19 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 3 — not yet planned"
-last_updated: "2026-04-03T15:00:00Z"
+stopped_at: "Phase 3 Plan 06 — complete"
+last_updated: "2026-04-09T00:00:00Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 20
+  completed_plans: 20
 ---
 
 # Project State: Household Management App
 
-**Last updated:** 2026-04-02
-**Session:** Phase 02 Plan 05 — Real-time notification bell in app header and email preference toggle in settings
+**Last updated:** 2026-04-09
+**Session:** Phase 03 Plans 04 + 06 — Kids UI and Calendar UI complete
 
 ---
 
@@ -32,7 +32,7 @@ progress:
 ## Current Position
 
 Phase: 02 (Home Chores) — COMPLETE (approved 2026-04-03)
-Phase: 03 (Kids Activities) — NOT STARTED (needs planning)
+Phase: 03 (Kids Activities) — COMPLETE (all 6 plans executed, 2026-04-09)
 
 ## Performance Metrics
 
@@ -41,9 +41,9 @@ Phase: 03 (Kids Activities) — NOT STARTED (needs planning)
 | Phases total | 6 |
 | Requirements total (v1) | 75 |
 | Requirements mapped | 75/75 |
-| Plans created | 0 |
-| Plans complete | 0 |
-| Phases complete | 0 |
+| Plans created | 20 |
+| Plans complete | 20 |
+| Phases complete | 2 |
 
 ---
 | Phase 01 P07 | 611 | 2 tasks | 16 files |
@@ -52,6 +52,8 @@ Phase: 03 (Kids Activities) — NOT STARTED (needs planning)
 | Phase 02-home-chores P01 | 5 | 2 tasks | 7 files |
 | Phase 02-home-chores P02 | ~30 | 2 tasks | 7 files |
 | Phase 02-home-chores P05 | 20 | 2 tasks | 8 files |
+| Phase 03-kids-activities P04 | 20 | 2 tasks | 6 files |
+| Phase 03-kids-activities P06 | 25 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -67,7 +69,7 @@ Phase: 03 (Kids Activities) — NOT STARTED (needs planning)
 | Modular onboarding (household type + module selection) | Different households have different needs; dashboard personalised from setup |
 | Children as named profiles, not accounts | Parents plan kids' activities; children don't need app access in v1 |
 | Single admin role (household management only) | Full content equality; admin only needed to manage membership |
-| Unified calendar deferred to Phase 4 | Only useful once multiple modules are populated with data |
+| Unified calendar delivered in Phase 3 (not Phase 4) | User wants calendar showing all modules from day one; Phase 4 adds car/insurance/electronics data to existing component |
 | Receipt OCR and bank sync deferred to v2 | Validates core tracking value before adding infrastructure complexity |
 | Chatbot creates tasks from document procedures | Reduces friction; turns insurance/manual content into actionable household tasks |
 | Middleware uses getUser() not getSession() | getSession() reads cookie without JWT verification — insecure for auth decisions |
@@ -84,6 +86,8 @@ Phase: 03 (Kids Activities) — NOT STARTED (needs planning)
 | seedDefaultAreas called server-side from page.tsx (not user-triggered) | Idempotent; safe to call on every /chores page load after auth is confirmed |
 | NotificationBell in fixed top-right position (not semantic header) | App layout has no explicit header bar; adding one is out of scope for Plan 02-05 |
 | NotificationToggle UI-only in Phase 2 | Email preference persistence deferred to Phase 6; Inngest always fires when RESEND_API_KEY is set |
+| react-day-picker v9 uses Day not DayDate for custom cell rendering | DayDate is not in v9 CustomComponents API; Day receives day + modifiers + HTMLAttributes and is the correct cell override |
+| Zod .default() on enum causes zodResolver type mismatch | Remove .default() from schema; provide defaults in useForm defaultValues instead — keeps TypeScript types exact |
 
 ### Architecture Flags (verify before implementation)
 
@@ -105,16 +109,18 @@ None.
 
 ## Session Continuity
 
-**Stopped at:** Phase 3 (Kids Activities) — needs plans created before execution
+**Stopped at:** Phase 3 (Kids Activities) — all 6 plans complete
 
 **Context for next session:**
 
-- Phase 02 complete. All 6 plans done, human verification approved 2026-04-03.
-- Phase 03 (Kids Activities) is next. No plans exist yet.
-- Run `/gsd:plan-phase 3` to create plans, then `/gsd:execute-phase 3` to execute.
-- Requirements: KIDS-01 through KIDS-08 (child profiles, activity tracking, calendar, reminders).
+- Phase 03 complete. All 6 plans done: schema, server actions, Inngest jobs, Kids UI, calendar types/data, calendar UI.
+- /kids route: activity list with child tab filter, category badges, add/edit/delete dialog.
+- /calendar route: UnifiedCalendar with month grid (DayPicker custom Day cells, event dots, +N more popover) and week view (time-slot grid).
+- Dashboard KidsDashboardCard shows 3 nearest upcoming activities.
+- Requirements fulfilled: KIDS-01 to KIDS-08, CAL-01 to CAL-04.
+- Phase 04 (Tracker Modules) is next. Plans TBD — run `/gsd:plan-phase 4`.
 
 ---
 
 *State initialised: 2026-03-19*
-*Last revised: 2026-04-02 — Plan 02-05 complete*
+*Last revised: 2026-04-09 — Phase 03 Plans 04 + 06 complete*
