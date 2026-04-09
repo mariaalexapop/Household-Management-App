@@ -37,7 +37,7 @@ export function KidsDashboardCard({ activities }: KidsDashboardCardProps) {
                 </span>
                 {activity.childId && activity.childName && (
                   <span
-                    className="rounded-full px-1.5 text-[11px] leading-[18px] font-body font-semibold text-white shrink-0"
+                    className="rounded-full px-1.5 text-[10px] leading-[16px] font-body font-medium text-white shrink-0"
                     style={{ backgroundColor: childHex(activity.childId) }}
                   >
                     {activity.childName}
