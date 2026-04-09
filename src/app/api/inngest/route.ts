@@ -6,6 +6,7 @@ import { sendTaskAssignedEmail } from '@/lib/inngest/functions/send-task-assigne
 import { sendTaskReminder } from '@/lib/inngest/functions/send-task-reminder'
 import { generateActivityRecurrence } from '@/lib/inngest/functions/generate-activity-recurrence'
 import { sendActivityReminder } from '@/lib/inngest/functions/send-activity-reminder'
+import { sendWarrantyReminder } from '@/lib/inngest/functions/send-warranty-reminder'
 
 /**
  * Inngest serve handler.
@@ -14,5 +15,5 @@ import { sendActivityReminder } from '@/lib/inngest/functions/send-activity-remi
  */
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [sendInviteEmail, generateRecurrence, sendTaskAssignedEmail, sendTaskReminder, generateActivityRecurrence, sendActivityReminder],
+  functions: [sendInviteEmail, generateRecurrence, sendTaskAssignedEmail, sendTaskReminder, generateActivityRecurrence, sendActivityReminder, sendWarrantyReminder],
 })
