@@ -208,6 +208,7 @@ export async function updateActivity(data: unknown): Promise<ActionResult<{ id: 
     .select({
       id: kidActivities.id,
       parentActivityId: kidActivities.parentActivityId,
+      isRecurring: kidActivities.isRecurring,
     })
     .from(kidActivities)
     .where(and(eq(kidActivities.id, parsed.data.id), eq(kidActivities.householdId, memberRow.householdId)))
@@ -245,6 +246,17 @@ export async function updateActivity(data: unknown): Promise<ActionResult<{ id: 
           gte(kidActivities.startsAt, new Date(parsed.data.startsAt))
         )
       )
+  }
+
+  // If recurrence was just enabled, fire Inngest to generate occurrence rows
+  const hasInngest = !!process.env.INNGEST_EVENT_KEY
+  const becameRecurring = parsed.data.isRecurring && !existingActivity.isRecurring
+
+  if (becameRecurring && hasInngest) {
+    await inngest.send({
+      name: 'kids/activity.recurring.created',
+      data: { activityId: parsed.data.id, householdId: memberRow.householdId },
+    })
   }
 
   await db.insert(activityFeed).values({
