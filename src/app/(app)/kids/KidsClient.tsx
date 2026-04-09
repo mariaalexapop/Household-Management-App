@@ -79,10 +79,8 @@ export function KidsClient({
     setOptimisticActivities(initialActivities)
   }, [initialActivities])
 
-  // Register child colour assignments whenever the list changes
-  useEffect(() => {
-    registerChildren(localChildList.map((c) => c.id))
-  }, [localChildList])
+  // Register child colour assignments synchronously so first render is correct
+  registerChildren(localChildList.map((c) => c.id))
 
   function handleAdd() {
     setSelectedActivity(null)
