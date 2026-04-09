@@ -13,6 +13,24 @@ const CATEGORY_COLOURS: Record<string, string> = {
   social:  'bg-kinship-surface-container text-kinship-on-surface',
 }
 
+// Rotating pastel colours for child name badges so each child is visually distinct
+const CHILD_COLOURS = [
+  'bg-module-kids-light text-module-kids-dark',       // coral
+  'bg-category-school-light text-category-school-dark', // teal
+  'bg-category-sport-light text-category-sport-dark',   // orange
+  'bg-category-hobby-light text-category-hobby-dark',   // rose
+  'bg-[#fffacd] text-[#746019]',                        // yellow
+  'bg-kinship-primary-surface text-kinship-primary',     // blue
+]
+
+function childColour(childId: string): string {
+  let hash = 0
+  for (let i = 0; i < childId.length; i++) {
+    hash = (hash * 31 + childId.charCodeAt(i)) | 0
+  }
+  return CHILD_COLOURS[Math.abs(hash) % CHILD_COLOURS.length]
+}
+
 interface ActivityRowProps {
   activity: ActivityItem
   child: ChildItem | undefined
@@ -35,7 +53,9 @@ export function ActivityRow({ activity, child, assignee, onEdit, onDelete }: Act
             {activity.category}
           </span>
           {child && (
-            <span className="font-body text-xs text-kinship-on-surface-variant">{child.name}</span>
+            <span className={`rounded-md px-2 py-1 text-xs font-body font-semibold ${childColour(child.id)}`}>
+              {child.name}
+            </span>
           )}
         </div>
         <div className="flex items-center gap-3 font-body text-xs text-kinship-on-surface-variant">
