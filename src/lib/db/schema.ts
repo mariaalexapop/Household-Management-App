@@ -14,6 +14,7 @@
  */
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgPolicy,
@@ -22,6 +23,7 @@ import {
   timestamp,
   unique,
   uuid,
+  vector,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { authenticatedRole, authUid } from 'drizzle-orm/supabase'
@@ -568,10 +570,112 @@ export const documents = pgTable(
     fileSizeBytes: integer('file_size_bytes'),
     // uploadedBy references auth.users(id) — cross-schema, FK added in migration
     uploadedBy: uuid('uploaded_by').notNull(),
+    readyForRag: boolean('ready_for_rag').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   },
   () => [
     pgPolicy('documents_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// document_chunks (Phase 5 RAG — chunked document text + 384-dim embeddings)
+// ---------------------------------------------------------------------------
+export const documentChunks = pgTable(
+  'document_chunks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    documentId: uuid('document_id')
+      .notNull()
+      .references(() => documents.id, { onDelete: 'cascade' }),
+    chunkIndex: integer('chunk_index').notNull(),
+    content: text('content').notNull(),
+    embedding: vector('embedding', { dimensions: 384 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (t) => [
+    index('document_chunks_embedding_idx').using(
+      'hnsw',
+      t.embedding.op('vector_cosine_ops')
+    ),
+    index('document_chunks_document_id_idx').on(t.documentId),
+    pgPolicy('document_chunks_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// conversations (Phase 5 chatbot — household-scoped chat sessions)
+// ---------------------------------------------------------------------------
+export const conversations = pgTable(
+  'conversations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    title: text('title'),
+    // References auth.users(id) — cross-schema, FK added in migration
+    createdBy: uuid('created_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('conversations_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// messages (Phase 5 chatbot — messages within conversations)
+// ---------------------------------------------------------------------------
+// householdId is denormalised from conversations.householdId so RLS can match
+// the shared household-membership pattern without a join.
+export const messages = pgTable(
+  'messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    conversationId: uuid('conversation_id')
+      .notNull()
+      .references(() => conversations.id, { onDelete: 'cascade' }),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    role: text('role').notNull(), // 'user' | 'assistant' | 'system' | 'tool'
+    content: text('content').notNull(),
+    toolCalls: jsonb('tool_calls'), // nullable — array of {name, input, output?}
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  () => [
+    pgPolicy('messages_all_member', {
       for: 'all',
       to: authenticatedRole,
       using: sql`household_id IN (
