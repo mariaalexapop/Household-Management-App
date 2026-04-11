@@ -33,7 +33,16 @@ export interface NotificationItem {
   id: string
   householdId: string
   userId: string
-  type: 'task_assigned' | 'task_reminder'
+  type:
+    | 'task_assigned'
+    | 'task_reminder'
+    | 'warranty_reminder'
+    | 'insurance_expiry_reminder'
+    | 'insurance_payment_reminder'
+    | 'activity_reminder'
+    | 'car_reminder'
+    | 'document_ready'
+    | (string & {})
   entityId?: string | null
   message: string
   readAt: string | null

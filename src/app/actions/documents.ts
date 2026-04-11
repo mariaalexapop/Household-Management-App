@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { documents, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
+import { inngest } from '@/lib/inngest/client'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -130,6 +131,24 @@ export async function confirmUpload(
       uploadedBy: user.id,
     })
     .returning({ id: documents.id })
+
+  // Emit documents/uploaded event so the processDocument Inngest function
+  // can download, extract, chunk, embed, and index the PDF asynchronously.
+  // Fire-and-forget: if the event bus is down, the upload still succeeds
+  // (processing can be kicked off later by ops).
+  try {
+    await inngest.send({
+      name: 'documents/uploaded',
+      data: {
+        documentId: newDoc.id,
+        householdId: memberRow.householdId,
+        storagePath: parsed.data.storagePath,
+        uploadedBy: user.id,
+      },
+    })
+  } catch (err) {
+    console.error('[confirmUpload] failed to emit documents/uploaded:', err)
+  }
 
   revalidatePath(`/${parsed.data.module}`)
 
