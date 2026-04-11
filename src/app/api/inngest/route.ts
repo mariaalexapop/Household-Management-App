@@ -9,6 +9,7 @@ import { sendActivityReminder } from '@/lib/inngest/functions/send-activity-remi
 import { sendCarReminder } from '@/lib/inngest/functions/send-car-reminder'
 import { sendWarrantyReminder } from '@/lib/inngest/functions/send-warranty-reminder'
 import { sendInsuranceExpiryReminder, sendInsurancePaymentReminder } from '@/lib/inngest/functions/send-insurance-reminder'
+import { processDocument } from '@/lib/inngest/functions/process-document'
 
 /**
  * Inngest serve handler.
@@ -17,5 +18,5 @@ import { sendInsuranceExpiryReminder, sendInsurancePaymentReminder } from '@/lib
  */
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [sendInviteEmail, generateRecurrence, sendTaskAssignedEmail, sendTaskReminder, generateActivityRecurrence, sendActivityReminder, sendCarReminder, sendWarrantyReminder, sendInsuranceExpiryReminder, sendInsurancePaymentReminder],
+  functions: [sendInviteEmail, generateRecurrence, sendTaskAssignedEmail, sendTaskReminder, generateActivityRecurrence, sendActivityReminder, sendCarReminder, sendWarrantyReminder, sendInsuranceExpiryReminder, sendInsurancePaymentReminder, processDocument],
 })
