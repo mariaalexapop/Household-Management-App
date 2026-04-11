@@ -2,7 +2,15 @@ import { redirect } from 'next/navigation'
 import { eq, and, gte, or, isNotNull } from 'drizzle-orm'
 import { startOfMonth, endOfMonth, addMonths } from 'date-fns'
 import { db } from '@/lib/db'
-import { tasks, kidActivities, children, householdMembers } from '@/lib/db/schema'
+import {
+  tasks,
+  kidActivities,
+  children,
+  householdMembers,
+  cars,
+  insurancePolicies,
+  electronics,
+} from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { CalendarClient } from './CalendarClient'
 import { MODULE_COLOURS, toCalendarLabel, type CalendarEvent } from '@/lib/calendar/types'
@@ -29,8 +37,15 @@ export default async function CalendarPage() {
   const windowStart = startOfMonth(addMonths(now, -1))
   const windowEnd = endOfMonth(addMonths(now, 1))
 
-  // Parallel data fetching — Phase 4 adds car/insurance/electronics queries here
-  const [choreRows, activityRows, childRows] = await Promise.all([
+  // Parallel data fetching — chores, kids, children, plus Phase 4 tracker modules
+  const [
+    choreRows,
+    activityRows,
+    childRows,
+    carRows,
+    insuranceRows,
+    electronicsRows,
+  ] = await Promise.all([
     // Chores: tasks in the window, excluding parent template rows
     db.select({
       id: tasks.id,
@@ -68,6 +83,38 @@ export default async function CalendarPage() {
     db.select({ id: children.id, name: children.name })
       .from(children)
       .where(eq(children.householdId, householdId)),
+
+    // Cars: small dataset, no window filtering — render all key dates
+    db.select({
+      id: cars.id,
+      make: cars.make,
+      model: cars.model,
+      motDueDate: cars.motDueDate,
+      taxDueDate: cars.taxDueDate,
+      nextServiceDate: cars.nextServiceDate,
+    })
+      .from(cars)
+      .where(eq(cars.householdId, householdId)),
+
+    // Insurance policies: small dataset, no window filtering
+    db.select({
+      id: insurancePolicies.id,
+      insurer: insurancePolicies.insurer,
+      policyType: insurancePolicies.policyType,
+      expiryDate: insurancePolicies.expiryDate,
+      nextPaymentDate: insurancePolicies.nextPaymentDate,
+    })
+      .from(insurancePolicies)
+      .where(eq(insurancePolicies.householdId, householdId)),
+
+    // Electronics: small dataset, no window filtering — only items with warranties
+    db.select({
+      id: electronics.id,
+      name: electronics.name,
+      warrantyExpiryDate: electronics.warrantyExpiryDate,
+    })
+      .from(electronics)
+      .where(eq(electronics.householdId, householdId)),
   ])
 
   // Map to CalendarEvent[]
@@ -101,9 +148,105 @@ export default async function CalendarPage() {
     }
   })
 
-  const allEvents: CalendarEvent[] = [...choreEvents, ...kidsEvents].sort(
-    (a, b) => a.startsAt.getTime() - b.startsAt.getTime()
-  )
+  // Cars: up to 3 events per car (MOT, tax, service)
+  const carEvents: CalendarEvent[] = carRows.flatMap((c) => {
+    const events: CalendarEvent[] = []
+    if (c.motDueDate) {
+      const title = `MOT: ${c.make} ${c.model}`
+      events.push({
+        id: `${c.id}-mot`,
+        title,
+        startsAt: c.motDueDate,
+        endsAt: null,
+        module: 'car' as const,
+        href: '/cars',
+        colour: MODULE_COLOURS.car,
+        label: toCalendarLabel(title),
+      })
+    }
+    if (c.taxDueDate) {
+      const title = `Tax: ${c.make} ${c.model}`
+      events.push({
+        id: `${c.id}-tax`,
+        title,
+        startsAt: c.taxDueDate,
+        endsAt: null,
+        module: 'car' as const,
+        href: '/cars',
+        colour: MODULE_COLOURS.car,
+        label: toCalendarLabel(title),
+      })
+    }
+    if (c.nextServiceDate) {
+      const title = `Service: ${c.make} ${c.model}`
+      events.push({
+        id: `${c.id}-service`,
+        title,
+        startsAt: c.nextServiceDate,
+        endsAt: null,
+        module: 'car' as const,
+        href: '/cars',
+        colour: MODULE_COLOURS.car,
+        label: toCalendarLabel(title),
+      })
+    }
+    return events
+  })
+
+  // Insurance: expiry event + optional payment event per policy
+  const insuranceEvents: CalendarEvent[] = insuranceRows.flatMap((p) => {
+    const events: CalendarEvent[] = []
+    const expiryTitle = `${p.insurer} ${p.policyType} expires`
+    events.push({
+      id: `${p.id}-expiry`,
+      title: expiryTitle,
+      startsAt: p.expiryDate,
+      endsAt: null,
+      module: 'insurance' as const,
+      href: '/insurance',
+      colour: MODULE_COLOURS.insurance,
+      label: toCalendarLabel(expiryTitle),
+    })
+    if (p.nextPaymentDate) {
+      const paymentTitle = `${p.insurer} payment due`
+      events.push({
+        id: `${p.id}-payment`,
+        title: paymentTitle,
+        startsAt: p.nextPaymentDate,
+        endsAt: null,
+        module: 'insurance' as const,
+        href: '/insurance',
+        colour: MODULE_COLOURS.insurance,
+        label: toCalendarLabel(paymentTitle),
+      })
+    }
+    return events
+  })
+
+  // Electronics: warranty expiry events
+  const electronicsEvents: CalendarEvent[] = electronicsRows
+    .filter((e) => e.warrantyExpiryDate != null)
+    .map((e) => {
+      const title = `${e.name} warranty expires`
+      return {
+        id: `${e.id}-warranty`,
+        title,
+        startsAt: e.warrantyExpiryDate as Date,
+        endsAt: null,
+        module: 'electronics' as const,
+        href: '/electronics',
+        colour: MODULE_COLOURS.electronics,
+        label: toCalendarLabel(title),
+      }
+    })
+
+  const allEvents: CalendarEvent[] = [
+    ...choreEvents,
+    ...kidsEvents,
+    ...carEvents,
+    ...insuranceEvents,
+    ...electronicsEvents,
+  ].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
 
   // windowEnd is referenced to silence unused variable lint
   void windowEnd
@@ -119,6 +262,9 @@ export default async function CalendarPage() {
           <div className="flex items-center gap-4">
             <a href="/kids" className="font-body text-sm text-kinship-primary hover:underline">Kids</a>
             <a href="/chores" className="font-body text-sm text-kinship-primary hover:underline">Chores</a>
+            <a href="/cars" className="font-body text-sm text-kinship-primary hover:underline">Cars</a>
+            <a href="/insurance" className="font-body text-sm text-kinship-primary hover:underline">Insurance</a>
+            <a href="/electronics" className="font-body text-sm text-kinship-primary hover:underline">Electronics</a>
             <a href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">Dashboard</a>
           </div>
         </div>
