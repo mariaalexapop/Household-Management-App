@@ -9,14 +9,19 @@ import {
   choreAreas,
   kidActivities,
   children,
+  cars,
+  insurancePolicies,
+  electronics,
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardGrid } from '@/components/dashboard/DashboardGrid'
-import { SignOutButton } from '@/components/dashboard/SignOutButton'
 import { registerChildren } from '@/lib/kids/child-colours'
 import type { ModuleKey } from '@/stores/onboarding'
 import type { UpcomingTask } from '@/components/dashboard/ChoresDashboardCard'
 import type { UpcomingActivity } from '@/components/dashboard/KidsDashboardCard'
+import type { UpcomingCar } from '@/components/dashboard/CarDashboardCard'
+import type { UpcomingPolicy } from '@/components/dashboard/InsuranceDashboardCard'
+import type { UpcomingElectronic } from '@/components/dashboard/ElectronicsDashboardCard'
 
 export const metadata = {
   title: 'Dashboard — Kinship',
@@ -119,6 +124,51 @@ export default async function DashboardPage() {
     registerChildren(allChildren.map((c) => c.id))
   }
 
+  // Fetch cars for CarDashboardCard
+  let upcomingCars: UpcomingCar[] = []
+  if (activeModules.includes('car')) {
+    upcomingCars = await db
+      .select({
+        id: cars.id,
+        make: cars.make,
+        model: cars.model,
+        motDueDate: cars.motDueDate,
+        taxDueDate: cars.taxDueDate,
+        nextServiceDate: cars.nextServiceDate,
+      })
+      .from(cars)
+      .where(eq(cars.householdId, row.householdId))
+  }
+
+  // Fetch insurance policies for InsuranceDashboardCard
+  let upcomingPolicies: UpcomingPolicy[] = []
+  if (activeModules.includes('insurance')) {
+    upcomingPolicies = await db
+      .select({
+        id: insurancePolicies.id,
+        insurer: insurancePolicies.insurer,
+        policyType: insurancePolicies.policyType,
+        expiryDate: insurancePolicies.expiryDate,
+        nextPaymentDate: insurancePolicies.nextPaymentDate,
+      })
+      .from(insurancePolicies)
+      .where(eq(insurancePolicies.householdId, row.householdId))
+      .orderBy(asc(insurancePolicies.expiryDate))
+  }
+
+  // Fetch electronics for ElectronicsDashboardCard
+  let upcomingElectronics: UpcomingElectronic[] = []
+  if (activeModules.includes('electronics')) {
+    upcomingElectronics = await db
+      .select({
+        id: electronics.id,
+        name: electronics.name,
+        warrantyExpiryDate: electronics.warrantyExpiryDate,
+      })
+      .from(electronics)
+      .where(eq(electronics.householdId, row.householdId))
+  }
+
   return (
     <div className="min-h-screen bg-kinship-surface">
       {/* Header */}
@@ -129,10 +179,8 @@ export default async function DashboardPage() {
             <p className="font-body text-sm text-kinship-on-surface-variant">{row.householdName}</p>
           </div>
           <div className="flex items-center gap-4">
-            <a href="/household" className="font-body text-sm text-kinship-primary hover:underline">
-              Manage household
-            </a>
-            <SignOutButton />
+            <a href="/calendar" className="font-body text-sm text-kinship-primary hover:underline">Calendar</a>
+            <a href="/costs" className="font-body text-sm text-kinship-primary hover:underline">Costs</a>
           </div>
         </div>
       </header>
@@ -146,6 +194,9 @@ export default async function DashboardPage() {
           activeModules={activeModules}
           upcomingTasks={upcomingTasks}
           upcomingActivities={upcomingActivities}
+          upcomingCars={upcomingCars}
+          upcomingPolicies={upcomingPolicies}
+          upcomingElectronics={upcomingElectronics}
         />
       </main>
     </div>
