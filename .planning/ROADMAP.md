@@ -27,7 +27,7 @@
 | 2. Home Chores | 6/6 | Complete | 2026-04-03 |
 | 3. Kids Activities | 6/6 | Complete | 2026-04-09 |
 | 4. Tracker Modules | 9/9 | Complete | 2026-04-11 |
-| 5. AI Chatbot & RAG | 0/TBD | Not started | - |
+| 5. AI Chatbot & RAG | 0/6 | Not started | - |
 | 6. Platform & Polish | 0/TBD | Not started | - |
 
 ---
@@ -155,7 +155,15 @@ Plans:
 5. Conversation history persists per household.
 6. Documents are processed asynchronously — user is notified when a document is ready for chatbot queries.
 
-**Plans:** TBD
+**Plans:** 6 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Schema + migration (pgvector, document_chunks, conversations, messages, documents.ready_for_rag) — Wave 1
+- [ ] 05-02-PLAN.md — Embed infra (Supabase gte-small Edge Function, embed.ts, rag.ts, pdf-parse externals) — Wave 2
+- [ ] 05-03-PLAN.md — Chat server actions (createConversation, listConversations, loadHistory, saveUserMessage, saveAssistantMessage, deleteConversation) — Wave 2
+- [ ] 05-04-PLAN.md — Inngest document pipeline (download → extract → chunk → embed → insert → notify) + confirmUpload event emit + NotificationDropdown document_ready — Wave 3
+- [ ] 05-05-PLAN.md — Chat API route (/api/chat) + system prompt + typed tools (5 live-data + extract_procedure) — Wave 3
+- [ ] 05-06-PLAN.md — Chatbot UI (FAB + 420px dock + MessageList + MessageInput + ProcedurePreviewModal + (app)/layout mount) — Wave 4
 
 ---
 
