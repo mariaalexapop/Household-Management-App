@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import Link from 'next/link'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { householdMembers } from '@/lib/db/schema'
@@ -7,7 +6,10 @@ import { createClient } from '@/lib/supabase/server'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { ConnectionIndicator } from '@/components/realtime/ConnectionIndicator'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
-import { CalendarDays, Settings } from 'lucide-react'
+import { HamburgerMenu } from '@/components/nav/HamburgerMenu'
+import { ChatbotProvider } from '@/components/chatbot/ChatbotProvider'
+import { ChatbotFab } from '@/components/chatbot/ChatbotFab'
+import { ChatbotDock } from '@/components/chatbot/ChatbotDock'
 
 /**
  * Protected (app) layout.
@@ -49,25 +51,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <RealtimeProvider householdId={householdId} userId={user.id}>
-      <ConnectionIndicator />
-      <div className="fixed top-3 right-4 z-30 flex items-center gap-2">
-        <Link
-          href="/calendar"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-kinship-on-surface"
-          aria-label="Calendar"
-        >
-          <CalendarDays className="h-5 w-5" />
-        </Link>
-        <NotificationBell />
-        <Link
-          href="/settings"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-kinship-on-surface"
-          aria-label="Settings"
-        >
-          <Settings className="h-5 w-5" />
-        </Link>
-      </div>
-      {children}
+      <ChatbotProvider>
+        <ConnectionIndicator />
+        <div className="fixed top-3 right-4 z-30 flex items-center gap-2">
+          <NotificationBell />
+          <HamburgerMenu />
+        </div>
+        {children}
+        <ChatbotFab />
+        <ChatbotDock />
+      </ChatbotProvider>
     </RealtimeProvider>
   )
 }
