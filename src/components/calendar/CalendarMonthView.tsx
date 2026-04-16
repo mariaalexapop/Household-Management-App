@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { isSameDay, format, addMonths, subMonths } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -34,7 +34,7 @@ function EventCell({ dayProps, events, popoverDate, onOpenPopover, onClosePopove
   return (
     <td
       {...restProps}
-      className={`align-top border border-kinship-outline-variant p-1 relative aspect-square ${
+      className={`align-top border border-kinship-outline-variant p-1 relative h-32 ${
         modifiers.outside ? 'opacity-40' : ''
       }`}
     >
@@ -83,13 +83,26 @@ function EventCell({ dayProps, events, popoverDate, onOpenPopover, onClosePopove
 export function CalendarMonthView({ events, currentMonth, onMonthChange }: CalendarMonthViewProps) {
   const [popoverDate, setPopoverDate] = useState<Date | null>(null)
 
+  const goPrev = useCallback(() => onMonthChange(subMonths(currentMonth, 1)), [currentMonth, onMonthChange])
+  const goNext = useCallback(() => onMonthChange(addMonths(currentMonth, 1)), [currentMonth, onMonthChange])
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev() }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goNext() }
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [goPrev, goNext])
+
   return (
-    <div className="w-full max-w-[1600px] mx-auto" style={{ maxHeight: '2400px' }}>
+    <div className="w-full">
       {/* Custom header: ← Month Year → */}
       <div className="flex items-center justify-between mb-3 px-1">
         <button
-          onClick={() => onMonthChange(subMonths(currentMonth, 1))}
-          className="p-2 hover:bg-kinship-surface-container rounded-lg text-kinship-on-surface"
+          onClick={goPrev}
+          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-kinship-surface-container active:bg-kinship-surface-container text-kinship-on-surface transition-colors"
           aria-label="Previous month"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -98,8 +111,8 @@ export function CalendarMonthView({ events, currentMonth, onMonthChange }: Calen
           {format(currentMonth, 'MMMM yyyy')}
         </h2>
         <button
-          onClick={() => onMonthChange(addMonths(currentMonth, 1))}
-          className="p-2 hover:bg-kinship-surface-container rounded-lg text-kinship-on-surface"
+          onClick={goNext}
+          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-kinship-surface-container active:bg-kinship-surface-container text-kinship-on-surface transition-colors"
           aria-label="Next month"
         >
           <ChevronRight className="h-5 w-5" />

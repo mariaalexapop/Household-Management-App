@@ -22,6 +22,7 @@ import type { UpcomingActivity } from '@/components/dashboard/KidsDashboardCard'
 import type { UpcomingCar } from '@/components/dashboard/CarDashboardCard'
 import type { UpcomingPolicy } from '@/components/dashboard/InsuranceDashboardCard'
 import type { UpcomingElectronic } from '@/components/dashboard/ElectronicsDashboardCard'
+import { AppHeader } from '@/components/nav/AppHeader'
 
 export const metadata = {
   title: 'Dashboard — Kinship',
@@ -171,19 +172,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-kinship-surface">
-      {/* Header */}
-      <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
-            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface-variant">{row.householdName}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="/calendar" className="font-body text-sm text-kinship-primary hover:underline">Calendar</a>
-            <a href="/costs" className="font-body text-sm text-kinship-primary hover:underline">Costs</a>
-          </div>
-        </div>
-      </header>
+      <AppHeader subtitle={row.householdName} />
 
       {/* Main content */}
       <main className="mx-auto max-w-6xl px-6 py-8">

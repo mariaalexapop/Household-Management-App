@@ -37,7 +37,7 @@ export function CostsClient({ monthlyRows, selectedYear, yearOptions }: CostsCli
 
   function handleYearChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const year = e.target.value
-    router.push(`/costs?year=${year}`)
+    window.location.href = `/costs?year=${year}`
   }
 
   return (

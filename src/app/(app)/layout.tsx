@@ -53,10 +53,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <RealtimeProvider householdId={householdId} userId={user.id}>
       <ChatbotProvider>
         <ConnectionIndicator />
-        <div className="fixed top-3 right-4 z-30 flex items-center gap-2">
-          <NotificationBell />
-          <HamburgerMenu />
-        </div>
         {children}
         <ChatbotFab />
         <ChatbotDock />

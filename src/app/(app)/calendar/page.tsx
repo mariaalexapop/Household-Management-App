@@ -13,6 +13,7 @@ import {
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { CalendarClient } from './CalendarClient'
+import { AppHeader } from '@/components/nav/AppHeader'
 import { MODULE_COLOURS, toCalendarLabel, type CalendarEvent } from '@/lib/calendar/types'
 import { childHex, registerChildren } from '@/lib/kids/child-colours'
 
@@ -298,23 +299,11 @@ export default async function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-kinship-surface">
-      <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div>
-            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface-variant">Calendar</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="/kids" className="font-body text-sm text-kinship-primary hover:underline">Kids</a>
-            <a href="/chores" className="font-body text-sm text-kinship-primary hover:underline">Chores</a>
-            <a href="/cars" className="font-body text-sm text-kinship-primary hover:underline">Cars</a>
-            <a href="/insurance" className="font-body text-sm text-kinship-primary hover:underline">Insurance</a>
-            <a href="/electronics" className="font-body text-sm text-kinship-primary hover:underline">Electronics</a>
-            <a href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">Dashboard</a>
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto max-w-[1600px] px-4 py-4">
+      <AppHeader subtitle="Calendar" />
+      <main className="mx-auto max-w-5xl px-6 py-8">
+        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
+          ← Go back to main dashboard
+        </a>
         <CalendarClient events={allEvents} />
       </main>
     </div>

@@ -128,17 +128,13 @@ export function KidsClient({
           >
             <List size={18} />
           </button>
-          <button
-            onClick={() => setView('calendar')}
-            className={`rounded-lg p-2 ${
-              view === 'calendar'
-                ? 'bg-module-kids-light text-module-kids-dark'
-                : 'hover:bg-kinship-surface-container text-kinship-on-surface'
-            }`}
-            aria-label="Calendar view"
+          <a
+            href="/calendar?filter=kids_activities"
+            className="rounded-lg p-2 hover:bg-kinship-surface-container text-kinship-on-surface"
+            aria-label="View in calendar"
           >
             <Calendar size={18} />
-          </button>
+          </a>
           <Button
             onClick={handleAdd}
             className="ml-2 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"

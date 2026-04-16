@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/household/ProfileForm'
 import { Label } from '@/components/ui/label'
 import { DeleteAccountSection } from './DeleteAccountSection'
+import { AppHeader } from '@/components/nav/AppHeader'
 import { NotificationToggle } from './NotificationToggle'
 
 export const metadata = {
@@ -45,24 +46,12 @@ export default async function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-kinship-surface">
-      <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
-        <div className="mx-auto max-w-3xl flex items-center justify-between">
-          <div>
-            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface-variant">Settings</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">
-              Dashboard
-            </Link>
-            <Link href="/household" className="font-body text-sm text-kinship-primary hover:underline">
-              Manage household
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader subtitle="Settings" />
 
       <main className="mx-auto max-w-3xl px-6 py-8 space-y-10">
+        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
+          ← Go back to main dashboard
+        </a>
         {/* Navigation links */}
         <nav className="flex gap-4 text-sm font-medium">
           <Link
@@ -72,10 +61,10 @@ export default async function SettingsPage() {
             Profile
           </Link>
           <Link
-            href="/settings/modules"
+            href="/settings/household"
             className="text-kinship-on-surface-variant hover:text-kinship-on-surface pb-1"
           >
-            Modules
+            Household
           </Link>
         </nav>
 
@@ -123,7 +112,7 @@ export default async function SettingsPage() {
         {/* Danger Zone */}
         <section>
           <h2 className="font-display text-xl font-semibold text-red-600 mb-2">
-            Danger Zone
+            Delete Account
           </h2>
           <p className="font-body text-sm text-kinship-on-surface-variant mb-4">
             Permanently delete your account and all associated household data.

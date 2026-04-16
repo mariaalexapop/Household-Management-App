@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { electronics, documents, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ElectronicsClient } from './ElectronicsClient'
+import { AppHeader } from '@/components/nav/AppHeader'
 
 export const metadata = { title: 'Electronics — Kinship' }
 
@@ -69,31 +70,11 @@ export default async function ElectronicsPage() {
 
   return (
     <div className="min-h-screen bg-kinship-surface">
-      <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div>
-            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">
-              Kinship
-            </h1>
-            <p className="font-body text-sm text-kinship-on-surface-variant">Electronics</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="/calendar"
-              className="font-body text-sm text-kinship-primary hover:underline"
-            >
-              Calendar
-            </a>
-            <a
-              href="/dashboard"
-              className="font-body text-sm text-kinship-primary hover:underline"
-            >
-              Dashboard
-            </a>
-          </div>
-        </div>
-      </header>
+      <AppHeader subtitle="Electronics" />
       <main className="mx-auto max-w-5xl px-6 py-8">
+        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
+          ← Go back to main dashboard
+        </a>
         <ElectronicsClient items={serializedItems} documents={serializedDocuments} />
       </main>
     </div>

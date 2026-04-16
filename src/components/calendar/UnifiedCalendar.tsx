@@ -10,9 +10,10 @@ import { CalendarWeekView } from './CalendarWeekView'
 interface UnifiedCalendarProps {
   events: CalendarEvent[]
   defaultView?: 'month' | 'week'
+  activeOnly?: FilterCategory | null
 }
 
-export function UnifiedCalendar({ events, defaultView = 'month' }: UnifiedCalendarProps) {
+export function UnifiedCalendar({ events, defaultView = 'month', activeOnly = null }: UnifiedCalendarProps) {
   const [view, setView] = useState<'month' | 'week'>(defaultView)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [currentWeek, setCurrentWeek] = useState(new Date())
@@ -24,7 +25,10 @@ export function UnifiedCalendar({ events, defaultView = 'month' }: UnifiedCalend
     return FILTER_ORDER.filter((f) => set.has(f))
   }, [events])
 
-  const [hiddenFilters, setHiddenFilters] = useState<Set<FilterCategory>>(new Set())
+  const [hiddenFilters, setHiddenFilters] = useState<Set<FilterCategory>>(() => {
+    if (!activeOnly) return new Set()
+    return new Set(FILTER_ORDER.filter((f) => f !== activeOnly))
+  })
 
   function toggleFilter(cat: FilterCategory) {
     setHiddenFilters((prev) => {

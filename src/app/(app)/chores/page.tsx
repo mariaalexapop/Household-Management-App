@@ -5,6 +5,7 @@ import { tasks, choreAreas, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ChoresClient } from './ChoresClient'
 import { seedDefaultAreas } from '@/app/actions/tasks'
+import { AppHeader } from '@/components/nav/AppHeader'
 
 export const metadata = { title: 'Home Chores — Kinship' }
 
@@ -99,23 +100,11 @@ export default async function ChoresPage({
 
   return (
     <div className="min-h-screen bg-kinship-surface">
-      <header className="border-b border-kinship-surface-container bg-kinship-surface-container-lowest px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <div>
-            <h1 className="font-display text-xl font-semibold text-kinship-on-surface">Kinship</h1>
-            <p className="font-body text-sm text-kinship-on-surface-variant">Home Chores</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="/household" className="font-body text-sm text-kinship-primary hover:underline">
-              Manage household
-            </a>
-            <a href="/dashboard" className="font-body text-sm text-kinship-primary hover:underline">
-              Dashboard
-            </a>
-          </div>
-        </div>
-      </header>
+      <AppHeader subtitle="Home Chores" />
       <main className="mx-auto max-w-4xl px-6 py-8">
+        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
+          ← Go back to main dashboard
+        </a>
         <div className="mb-6">
           <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-module-chores-dark pl-3">Home Chores</h2>
           <p className="font-body text-base text-kinship-on-surface-variant">
