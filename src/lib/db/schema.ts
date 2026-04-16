@@ -490,7 +490,7 @@ export const insurancePolicies = pgTable(
     policyType: text('policy_type').notNull(), // 'home' | 'car' | 'health' | 'life' | 'travel' | 'other'
     insurer: text('insurer').notNull(),
     policyNumber: text('policy_number'),
-    expiryDate: timestamp('expiry_date', { withTimezone: true }).notNull(),
+    expiryDate: timestamp('expiry_date', { withTimezone: true }),
     renewalContactName: text('renewal_contact_name'),
     renewalContactPhone: text('renewal_contact_phone'),
     renewalContactEmail: text('renewal_contact_email'),
@@ -499,6 +499,8 @@ export const insurancePolicies = pgTable(
     nextPaymentDate: timestamp('next_payment_date', { withTimezone: true }),
     expiryReminderDays: integer('expiry_reminder_days').default(30),
     paymentReminderDays: integer('payment_reminder_days').default(7),
+    coveredName: text('covered_name'), // person or asset this policy covers
+    linkedCarId: uuid('linked_car_id').references(() => cars.id, { onDelete: 'set null' }),
     // createdBy references auth.users(id) — cross-schema, FK added in migration
     createdBy: uuid('created_by').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),

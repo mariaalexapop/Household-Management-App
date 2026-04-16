@@ -53,13 +53,14 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
       GROUP BY month
     `),
     db.execute(sql`
-      SELECT to_char(${insurancePolicies.nextPaymentDate}, 'YYYY-MM') AS month,
-             COALESCE(SUM(${insurancePolicies.premiumCents}), 0)::int AS total
+      SELECT ${insurancePolicies.premiumCents} AS premium_cents,
+             ${insurancePolicies.paymentSchedule} AS payment_schedule,
+             ${insurancePolicies.nextPaymentDate} AS next_payment_date,
+             ${insurancePolicies.createdAt} AS created_at
       FROM ${insurancePolicies}
       WHERE ${insurancePolicies.householdId} = ${householdId}
-        AND ${insurancePolicies.nextPaymentDate} >= ${yearStart.toISOString()}
-        AND ${insurancePolicies.nextPaymentDate} < ${yearEnd.toISOString()}
-      GROUP BY month
+        AND ${insurancePolicies.premiumCents} IS NOT NULL
+        AND ${insurancePolicies.paymentSchedule} IS NOT NULL
     `),
     db.execute(sql`
       SELECT to_char(${electronics.purchaseDate}, 'YYYY-MM') AS month,
@@ -84,8 +85,52 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
   }
 
   const carMap = rowsToMap(carRows)
-  const insuranceMap = rowsToMap(insuranceRows)
   const electronicsMap = rowsToMap(electronicsRows)
+
+  // Project insurance premiums across months based on payment schedule
+  const insuranceMap = new Map<string, number>()
+  const insPolicies = insuranceRows as unknown as Array<{
+    premium_cents: number | string | null
+    payment_schedule: string | null
+    next_payment_date: string | Date | null
+    created_at: string | Date | null
+  }>
+  for (const p of insPolicies) {
+    const cents = typeof p.premium_cents === 'string' ? parseInt(p.premium_cents, 10) : (p.premium_cents ?? 0)
+    if (!cents || !p.payment_schedule) continue
+
+    const intervalMonths = p.payment_schedule === 'monthly' ? 1 : p.payment_schedule === 'quarterly' ? 3 : 12
+
+    // Earliest month this policy can have costs (month it was created)
+    const policyStart = p.created_at ? new Date(p.created_at) : null
+    const earliestAbsMonth = policyStart
+      ? policyStart.getFullYear() * 12 + policyStart.getMonth()
+      : selectedYear * 12 // fallback: start of selected year
+
+    // Determine which months in the selected year have a payment
+    if (p.next_payment_date) {
+      const anchor = new Date(p.next_payment_date)
+      const anchorMonth = anchor.getFullYear() * 12 + anchor.getMonth()
+      for (let m = 0; m < 12; m++) {
+        const targetMonth = selectedYear * 12 + m
+        // Skip months before the policy existed
+        if (targetMonth < earliestAbsMonth) continue
+        const diff = targetMonth - anchorMonth
+        if (diff % intervalMonths === 0) {
+          const key = `${selectedYear}-${String(m + 1).padStart(2, '0')}`
+          insuranceMap.set(key, (insuranceMap.get(key) ?? 0) + cents)
+        }
+      }
+    } else {
+      // No anchor date — distribute based on schedule starting from policy creation
+      for (let m = 0; m < 12; m += intervalMonths) {
+        const targetMonth = selectedYear * 12 + m
+        if (targetMonth < earliestAbsMonth) continue
+        const key = `${selectedYear}-${String(m + 1).padStart(2, '0')}`
+        insuranceMap.set(key, (insuranceMap.get(key) ?? 0) + cents)
+      }
+    }
+  }
 
   // Build 12-month rows
   const months: MonthlyCostRow[] = Array.from({ length: 12 }, (_, i) => {

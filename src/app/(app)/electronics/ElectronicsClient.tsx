@@ -595,7 +595,7 @@ function ItemDialog({
               </div>
             </div>
             <div>
-              <Label htmlFor="costPounds">Cost (£)</Label>
+              <Label htmlFor="costPounds">Cost (€)</Label>
               <Input
                 id="costPounds"
                 type="number"

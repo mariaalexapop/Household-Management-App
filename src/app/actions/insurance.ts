@@ -17,7 +17,7 @@ const createPolicySchema = z.object({
   policyType: z.enum(['home', 'car', 'health', 'life', 'travel', 'other']),
   insurer: z.string().min(1, 'Insurer is required').max(200, 'Insurer must be 200 characters or fewer'),
   policyNumber: z.string().max(100).optional().nullable(),
-  expiryDate: z.string().datetime({ offset: true }),
+  expiryDate: z.string().datetime({ offset: true }).optional().nullable(),
   renewalContactName: z.string().max(200).optional().nullable(),
   renewalContactPhone: z.string().max(50).optional().nullable(),
   renewalContactEmail: z.string().email().optional().nullable(),
@@ -26,6 +26,8 @@ const createPolicySchema = z.object({
   nextPaymentDate: z.string().datetime({ offset: true }).optional().nullable(),
   expiryReminderDays: z.number().int().min(1).default(30).optional(),
   paymentReminderDays: z.number().int().min(1).default(7).optional(),
+  coveredName: z.string().max(200).optional().nullable(),
+  linkedCarId: z.string().uuid().optional().nullable(),
 })
 
 const updatePolicySchema = createPolicySchema.extend({
@@ -90,7 +92,7 @@ export async function createPolicy(data: unknown): Promise<ActionResult<{ id: st
       policyType: parsed.data.policyType,
       insurer: parsed.data.insurer,
       policyNumber: parsed.data.policyNumber ?? null,
-      expiryDate: new Date(parsed.data.expiryDate),
+      expiryDate: parsed.data.expiryDate ? new Date(parsed.data.expiryDate) : null,
       renewalContactName: parsed.data.renewalContactName ?? null,
       renewalContactPhone: parsed.data.renewalContactPhone ?? null,
       renewalContactEmail: parsed.data.renewalContactEmail ?? null,
@@ -99,34 +101,41 @@ export async function createPolicy(data: unknown): Promise<ActionResult<{ id: st
       nextPaymentDate: parsed.data.nextPaymentDate ? new Date(parsed.data.nextPaymentDate) : null,
       expiryReminderDays,
       paymentReminderDays,
+      coveredName: parsed.data.coveredName ?? null,
+      linkedCarId: parsed.data.linkedCarId ?? null,
       createdBy: user.id,
     })
     .returning({ id: insurancePolicies.id })
 
-  // Fire Inngest expiry reminder event
-  await inngest.send({
-    name: 'insurance/expiry.reminder.scheduled',
-    data: {
-      policyId: newPolicy.id,
-      householdId: memberRow.householdId,
-      expiryDate: parsed.data.expiryDate,
-      reminderDays: expiryReminderDays,
-      createdBy: user.id,
-    },
-  })
+  // Fire Inngest reminder events (best-effort — don't block policy creation)
+  try {
+    if (parsed.data.expiryDate) {
+      await inngest.send({
+        name: 'insurance/expiry.reminder.scheduled',
+        data: {
+          policyId: newPolicy.id,
+          householdId: memberRow.householdId,
+          expiryDate: parsed.data.expiryDate,
+          reminderDays: expiryReminderDays,
+          createdBy: user.id,
+        },
+      })
+    }
 
-  // Fire Inngest payment reminder event if nextPaymentDate is set
-  if (parsed.data.nextPaymentDate) {
-    await inngest.send({
-      name: 'insurance/payment.reminder.scheduled',
-      data: {
-        policyId: newPolicy.id,
-        householdId: memberRow.householdId,
-        nextPaymentDate: parsed.data.nextPaymentDate,
-        reminderDays: paymentReminderDays,
-        createdBy: user.id,
-      },
-    })
+    if (parsed.data.nextPaymentDate) {
+      await inngest.send({
+        name: 'insurance/payment.reminder.scheduled',
+        data: {
+          policyId: newPolicy.id,
+          householdId: memberRow.householdId,
+          nextPaymentDate: parsed.data.nextPaymentDate,
+          reminderDays: paymentReminderDays,
+          createdBy: user.id,
+        },
+      })
+    }
+  } catch {
+    console.warn('Failed to send Inngest reminder events for policy', newPolicy.id)
   }
 
   revalidatePath('/insurance')
@@ -178,7 +187,7 @@ export async function updatePolicy(data: unknown): Promise<ActionResult<{ id: st
       policyType: parsed.data.policyType,
       insurer: parsed.data.insurer,
       policyNumber: parsed.data.policyNumber ?? null,
-      expiryDate: new Date(parsed.data.expiryDate),
+      expiryDate: parsed.data.expiryDate ? new Date(parsed.data.expiryDate) : null,
       renewalContactName: parsed.data.renewalContactName ?? null,
       renewalContactPhone: parsed.data.renewalContactPhone ?? null,
       renewalContactEmail: parsed.data.renewalContactEmail ?? null,
@@ -187,40 +196,46 @@ export async function updatePolicy(data: unknown): Promise<ActionResult<{ id: st
       nextPaymentDate: parsed.data.nextPaymentDate ? new Date(parsed.data.nextPaymentDate) : null,
       expiryReminderDays,
       paymentReminderDays,
+      coveredName: parsed.data.coveredName ?? null,
+      linkedCarId: parsed.data.linkedCarId ?? null,
     })
     .where(eq(insurancePolicies.id, parsed.data.id))
 
-  // Fire new expiry reminder if expiry date changed
-  const oldExpiryDate = existingPolicy.expiryDate?.toISOString()
-  if (oldExpiryDate !== new Date(parsed.data.expiryDate).toISOString()) {
-    await inngest.send({
-      name: 'insurance/expiry.reminder.scheduled',
-      data: {
-        policyId: parsed.data.id,
-        householdId: memberRow.householdId,
-        expiryDate: parsed.data.expiryDate,
-        reminderDays: expiryReminderDays,
-        createdBy: user.id,
-      },
-    })
-  }
+  // Fire Inngest reminder events (best-effort — don't block policy update)
+  try {
+    const oldExpiryDate = existingPolicy.expiryDate?.toISOString()
+    const newExpiryDate = parsed.data.expiryDate ? new Date(parsed.data.expiryDate).toISOString() : null
+    if (newExpiryDate && oldExpiryDate !== newExpiryDate) {
+      await inngest.send({
+        name: 'insurance/expiry.reminder.scheduled',
+        data: {
+          policyId: parsed.data.id,
+          householdId: memberRow.householdId,
+          expiryDate: parsed.data.expiryDate,
+          reminderDays: expiryReminderDays,
+          createdBy: user.id,
+        },
+      })
+    }
 
-  // Fire new payment reminder if nextPaymentDate changed
-  const oldPaymentDate = existingPolicy.nextPaymentDate?.toISOString() ?? null
-  const newPaymentDate = parsed.data.nextPaymentDate
-    ? new Date(parsed.data.nextPaymentDate).toISOString()
-    : null
-  if (newPaymentDate && oldPaymentDate !== newPaymentDate) {
-    await inngest.send({
-      name: 'insurance/payment.reminder.scheduled',
-      data: {
-        policyId: parsed.data.id,
-        householdId: memberRow.householdId,
-        nextPaymentDate: parsed.data.nextPaymentDate!,
-        reminderDays: paymentReminderDays,
-        createdBy: user.id,
-      },
-    })
+    const oldPaymentDate = existingPolicy.nextPaymentDate?.toISOString() ?? null
+    const newPaymentDate = parsed.data.nextPaymentDate
+      ? new Date(parsed.data.nextPaymentDate).toISOString()
+      : null
+    if (newPaymentDate && oldPaymentDate !== newPaymentDate) {
+      await inngest.send({
+        name: 'insurance/payment.reminder.scheduled',
+        data: {
+          policyId: parsed.data.id,
+          householdId: memberRow.householdId,
+          nextPaymentDate: parsed.data.nextPaymentDate!,
+          reminderDays: paymentReminderDays,
+          createdBy: user.id,
+        },
+      })
+    }
+  } catch {
+    console.warn('Failed to send Inngest reminder events for policy', parsed.data.id)
   }
 
   revalidatePath('/insurance')

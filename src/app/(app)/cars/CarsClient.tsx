@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -155,9 +155,19 @@ function formatDisplayDate(iso: string | null | undefined): string {
 
 export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null)
   const [showAddCar, setShowAddCar] = useState(false)
+
+  // Auto-open add car dialog when redirected from insurance page
+  useEffect(() => {
+    if (searchParams.get('addCar') === '1') {
+      setShowAddCar(true)
+      // Clean up the URL param
+      router.replace('/cars', { scroll: false })
+    }
+  }, [searchParams, router])
   const [editingCar, setEditingCar] = useState<SerializedCar | null>(null)
   const [deletingCarId, setDeletingCarId] = useState<string | null>(null)
 
@@ -961,7 +971,7 @@ function ServiceRecordForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-body text-sm font-medium text-kinship-on-surface">
-            Cost (£)
+            Cost (€)
           </label>
           <input
             type="number"

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { DayPicker } from 'react-day-picker'
-import { isSameDay } from 'date-fns'
+import { isSameDay, format, addMonths, subMonths } from 'date-fns'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { DayProps } from 'react-day-picker'
 import type { CalendarEvent } from '@/lib/calendar/types'
 import { CalendarEventDot } from './CalendarEventDot'
@@ -26,14 +27,14 @@ function EventCell({ dayProps, events, popoverDate, onOpenPopover, onClosePopove
   const { day, modifiers, ...restProps } = dayProps
   const date = day.date
   const dayEvents = events.filter((e) => isSameDay(e.startsAt, date))
-  const visibleEvents = dayEvents.slice(0, 2)
-  const extraCount = dayEvents.length - 2
+  const visibleEvents = dayEvents.slice(0, 3)
+  const extraCount = dayEvents.length - 3
   const isPopoverOpen = popoverDate !== null && isSameDay(popoverDate, date)
 
   return (
     <td
       {...restProps}
-      className={`align-top border border-kinship-outline-variant p-1 relative ${
+      className={`align-top border border-kinship-outline-variant p-1 relative aspect-square ${
         modifiers.outside ? 'opacity-40' : ''
       }`}
     >
@@ -83,25 +84,43 @@ export function CalendarMonthView({ events, currentMonth, onMonthChange }: Calen
   const [popoverDate, setPopoverDate] = useState<Date | null>(null)
 
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full max-w-[1600px] mx-auto" style={{ maxHeight: '2400px' }}>
+      {/* Custom header: ← Month Year → */}
+      <div className="flex items-center justify-between mb-3 px-1">
+        <button
+          onClick={() => onMonthChange(subMonths(currentMonth, 1))}
+          className="p-2 hover:bg-kinship-surface-container rounded-lg text-kinship-on-surface"
+          aria-label="Previous month"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <h2 className="font-display text-lg font-semibold text-kinship-on-surface">
+          {format(currentMonth, 'MMMM yyyy')}
+        </h2>
+        <button
+          onClick={() => onMonthChange(addMonths(currentMonth, 1))}
+          className="p-2 hover:bg-kinship-surface-container rounded-lg text-kinship-on-surface"
+          aria-label="Next month"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+
       <DayPicker
         month={currentMonth}
         onMonthChange={onMonthChange}
         showOutsideDays
+        hideNavigation
         classNames={{
           root: 'w-full',
           months: 'w-full',
           month: 'w-full',
-          month_grid: 'w-full border-collapse',
+          month_grid: 'w-full border-collapse table-fixed',
           weekdays: '',
-          weekday: 'text-center font-body text-xs text-kinship-on-surface-variant py-2',
+          weekday: 'w-[14.2857%] text-center font-body text-xs font-medium text-kinship-on-surface-variant py-2 uppercase tracking-wider',
           weeks: '',
           week: '',
-          nav: 'flex justify-between mb-3 items-center',
-          button_previous: 'p-1 hover:bg-kinship-surface-container rounded-lg font-body text-kinship-on-surface',
-          button_next: 'p-1 hover:bg-kinship-surface-container rounded-lg font-body text-kinship-on-surface',
-          month_caption: 'flex justify-center mb-2',
-          caption_label: 'font-display font-semibold text-kinship-on-surface',
+          month_caption: 'hidden',
         }}
         components={{
           Day: (props: DayProps) => (

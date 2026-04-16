@@ -170,6 +170,7 @@ export function KidsClient({
                 href: '/kids',
                 colour: MODULE_COLOURS.kids,
                 label: a.title.slice(0, 20),
+                filterCategory: 'kids_activities',
               }))}
             defaultView="month"
           />

@@ -36,7 +36,7 @@ export interface SerializedPolicy {
   policyType: PolicyType
   insurer: string
   policyNumber: string | null
-  expiryDate: string // ISO
+  expiryDate: string | null // ISO or null for ongoing
   renewalContactName: string | null
   renewalContactPhone: string | null
   renewalContactEmail: string | null
@@ -45,7 +45,19 @@ export interface SerializedPolicy {
   nextPaymentDate: string | null
   expiryReminderDays: number
   paymentReminderDays: number
+  coveredName: string | null
+  linkedCarId: string | null
   createdAt: string
+}
+
+export interface PersonOption {
+  id: string
+  name: string
+}
+
+export interface CarOption {
+  id: string
+  label: string
 }
 
 export interface SerializedDocument {
@@ -60,6 +72,9 @@ export interface SerializedDocument {
 interface InsuranceClientProps {
   policies: SerializedPolicy[]
   documents: SerializedDocument[]
+  members: PersonOption[]
+  kids: PersonOption[]
+  cars: CarOption[]
 }
 
 // ---------------------------------------------------------------------------
@@ -101,12 +116,15 @@ const formSchema = z.object({
   policyType: z.enum(['home', 'car', 'health', 'life', 'travel', 'other']),
   insurer: z.string().min(1, 'Insurer is required').max(200),
   policyNumber: z.string().max(100).optional().default(''),
-  expiryDate: z.string().min(1, 'Expiry date is required'),
+  noExpiry: z.boolean().optional().default(false),
+  expiryDate: z.string().optional().default(''),
   expiryReminderDays: z.number().int().min(1),
   paymentSchedule: z.string().optional().default(''),
   premiumPounds: z.string().optional().default(''),
   nextPaymentDate: z.string().optional().default(''),
   paymentReminderDays: z.number().int().min(1),
+  coveredName: z.string().max(200).optional().default(''),
+  linkedCarId: z.string().optional().default(''),
   renewalContactName: z.string().max(200).optional().default(''),
   renewalContactPhone: z.string().max(50).optional().default(''),
   renewalContactEmail: z
@@ -147,7 +165,7 @@ function isoToDateInput(iso: string | null): string {
 // Component
 // ---------------------------------------------------------------------------
 
-export function InsuranceClient({ policies, documents }: InsuranceClientProps) {
+export function InsuranceClient({ policies, documents, members, kids, cars }: InsuranceClientProps) {
   const router = useRouter()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPolicy, setEditingPolicy] = useState<SerializedPolicy | null>(null)
@@ -239,8 +257,8 @@ export function InsuranceClient({ policies, documents }: InsuranceClientProps) {
             const policyDocs = docsByPolicy.get(policy.id) ?? []
             const isExpanded = expandedId === policy.id
             const badge = POLICY_TYPE_BADGE[policy.policyType]
-            const expiryDate = parseISO(policy.expiryDate)
-            const expiryDistance = formatDistanceToNow(expiryDate, { addSuffix: true })
+            const expiryDate = policy.expiryDate ? parseISO(policy.expiryDate) : null
+            const expiryDistance = expiryDate ? formatDistanceToNow(expiryDate, { addSuffix: true }) : null
 
             return (
               <div key={policy.id} className="rounded-xl ring-miro bg-white p-5">
@@ -260,12 +278,23 @@ export function InsuranceClient({ policies, documents }: InsuranceClientProps) {
                     </div>
                     <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
                       {policy.insurer}
+                      {policy.coveredName && (
+                        <span className="ml-2 font-body text-sm font-normal text-kinship-on-surface-variant">
+                          — {policy.coveredName}
+                        </span>
+                      )}
                     </h3>
                     <div className="mt-2 grid gap-1 font-body text-sm text-kinship-on-surface-variant sm:grid-cols-2">
                       <div>
                         <span className="font-medium">Expires:</span>{' '}
-                        {format(expiryDate, 'd MMM yyyy')}{' '}
-                        <span className="text-kinship-on-surface-variant/80">({expiryDistance})</span>
+                        {expiryDate ? (
+                          <>
+                            {format(expiryDate, 'd MMM yyyy')}{' '}
+                            <span className="text-kinship-on-surface-variant/80">({expiryDistance})</span>
+                          </>
+                        ) : (
+                          <span className="italic">Ongoing</span>
+                        )}
                       </div>
                       {policy.paymentSchedule && (
                         <div>
@@ -391,6 +420,9 @@ export function InsuranceClient({ policies, documents }: InsuranceClientProps) {
           <PolicyForm
             key={editingPolicy?.id ?? 'new'}
             policy={editingPolicy}
+            members={members}
+            kids={kids}
+            cars={cars}
             onSuccess={() => {
               setDialogOpen(false)
               router.refresh()
@@ -411,9 +443,12 @@ interface PolicyFormProps {
   policy: SerializedPolicy | null
   onSuccess: () => void
   onCancel: () => void
+  members: PersonOption[]
+  kids: PersonOption[]
+  cars: CarOption[]
 }
 
-function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
+function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: PolicyFormProps) {
   const isEdit = !!policy
   const [submitting, setSubmitting] = useState(false)
 
@@ -422,6 +457,7 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -429,6 +465,7 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
       policyType: policy?.policyType ?? 'home',
       insurer: policy?.insurer ?? '',
       policyNumber: policy?.policyNumber ?? '',
+      noExpiry: !policy?.expiryDate && !!policy,
       expiryDate: isoToDateInput(policy?.expiryDate ?? null),
       expiryReminderDays: policy?.expiryReminderDays ?? 30,
       paymentSchedule: policy?.paymentSchedule ?? '',
@@ -436,6 +473,8 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
         policy?.premiumCents != null ? String(centsToPounds(policy.premiumCents)) : '',
       nextPaymentDate: isoToDateInput(policy?.nextPaymentDate ?? null),
       paymentReminderDays: policy?.paymentReminderDays ?? 7,
+      coveredName: policy?.coveredName ?? '',
+      linkedCarId: policy?.linkedCarId ?? '',
       renewalContactName: policy?.renewalContactName ?? '',
       renewalContactPhone: policy?.renewalContactPhone ?? '',
       renewalContactEmail: policy?.renewalContactEmail ?? '',
@@ -443,6 +482,10 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
   })
 
   const watchedSchedule = watch('paymentSchedule')
+  const watchedType = watch('policyType')
+  const watchedNoExpiry = watch('noExpiry')
+  const watchedCoveredName = watch('coveredName')
+  const [showOtherPersonInput, setShowOtherPersonInput] = useState(false)
 
   const onSubmit = async (rawValues: FormValues) => {
     const values = formSchema.parse(rawValues)
@@ -456,7 +499,7 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
         policyType: values.policyType,
         insurer: values.insurer.trim(),
         policyNumber: values.policyNumber?.trim() || null,
-        expiryDate: dateToISOWithOffset(values.expiryDate),
+        expiryDate: values.noExpiry || !values.expiryDate ? null : dateToISOWithOffset(values.expiryDate),
         renewalContactName: values.renewalContactName?.trim() || null,
         renewalContactPhone: values.renewalContactPhone?.trim() || null,
         renewalContactEmail: values.renewalContactEmail?.trim() || null,
@@ -470,6 +513,8 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
         nextPaymentDate: values.nextPaymentDate ? dateToISOWithOffset(values.nextPaymentDate) : null,
         expiryReminderDays: Number(values.expiryReminderDays) || 30,
         paymentReminderDays: Number(values.paymentReminderDays) || 7,
+        coveredName: values.coveredName?.trim() || null,
+        linkedCarId: values.linkedCarId || null,
       }
 
       const result = isEdit
@@ -527,31 +572,153 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
         </div>
       </section>
 
+      {/* Covered entity — contextual based on policy type */}
+      {(watchedType === 'health' || watchedType === 'life') && (
+        <section className="space-y-3">
+          <h3 className="font-display text-sm font-semibold text-kinship-on-surface">Covered Person</h3>
+          <div>
+            <Label htmlFor="coveredName">Person</Label>
+            {!showOtherPersonInput ? (
+              <select
+                id="coveredName"
+                value={watchedCoveredName}
+                onChange={(e) => {
+                  if (e.target.value === '__other__') {
+                    setShowOtherPersonInput(true)
+                    setValue('coveredName', '')
+                  } else {
+                    setValue('coveredName', e.target.value)
+                  }
+                }}
+                className="mt-1 h-10 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="">Select a person...</option>
+                {members.length > 0 && (
+                  <optgroup label="Household Members">
+                    {members.map((m) => (
+                      <option key={`m-${m.id}`} value={m.name}>{m.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+                {kids.length > 0 && (
+                  <optgroup label="Children">
+                    {kids.map((k) => (
+                      <option key={`k-${k.id}`} value={k.name}>{k.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+                <option value="__other__">Other (type a name)</option>
+              </select>
+            ) : (
+              <div className="mt-1 flex gap-2">
+                <Input
+                  placeholder="Enter person's name"
+                  {...register('coveredName')}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowOtherPersonInput(false)
+                    setValue('coveredName', '')
+                  }}
+                  className="shrink-0"
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {watchedType === 'car' && (
+        <section className="space-y-3">
+          <h3 className="font-display text-sm font-semibold text-kinship-on-surface">Covered Vehicle</h3>
+          {cars.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-kinship-outline-variant p-4 text-center">
+              <p className="font-body text-sm text-kinship-on-surface-variant">
+                No cars registered yet.
+              </p>
+              <a
+                href="/cars?addCar=1"
+                className="mt-2 inline-block font-body text-sm font-medium"
+                style={{ color: PURPLE }}
+              >
+                Add a car first →
+              </a>
+            </div>
+          ) : (
+            <div>
+              <Label htmlFor="linkedCarId">Vehicle</Label>
+              <select
+                id="linkedCarId"
+                value={watch('linkedCarId')}
+                onChange={(e) => {
+                  setValue('linkedCarId', e.target.value)
+                  const car = cars.find((c) => c.id === e.target.value)
+                  setValue('coveredName', car ? car.label : '')
+                }}
+                className="mt-1 h-10 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="">Select a vehicle...</option>
+                {cars.map((c) => (
+                  <option key={c.id} value={c.id}>{c.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </section>
+      )}
+
+      {watchedType === 'home' && (
+        <section className="space-y-3">
+          <h3 className="font-display text-sm font-semibold text-kinship-on-surface">Covered Property</h3>
+          <div>
+            <Label htmlFor="coveredName">Property name or address</Label>
+            <Input id="coveredNameHome" {...register('coveredName')} className="mt-1" placeholder="e.g. Main house, Holiday flat" />
+          </div>
+        </section>
+      )}
+
+      {(watchedType === 'travel' || watchedType === 'other') && (
+        <section className="space-y-3">
+          <h3 className="font-display text-sm font-semibold text-kinship-on-surface">Coverage</h3>
+          <div>
+            <Label htmlFor="coveredName">Who or what is covered?</Label>
+            <Input id="coveredNameOther" {...register('coveredName')} className="mt-1" placeholder="Optional" />
+          </div>
+        </section>
+      )}
+
       {/* Dates + expiry reminder */}
       <section className="space-y-3">
         <h3 className="font-display text-sm font-semibold text-kinship-on-surface">Expiry</h3>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <Label>Expiry Date *</Label>
+        <label className="flex items-center gap-2 font-body text-sm text-kinship-on-surface-variant">
+          <input type="checkbox" {...register('noExpiry')} className="rounded border-input" />
+          No expiry date (ongoing policy)
+        </label>
+
+        {!watchedNoExpiry && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>Expiry Date</Label>
+              <Controller
+                control={control}
+                name="expiryDate"
+                render={({ field }) => (
+                  <div className="mt-1">
+                    <DatePicker value={field.value ?? ''} onChange={field.onChange} placeholder="Pick expiry date" />
+                  </div>
+                )}
+              />
+            </div>
+
             <Controller
               control={control}
-              name="expiryDate"
+              name="expiryReminderDays"
               render={({ field }) => (
-                <div className="mt-1">
-                  <DatePicker value={field.value} onChange={field.onChange} placeholder="Pick expiry date" />
-                </div>
-              )}
-            />
-            {errors.expiryDate && (
-              <p className="mt-1 font-body text-xs text-red-600">{errors.expiryDate.message}</p>
-            )}
-          </div>
-
-          <Controller
-            control={control}
-            name="expiryReminderDays"
-            render={({ field }) => (
               <ReminderConfig
                 label="Expiry reminder"
                 value={Number(field.value) || 30}
@@ -559,7 +726,8 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
               />
             )}
           />
-        </div>
+          </div>
+        )}
       </section>
 
       {/* Payment */}
@@ -582,7 +750,7 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
           </div>
 
           <div>
-            <Label htmlFor="premiumPounds">Premium (£)</Label>
+            <Label htmlFor="premiumPounds">Premium (€)</Label>
             <Input
               id="premiumPounds"
               type="number"
@@ -661,14 +829,14 @@ function PolicyForm({ policy, onSuccess, onCancel }: PolicyFormProps) {
         <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
           Cancel
         </Button>
-        <Button
+        <button
           type="submit"
           disabled={submitting}
-          className="text-white"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg px-2.5 h-8 text-sm font-medium text-white disabled:pointer-events-none disabled:opacity-50"
           style={{ backgroundColor: PURPLE }}
         >
           {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Policy'}
-        </Button>
+        </button>
       </div>
     </form>
   )

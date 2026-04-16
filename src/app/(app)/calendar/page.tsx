@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { eq, and, gte, or, isNotNull } from 'drizzle-orm'
-import { startOfMonth, endOfMonth, addMonths } from 'date-fns'
+import { startOfMonth, endOfMonth, addMonths, setDate } from 'date-fns'
 import { db } from '@/lib/db'
 import {
   tasks,
@@ -32,10 +32,10 @@ export default async function CalendarPage() {
 
   const { householdId } = memberRow
 
-  // Query window: current month ±1 month (3-month sliding window)
+  // Query window: current month ±12 months (25-month window for full navigation)
   const now = new Date()
-  const windowStart = startOfMonth(addMonths(now, -1))
-  const windowEnd = endOfMonth(addMonths(now, 1))
+  const windowStart = startOfMonth(addMonths(now, -12))
+  const windowEnd = endOfMonth(addMonths(now, 12))
 
   // Parallel data fetching — chores, kids, children, plus Phase 4 tracker modules
   const [
@@ -103,6 +103,10 @@ export default async function CalendarPage() {
       policyType: insurancePolicies.policyType,
       expiryDate: insurancePolicies.expiryDate,
       nextPaymentDate: insurancePolicies.nextPaymentDate,
+      paymentSchedule: insurancePolicies.paymentSchedule,
+      premiumCents: insurancePolicies.premiumCents,
+      coveredName: insurancePolicies.coveredName,
+      createdAt: insurancePolicies.createdAt,
     })
       .from(insurancePolicies)
       .where(eq(insurancePolicies.householdId, householdId)),
@@ -130,6 +134,7 @@ export default async function CalendarPage() {
     href: '/chores',
     colour: MODULE_COLOURS.chores,
     label: toCalendarLabel(t.title),
+    filterCategory: 'chores' as const,
   }))
 
   const kidsEvents: CalendarEvent[] = activityRows.map((a) => {
@@ -143,6 +148,7 @@ export default async function CalendarPage() {
       href: '/kids',
       colour: childHex(a.childId),
       label: toCalendarLabel(a.title),
+      filterCategory: 'kids_activities' as const,
       childName: cName,
       childColour: childHex(a.childId),
     }
@@ -162,6 +168,7 @@ export default async function CalendarPage() {
         href: '/cars',
         colour: MODULE_COLOURS.car,
         label: toCalendarLabel(title),
+        filterCategory: 'car_deadlines' as const,
       })
     }
     if (c.taxDueDate) {
@@ -175,6 +182,7 @@ export default async function CalendarPage() {
         href: '/cars',
         colour: MODULE_COLOURS.car,
         label: toCalendarLabel(title),
+        filterCategory: 'car_deadlines' as const,
       })
     }
     if (c.nextServiceDate) {
@@ -188,6 +196,7 @@ export default async function CalendarPage() {
         href: '/cars',
         colour: MODULE_COLOURS.car,
         label: toCalendarLabel(title),
+        filterCategory: 'car_deadlines' as const,
       })
     }
     return events
@@ -196,28 +205,18 @@ export default async function CalendarPage() {
   // Insurance: expiry event + optional payment event per policy
   const insuranceEvents: CalendarEvent[] = insuranceRows.flatMap((p) => {
     const events: CalendarEvent[] = []
-    const expiryTitle = `${p.insurer} ${p.policyType} expires`
-    events.push({
-      id: `${p.id}-expiry`,
-      title: expiryTitle,
-      startsAt: p.expiryDate,
-      endsAt: null,
-      module: 'insurance' as const,
-      href: '/insurance',
-      colour: MODULE_COLOURS.insurance,
-      label: toCalendarLabel(expiryTitle),
-    })
-    if (p.nextPaymentDate) {
-      const paymentTitle = `${p.insurer} payment due`
+    if (p.expiryDate) {
+      const expiryTitle = `${p.insurer} ${p.policyType} expires`
       events.push({
-        id: `${p.id}-payment`,
-        title: paymentTitle,
-        startsAt: p.nextPaymentDate,
+        id: `${p.id}-expiry`,
+        title: expiryTitle,
+        startsAt: p.expiryDate,
         endsAt: null,
         module: 'insurance' as const,
         href: '/insurance',
         colour: MODULE_COLOURS.insurance,
-        label: toCalendarLabel(paymentTitle),
+        label: toCalendarLabel(expiryTitle),
+        filterCategory: 'insurance_expiry' as const,
       })
     }
     return events
@@ -237,8 +236,53 @@ export default async function CalendarPage() {
         href: '/electronics',
         colour: MODULE_COLOURS.electronics,
         label: toCalendarLabel(title),
+        filterCategory: 'warranty_expiry' as const,
       }
     })
+
+  // Costs: project recurring insurance payments across the 3-month window
+  const costEvents: CalendarEvent[] = insuranceRows.flatMap((p) => {
+    if (!p.premiumCents || !p.paymentSchedule) return []
+    const intervalMonths = p.paymentSchedule === 'monthly' ? 1 : p.paymentSchedule === 'quarterly' ? 3 : 12
+    const events: CalendarEvent[] = []
+    const policyStart = p.createdAt ? new Date(p.createdAt) : null
+    const earliestMonth = policyStart
+      ? policyStart.getFullYear() * 12 + policyStart.getMonth()
+      : 0
+
+    if (p.nextPaymentDate) {
+      const anchor = new Date(p.nextPaymentDate)
+      const anchorMonth = anchor.getFullYear() * 12 + anchor.getMonth()
+      const anchorDay = anchor.getDate()
+
+      // Walk through the ±12 month window
+      for (let m = -12; m <= 12; m++) {
+        const target = addMonths(now, m)
+        const targetAbsMonth = target.getFullYear() * 12 + target.getMonth()
+        if (targetAbsMonth < earliestMonth) continue
+        const diff = targetAbsMonth - anchorMonth
+        if (diff % intervalMonths === 0) {
+          const payDate = setDate(new Date(target.getFullYear(), target.getMonth(), 1), Math.min(anchorDay, 28))
+          const label = p.coveredName
+            ? `${p.insurer} · ${p.coveredName}`
+            : `${p.insurer} ${p.policyType}`
+          events.push({
+            id: `${p.id}-cost-${target.getFullYear()}-${target.getMonth()}`,
+            title: `Payment: ${label}`,
+            startsAt: payDate,
+            endsAt: null,
+            module: 'costs' as const,
+            href: '/costs',
+            colour: MODULE_COLOURS.costs,
+            label: toCalendarLabel(`${p.insurer} payment`),
+            icon: 'money',
+            filterCategory: 'insurance_costs' as const,
+          })
+        }
+      }
+    }
+    return events
+  })
 
   const allEvents: CalendarEvent[] = [
     ...choreEvents,
@@ -246,6 +290,7 @@ export default async function CalendarPage() {
     ...carEvents,
     ...insuranceEvents,
     ...electronicsEvents,
+    ...costEvents,
   ].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
 
   // windowEnd is referenced to silence unused variable lint
@@ -269,7 +314,7 @@ export default async function CalendarPage() {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      <main className="mx-auto max-w-[1600px] px-4 py-4">
         <CalendarClient events={allEvents} />
       </main>
     </div>

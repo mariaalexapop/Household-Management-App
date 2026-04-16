@@ -155,7 +155,7 @@ export function buildTools(ctx: ToolContext) {
         return {
           policies: rows.map((r) => ({
             ...r,
-            expiryDate: r.expiryDate.toISOString(),
+            expiryDate: r.expiryDate?.toISOString() ?? 'ongoing',
           })),
         }
       },

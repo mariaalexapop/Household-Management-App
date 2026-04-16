@@ -6,7 +6,7 @@ export interface UpcomingPolicy {
   id: string
   insurer: string
   policyType: string
-  expiryDate: Date
+  expiryDate: Date | null
   nextPaymentDate: Date | null
 }
 
@@ -17,8 +17,8 @@ interface InsuranceDashboardCardProps {
 export function InsuranceDashboardCard({ policies }: InsuranceDashboardCardProps) {
   const today = new Date()
   const upcoming = [...policies]
-    .filter((p) => differenceInCalendarDays(new Date(p.expiryDate), today) >= -1)
-    .sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime())
+    .filter((p) => p.expiryDate && differenceInCalendarDays(new Date(p.expiryDate), today) >= -1)
+    .sort((a, b) => new Date(a.expiryDate!).getTime() - new Date(b.expiryDate!).getTime())
     .slice(0, 3)
 
   return (
@@ -40,7 +40,7 @@ export function InsuranceDashboardCard({ policies }: InsuranceDashboardCardProps
       ) : (
         <ul className="flex flex-col gap-2">
           {upcoming.map((p) => {
-            const date = new Date(p.expiryDate)
+            const date = new Date(p.expiryDate!)
             const days = differenceInCalendarDays(date, today)
             return (
               <li key={p.id} className="flex items-center justify-between gap-2">

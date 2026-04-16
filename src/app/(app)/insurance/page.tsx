@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { eq, and, desc } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { insurancePolicies, documents, householdMembers } from '@/lib/db/schema'
+import { insurancePolicies, documents, householdMembers, children, cars } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { InsuranceClient } from './InsuranceClient'
 
@@ -23,8 +23,8 @@ export default async function InsurancePage() {
 
   const { householdId } = memberRow
 
-  // Parallel fetch: policies + documents for the insurance module
-  const [policiesRows, documentRows] = await Promise.all([
+  // Parallel fetch: policies + documents + members + kids + cars
+  const [policiesRows, documentRows, memberRows, childrenRows, carRows] = await Promise.all([
     db
       .select({
         id: insurancePolicies.id,
@@ -40,6 +40,8 @@ export default async function InsurancePage() {
         nextPaymentDate: insurancePolicies.nextPaymentDate,
         expiryReminderDays: insurancePolicies.expiryReminderDays,
         paymentReminderDays: insurancePolicies.paymentReminderDays,
+        coveredName: insurancePolicies.coveredName,
+        linkedCarId: insurancePolicies.linkedCarId,
         createdAt: insurancePolicies.createdAt,
       })
       .from(insurancePolicies)
@@ -62,6 +64,18 @@ export default async function InsurancePage() {
         )
       )
       .orderBy(desc(documents.createdAt)),
+    db
+      .select({ id: householdMembers.id, displayName: householdMembers.displayName })
+      .from(householdMembers)
+      .where(eq(householdMembers.householdId, householdId)),
+    db
+      .select({ id: children.id, name: children.name })
+      .from(children)
+      .where(eq(children.householdId, householdId)),
+    db
+      .select({ id: cars.id, make: cars.make, model: cars.model, plate: cars.plate })
+      .from(cars)
+      .where(eq(cars.householdId, householdId)),
   ])
 
   // Serialize dates to ISO strings (Date → string) so the data is safe to pass to a Client Component.
@@ -70,7 +84,7 @@ export default async function InsurancePage() {
     policyType: p.policyType as 'home' | 'car' | 'health' | 'life' | 'travel' | 'other',
     insurer: p.insurer,
     policyNumber: p.policyNumber,
-    expiryDate: p.expiryDate ? p.expiryDate.toISOString() : new Date().toISOString(),
+    expiryDate: p.expiryDate ? p.expiryDate.toISOString() : null,
     renewalContactName: p.renewalContactName,
     renewalContactPhone: p.renewalContactPhone,
     renewalContactEmail: p.renewalContactEmail,
@@ -79,6 +93,8 @@ export default async function InsurancePage() {
     nextPaymentDate: p.nextPaymentDate ? p.nextPaymentDate.toISOString() : null,
     expiryReminderDays: p.expiryReminderDays ?? 30,
     paymentReminderDays: p.paymentReminderDays ?? 7,
+    coveredName: p.coveredName,
+    linkedCarId: p.linkedCarId,
     createdAt: p.createdAt ? p.createdAt.toISOString() : new Date().toISOString(),
   }))
 
@@ -110,7 +126,13 @@ export default async function InsurancePage() {
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-8">
-        <InsuranceClient policies={policies} documents={docs} />
+        <InsuranceClient
+          policies={policies}
+          documents={docs}
+          members={memberRows.map((m) => ({ id: m.id, name: m.displayName ?? 'Unnamed member' }))}
+          kids={childrenRows.map((c) => ({ id: c.id, name: c.name }))}
+          cars={carRows.map((c) => ({ id: c.id, label: `${c.make} ${c.model} (${c.plate})` }))}
+        />
       </main>
     </div>
   )

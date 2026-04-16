@@ -1,5 +1,6 @@
 'use client'
 
+import { Coins } from 'lucide-react'
 import type { CalendarEvent } from '@/lib/calendar/types'
 
 interface CalendarEventDotProps {
@@ -14,10 +15,14 @@ export function CalendarEventDot({ event, onClick }: CalendarEventDotProps) {
       className="flex items-center gap-1 text-xs hover:opacity-80 cursor-pointer w-full text-left truncate"
       title={event.childName ? `${event.title} · ${event.childName}` : event.title}
     >
-      <span
-        className="w-2 h-2 rounded-full flex-shrink-0"
-        style={{ backgroundColor: event.colour }}
-      />
+      {event.icon === 'money' ? (
+        <Coins className="w-3 h-3 flex-shrink-0" style={{ color: event.colour }} />
+      ) : (
+        <span
+          className="w-2 h-2 rounded-full flex-shrink-0"
+          style={{ backgroundColor: event.colour }}
+        />
+      )}
       <span className="truncate text-kinship-on-surface font-body">
         {event.label ?? event.title.slice(0, 16)}
       </span>

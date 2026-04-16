@@ -6,7 +6,7 @@
 
 export function formatCostFromCents(cents: number | null | undefined): string {
   if (cents == null) return '--'
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(cents / 100)
+  return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(cents / 100)
 }
 
 export function centsToPounds(cents: number): number {
