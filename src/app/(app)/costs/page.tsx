@@ -7,6 +7,7 @@ import {
   serviceRecords,
   insurancePolicies,
   electronics,
+  cars,
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { CostsClient, type MonthlyCostRow } from './CostsClient'
@@ -43,7 +44,7 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
   const yearEnd = new Date(selectedYear + 1, 0, 1)
 
   // Parallel cost aggregation queries — group by month-of-year
-  const [carRows, insuranceRows, electronicsRows] = await Promise.all([
+  const [carRows, carMotTaxRows, insuranceRows, electronicsRows] = await Promise.all([
     db.execute(sql`
       SELECT to_char(${serviceRecords.serviceDate}, 'YYYY-MM') AS month,
              COALESCE(SUM(${serviceRecords.costCents}), 0)::int AS total
@@ -53,11 +54,22 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
         AND ${serviceRecords.serviceDate} < ${yearEnd.toISOString()}
       GROUP BY month
     `),
+    // MOT and Road Tax costs from the cars table
+    db.execute(sql`
+      SELECT ${cars.motCostCents} AS mot_cost_cents,
+             ${cars.motPaymentDate} AS mot_payment_date,
+             ${cars.taxCostCents} AS tax_cost_cents,
+             ${cars.taxPaymentDate} AS tax_payment_date
+      FROM ${cars}
+      WHERE ${cars.householdId} = ${householdId}
+        AND (${cars.motCostCents} IS NOT NULL OR ${cars.taxCostCents} IS NOT NULL)
+    `),
     db.execute(sql`
       SELECT ${insurancePolicies.premiumCents} AS premium_cents,
              ${insurancePolicies.paymentSchedule} AS payment_schedule,
              ${insurancePolicies.nextPaymentDate} AS next_payment_date,
-             ${insurancePolicies.createdAt} AS created_at
+             ${insurancePolicies.createdAt} AS created_at,
+             ${insurancePolicies.policyType} AS policy_type
       FROM ${insurancePolicies}
       WHERE ${insurancePolicies.householdId} = ${householdId}
         AND ${insurancePolicies.premiumCents} IS NOT NULL
@@ -88,17 +100,63 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
   const carMap = rowsToMap(carRows)
   const electronicsMap = rowsToMap(electronicsRows)
 
-  // Project insurance premiums across months based on payment schedule
-  const insuranceMap = new Map<string, number>()
+  // Add MOT and Road Tax costs from cars table into carMap
+  const carMotTax = carMotTaxRows as unknown as Array<{
+    mot_cost_cents: number | string | null
+    mot_payment_date: string | Date | null
+    tax_cost_cents: number | string | null
+    tax_payment_date: string | Date | null
+  }>
+  for (const c of carMotTax) {
+    if (c.mot_cost_cents && c.mot_payment_date) {
+      const d = new Date(c.mot_payment_date)
+      if (d.getFullYear() === selectedYear) {
+        const key = `${selectedYear}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        const cents = typeof c.mot_cost_cents === 'string' ? parseInt(c.mot_cost_cents, 10) : c.mot_cost_cents
+        carMap.set(key, (carMap.get(key) ?? 0) + cents)
+      }
+    }
+    if (c.tax_cost_cents && c.tax_payment_date) {
+      const d = new Date(c.tax_payment_date)
+      if (d.getFullYear() === selectedYear) {
+        const key = `${selectedYear}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        const cents = typeof c.tax_cost_cents === 'string' ? parseInt(c.tax_cost_cents, 10) : c.tax_cost_cents
+        carMap.set(key, (carMap.get(key) ?? 0) + cents)
+      }
+    }
+  }
+
+  // Project insurance premiums across months based on payment schedule,
+  // routing costs to the right category by policy type:
+  //   car → carInsuranceMap (merged into car column)
+  //   health, life → medicalMap
+  //   home → homeMap
+  const carInsuranceMap = new Map<string, number>()
+  const medicalMap = new Map<string, number>()
+  const homeMap = new Map<string, number>()
   const insPolicies = insuranceRows as unknown as Array<{
     premium_cents: number | string | null
     payment_schedule: string | null
     next_payment_date: string | Date | null
     created_at: string | Date | null
+    policy_type: string | null
   }>
   for (const p of insPolicies) {
     const cents = typeof p.premium_cents === 'string' ? parseInt(p.premium_cents, 10) : (p.premium_cents ?? 0)
     if (!cents || !p.payment_schedule) continue
+
+    // Pick the target map based on policy type
+    let targetMap: Map<string, number>
+    if (p.policy_type === 'car') {
+      targetMap = carInsuranceMap
+    } else if (p.policy_type === 'health' || p.policy_type === 'life') {
+      targetMap = medicalMap
+    } else if (p.policy_type === 'home') {
+      targetMap = homeMap
+    } else {
+      // travel, other — default to home for now
+      targetMap = homeMap
+    }
 
     const intervalMonths = p.payment_schedule === 'monthly' ? 1 : p.payment_schedule === 'quarterly' ? 3 : 12
 
@@ -119,7 +177,7 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
         const diff = targetMonth - anchorMonth
         if (diff % intervalMonths === 0) {
           const key = `${selectedYear}-${String(m + 1).padStart(2, '0')}`
-          insuranceMap.set(key, (insuranceMap.get(key) ?? 0) + cents)
+          targetMap.set(key, (targetMap.get(key) ?? 0) + cents)
         }
       }
     } else {
@@ -128,19 +186,20 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
         const targetMonth = selectedYear * 12 + m
         if (targetMonth < earliestAbsMonth) continue
         const key = `${selectedYear}-${String(m + 1).padStart(2, '0')}`
-        insuranceMap.set(key, (insuranceMap.get(key) ?? 0) + cents)
+        targetMap.set(key, (targetMap.get(key) ?? 0) + cents)
       }
     }
   }
 
-  // Build 12-month rows
+  // Build 12-month rows — car insurance costs are merged into the car column
   const months: MonthlyCostRow[] = Array.from({ length: 12 }, (_, i) => {
     const monthKey = `${selectedYear}-${String(i + 1).padStart(2, '0')}`
     return {
       monthKey,
       monthIndex: i,
-      carCents: carMap.get(monthKey) ?? 0,
-      insuranceCents: insuranceMap.get(monthKey) ?? 0,
+      carCents: (carMap.get(monthKey) ?? 0) + (carInsuranceMap.get(monthKey) ?? 0),
+      medicalCents: medicalMap.get(monthKey) ?? 0,
+      homeCents: homeMap.get(monthKey) ?? 0,
       electronicsCents: electronicsMap.get(monthKey) ?? 0,
     }
   })

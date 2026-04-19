@@ -29,7 +29,11 @@ const createCarSchema = z.object({
   plate: z.string().min(1, 'Plate is required').max(20),
   colour: z.string().max(50).optional().nullable(),
   motDueDate: z.string().datetime({ offset: true }).optional().nullable(),
+  motCostCents: z.number().int().min(0).optional().nullable(),
+  motPaymentDate: z.string().datetime({ offset: true }).optional().nullable(),
   taxDueDate: z.string().datetime({ offset: true }).optional().nullable(),
+  taxCostCents: z.number().int().min(0).optional().nullable(),
+  taxPaymentDate: z.string().datetime({ offset: true }).optional().nullable(),
   nextServiceDate: z.string().datetime({ offset: true }).optional().nullable(),
   motReminderDays: z.number().int().min(1).max(365).optional().default(30),
   taxReminderDays: z.number().int().min(1).max(365).optional().default(30),
@@ -43,7 +47,8 @@ const updateCarSchema = createCarSchema.extend({
 const createServiceRecordSchema = z.object({
   carId: z.string().uuid('Car is required'),
   serviceDate: z.string().datetime({ offset: true }),
-  serviceType: z.enum(['full_service', 'mot', 'repair', 'tyre', 'other']),
+  serviceType: z.enum(['full_service', 'mot', 'road_tax', 'repair', 'tyre', 'other']),
+  expiryDate: z.string().datetime({ offset: true }).optional().nullable(),
   mileage: z.number().int().min(0).optional().nullable(),
   garage: z.string().max(200).optional().nullable(),
   costCents: z.number().int().min(0).optional().nullable(),
@@ -154,7 +159,11 @@ export async function createCar(data: unknown): Promise<ActionResult<{ id: strin
       plate: parsed.data.plate,
       colour: parsed.data.colour ?? null,
       motDueDate: parsed.data.motDueDate ? new Date(parsed.data.motDueDate) : null,
+      motCostCents: parsed.data.motCostCents ?? null,
+      motPaymentDate: parsed.data.motPaymentDate ? new Date(parsed.data.motPaymentDate) : null,
       taxDueDate: parsed.data.taxDueDate ? new Date(parsed.data.taxDueDate) : null,
+      taxCostCents: parsed.data.taxCostCents ?? null,
+      taxPaymentDate: parsed.data.taxPaymentDate ? new Date(parsed.data.taxPaymentDate) : null,
       nextServiceDate: parsed.data.nextServiceDate ? new Date(parsed.data.nextServiceDate) : null,
       motReminderDays: parsed.data.motReminderDays,
       taxReminderDays: parsed.data.taxReminderDays,
@@ -212,7 +221,11 @@ export async function updateCar(data: unknown): Promise<ActionResult<{ id: strin
       plate: parsed.data.plate,
       colour: parsed.data.colour ?? null,
       motDueDate: parsed.data.motDueDate ? new Date(parsed.data.motDueDate) : null,
+      motCostCents: parsed.data.motCostCents ?? null,
+      motPaymentDate: parsed.data.motPaymentDate ? new Date(parsed.data.motPaymentDate) : null,
       taxDueDate: parsed.data.taxDueDate ? new Date(parsed.data.taxDueDate) : null,
+      taxCostCents: parsed.data.taxCostCents ?? null,
+      taxPaymentDate: parsed.data.taxPaymentDate ? new Date(parsed.data.taxPaymentDate) : null,
       nextServiceDate: parsed.data.nextServiceDate ? new Date(parsed.data.nextServiceDate) : null,
       motReminderDays: parsed.data.motReminderDays,
       taxReminderDays: parsed.data.taxReminderDays,
@@ -305,6 +318,7 @@ export async function createServiceRecord(data: unknown): Promise<ActionResult<{
       carId: parsed.data.carId,
       serviceDate: new Date(parsed.data.serviceDate),
       serviceType: parsed.data.serviceType,
+      expiryDate: parsed.data.expiryDate ? new Date(parsed.data.expiryDate) : null,
       mileage: parsed.data.mileage ?? null,
       garage: parsed.data.garage ?? null,
       costCents: parsed.data.costCents ?? null,
@@ -314,6 +328,7 @@ export async function createServiceRecord(data: unknown): Promise<ActionResult<{
     .returning({ id: serviceRecords.id })
 
   revalidatePath('/cars')
+  revalidatePath('/costs')
 
   return { success: true, data: { id: newRecord.id } }
 }
@@ -349,6 +364,7 @@ export async function updateServiceRecord(data: unknown): Promise<ActionResult<{
       carId: parsed.data.carId,
       serviceDate: new Date(parsed.data.serviceDate),
       serviceType: parsed.data.serviceType,
+      expiryDate: parsed.data.expiryDate ? new Date(parsed.data.expiryDate) : null,
       mileage: parsed.data.mileage ?? null,
       garage: parsed.data.garage ?? null,
       costCents: parsed.data.costCents ?? null,
@@ -357,6 +373,7 @@ export async function updateServiceRecord(data: unknown): Promise<ActionResult<{
     .where(eq(serviceRecords.id, parsed.data.id))
 
   revalidatePath('/cars')
+  revalidatePath('/costs')
 
   return { success: true, data: { id: parsed.data.id } }
 }

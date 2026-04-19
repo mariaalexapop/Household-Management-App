@@ -417,7 +417,11 @@ export const cars = pgTable(
     plate: text('plate').notNull(),
     colour: text('colour'),
     motDueDate: timestamp('mot_due_date', { withTimezone: true }),
+    motCostCents: integer('mot_cost_cents'), // COST-01: cost in cents
+    motPaymentDate: timestamp('mot_payment_date', { withTimezone: true }),
     taxDueDate: timestamp('tax_due_date', { withTimezone: true }),
+    taxCostCents: integer('tax_cost_cents'), // COST-01: cost in cents
+    taxPaymentDate: timestamp('tax_payment_date', { withTimezone: true }),
     nextServiceDate: timestamp('next_service_date', { withTimezone: true }),
     motReminderDays: integer('mot_reminder_days').default(30),
     taxReminderDays: integer('tax_reminder_days').default(30),
@@ -454,7 +458,8 @@ export const serviceRecords = pgTable(
       .notNull()
       .references(() => cars.id, { onDelete: 'cascade' }),
     serviceDate: timestamp('service_date', { withTimezone: true }).notNull(),
-    serviceType: text('service_type').notNull(), // 'full_service' | 'mot' | 'repair' | 'tyre' | 'other'
+    serviceType: text('service_type').notNull(), // 'full_service' | 'mot' | 'road_tax' | 'repair' | 'tyre' | 'other'
+    expiryDate: timestamp('expiry_date', { withTimezone: true }),
     mileage: integer('mileage'),
     garage: text('garage'),
     costCents: integer('cost_cents'), // COST-01: cost in cents

@@ -41,7 +41,11 @@ export type SerializedCar = {
   plate: string
   colour: string | null
   motDueDate: string | null
+  motCostCents: number | null
+  motPaymentDate: string | null
   taxDueDate: string | null
+  taxCostCents: number | null
+  taxPaymentDate: string | null
   nextServiceDate: string | null
   motReminderDays: number
   taxReminderDays: number
@@ -50,7 +54,7 @@ export type SerializedCar = {
   createdAt: string | null
 }
 
-export type ServiceType = 'full_service' | 'mot' | 'repair' | 'tyre' | 'other'
+export type ServiceType = 'full_service' | 'mot' | 'road_tax' | 'repair' | 'tyre' | 'other'
 
 export type SerializedServiceRecord = {
   id: string
@@ -58,6 +62,7 @@ export type SerializedServiceRecord = {
   carId: string
   serviceDate: string
   serviceType: ServiceType
+  expiryDate: string | null
   mileage: number | null
   garage: string | null
   costCents: number | null
@@ -86,7 +91,11 @@ const carFormSchema = z.object({
   plate: z.string().min(1, 'Plate is required').max(20),
   colour: z.string().max(50).optional(),
   motDueDate: z.string().optional(),
+  motCostPounds: z.number().min(0).optional().nullable(),
+  motPaymentDate: z.string().optional(),
   taxDueDate: z.string().optional(),
+  taxCostPounds: z.number().min(0).optional().nullable(),
+  taxPaymentDate: z.string().optional(),
   nextServiceDate: z.string().optional(),
   motReminderDays: z.number().int().min(1).max(365),
   taxReminderDays: z.number().int().min(1).max(365),
@@ -96,8 +105,9 @@ const carFormSchema = z.object({
 type CarFormValues = z.infer<typeof carFormSchema>
 
 const serviceFormSchema = z.object({
-  serviceDate: z.string().min(1, 'Service date is required'),
-  serviceType: z.enum(['full_service', 'mot', 'repair', 'tyre', 'other']),
+  serviceDate: z.string().min(1, 'Payment date is required'),
+  serviceType: z.enum(['full_service', 'mot', 'road_tax', 'repair', 'tyre', 'other']),
+  expiryDate: z.string().optional().nullable(),
   mileage: z.number().int().min(0).optional().nullable(),
   garage: z.string().max(200).optional(),
   costPounds: z.number().min(0).optional().nullable(),
@@ -114,16 +124,18 @@ const ORANGE = '#ea580c'
 const ORANGE_DARK = '#c2410c'
 
 const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
-  full_service: 'Full service',
-  mot: 'MOT',
+  full_service: 'Maintenance',
+  mot: 'MOT / ITP',
+  road_tax: 'Road Tax',
   repair: 'Repair',
-  tyre: 'Tyre',
-  other: 'Other',
+  tyre: 'Tyre Change',
+  other: 'Other Service',
 }
 
 const SERVICE_TYPE_BADGE_CLASSES: Record<ServiceType, string> = {
   full_service: 'bg-emerald-100 text-emerald-800',
   mot: 'bg-blue-100 text-blue-800',
+  road_tax: 'bg-violet-100 text-violet-800',
   repair: 'bg-rose-100 text-rose-800',
   tyre: 'bg-amber-100 text-amber-800',
   other: 'bg-slate-100 text-slate-800',
@@ -337,18 +349,28 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
                         </span>
                       </div>
                       <div className="mt-2 grid grid-cols-1 gap-1 font-body text-sm text-kinship-on-surface-variant sm:grid-cols-3">
-                        <div>
-                          <span className="font-medium text-kinship-on-surface">Mileage: </span>
-                          {record.mileage != null ? `${record.mileage.toLocaleString()} mi` : '—'}
-                        </div>
-                        <div>
-                          <span className="font-medium text-kinship-on-surface">Garage: </span>
-                          {record.garage ?? '—'}
-                        </div>
+                        {record.expiryDate && (
+                          <div>
+                            <span className="font-medium text-kinship-on-surface">Expires: </span>
+                            {formatDisplayDate(record.expiryDate)}
+                          </div>
+                        )}
                         <div>
                           <span className="font-medium text-kinship-on-surface">Cost: </span>
                           {formatCostFromCents(record.costCents)}
                         </div>
+                        {record.mileage != null && (
+                          <div>
+                            <span className="font-medium text-kinship-on-surface">Mileage: </span>
+                            {record.mileage.toLocaleString()} mi
+                          </div>
+                        )}
+                        {record.garage && (
+                          <div>
+                            <span className="font-medium text-kinship-on-surface">Garage: </span>
+                            {record.garage}
+                          </div>
+                        )}
                       </div>
                       {record.notes && (
                         <p className="mt-2 font-body text-sm text-kinship-on-surface-variant">
@@ -555,8 +577,8 @@ function CarCard({
 
       {/* Key dates */}
       <div className="mt-4 flex flex-col gap-1.5">
-        <KeyDateBadge label="MOT" date={car.motDueDate} days={car.motReminderDays} />
-        <KeyDateBadge label="Tax" date={car.taxDueDate} days={car.taxReminderDays} />
+        <KeyDateBadge label="MOT / ITP" date={car.motDueDate} days={car.motReminderDays} costCents={car.motCostCents} />
+        <KeyDateBadge label="Road Tax" date={car.taxDueDate} days={car.taxReminderDays} costCents={car.taxCostCents} />
         <KeyDateBadge
           label="Service"
           date={car.nextServiceDate}
@@ -573,7 +595,7 @@ function CarCard({
           className="rounded-full"
         >
           <History className="mr-1 h-3.5 w-3.5" />
-          {selected ? 'Hide history' : `History (${serviceRecordCount})`}
+          {selected ? 'Hide Service Info' : `Show Service Info (${serviceRecordCount})`}
         </Button>
         <div className="flex items-center gap-1">
           <Button
@@ -602,15 +624,22 @@ function KeyDateBadge({
   label,
   date,
   days,
+  costCents,
 }: {
   label: string
   date: string | null
   days: number
+  costCents?: number | null
 }) {
   return (
     <div className="flex items-center justify-between rounded-lg bg-kinship-surface-container-lowest px-3 py-1.5">
       <span className="font-body text-xs font-medium text-kinship-on-surface">{label}</span>
       <div className="flex items-center gap-2 text-right">
+        {costCents != null && costCents > 0 && (
+          <span className="font-body text-xs text-kinship-on-surface-variant">
+            {formatCostFromCents(costCents)}
+          </span>
+        )}
         <span className="font-body text-xs text-kinship-on-surface">
           {formatDisplayDate(date)}
         </span>
@@ -656,7 +685,11 @@ function CarForm({
       plate: car?.plate ?? '',
       colour: car?.colour ?? '',
       motDueDate: isoToDateInput(car?.motDueDate ?? null),
+      motCostPounds: car?.motCostCents != null ? centsToPounds(car.motCostCents) : null,
+      motPaymentDate: isoToDateInput(car?.motPaymentDate ?? null),
       taxDueDate: isoToDateInput(car?.taxDueDate ?? null),
+      taxCostPounds: car?.taxCostCents != null ? centsToPounds(car.taxCostCents) : null,
+      taxPaymentDate: isoToDateInput(car?.taxPaymentDate ?? null),
       nextServiceDate: isoToDateInput(car?.nextServiceDate ?? null),
       motReminderDays: car?.motReminderDays ?? 30,
       taxReminderDays: car?.taxReminderDays ?? 30,
@@ -666,7 +699,9 @@ function CarForm({
 
   const colourValue = watch('colour')
   const motDueDateValue = watch('motDueDate') ?? ''
+  const motPaymentDateValue = watch('motPaymentDate') ?? ''
   const taxDueDateValue = watch('taxDueDate') ?? ''
+  const taxPaymentDateValue = watch('taxPaymentDate') ?? ''
   const nextServiceDateValue = watch('nextServiceDate') ?? ''
   const motReminderDaysValue = watch('motReminderDays')
   const taxReminderDaysValue = watch('taxReminderDays')
@@ -680,7 +715,17 @@ function CarForm({
       plate: values.plate.trim(),
       colour: values.colour?.trim() ? values.colour.trim() : null,
       motDueDate: dateInputToIso(values.motDueDate ?? ''),
+      motCostCents:
+        values.motCostPounds != null && !Number.isNaN(values.motCostPounds)
+          ? poundsToCents(values.motCostPounds)
+          : null,
+      motPaymentDate: dateInputToIso(values.motPaymentDate ?? ''),
       taxDueDate: dateInputToIso(values.taxDueDate ?? ''),
+      taxCostCents:
+        values.taxCostPounds != null && !Number.isNaN(values.taxCostPounds)
+          ? poundsToCents(values.taxCostPounds)
+          : null,
+      taxPaymentDate: dateInputToIso(values.taxPaymentDate ?? ''),
       nextServiceDate: dateInputToIso(values.nextServiceDate ?? ''),
       motReminderDays: values.motReminderDays,
       taxReminderDays: values.taxReminderDays,
@@ -771,12 +816,12 @@ function CarForm({
 
       <div className="border-t border-kinship-outline-variant pt-4">
         <h4 className="mb-3 font-display text-base font-semibold text-kinship-on-surface">
-          Key dates
+          MOT / ITP
         </h4>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex flex-col gap-1.5">
             <label className="font-body text-sm font-medium text-kinship-on-surface">
-              MOT due
+              Expiry date
             </label>
             <DatePicker
               value={motDueDateValue}
@@ -786,7 +831,40 @@ function CarForm({
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-body text-sm font-medium text-kinship-on-surface">
-              Tax due
+              Cost (€)
+            </label>
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              {...register('motCostPounds', {
+                setValueAs: (v) =>
+                  v === '' || v === null || v === undefined ? null : Number(v),
+              })}
+              className="rounded-lg border border-kinship-outline-variant bg-white px-3 py-2 font-body text-sm outline-none focus:border-kinship-primary focus:ring-1 focus:ring-kinship-primary"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body text-sm font-medium text-kinship-on-surface">
+              Payment date
+            </label>
+            <DatePicker
+              value={motPaymentDateValue}
+              onChange={(v) => setValue('motPaymentDate', v, { shouldDirty: true })}
+              placeholder="Pick a date"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-kinship-outline-variant pt-4">
+        <h4 className="mb-3 font-display text-base font-semibold text-kinship-on-surface">
+          Road Tax
+        </h4>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body text-sm font-medium text-kinship-on-surface">
+              Expiry date
             </label>
             <DatePicker
               value={taxDueDateValue}
@@ -794,6 +872,39 @@ function CarForm({
               placeholder="Pick a date"
             />
           </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body text-sm font-medium text-kinship-on-surface">
+              Cost (€)
+            </label>
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              {...register('taxCostPounds', {
+                setValueAs: (v) =>
+                  v === '' || v === null || v === undefined ? null : Number(v),
+              })}
+              className="rounded-lg border border-kinship-outline-variant bg-white px-3 py-2 font-body text-sm outline-none focus:border-kinship-primary focus:ring-1 focus:ring-kinship-primary"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body text-sm font-medium text-kinship-on-surface">
+              Payment date
+            </label>
+            <DatePicker
+              value={taxPaymentDateValue}
+              onChange={(v) => setValue('taxPaymentDate', v, { shouldDirty: true })}
+              placeholder="Pick a date"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-kinship-outline-variant pt-4">
+        <h4 className="mb-3 font-display text-base font-semibold text-kinship-on-surface">
+          Service
+        </h4>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex flex-col gap-1.5">
             <label className="font-body text-sm font-medium text-kinship-on-surface">
               Next service
@@ -880,6 +991,7 @@ function ServiceRecordForm({
     defaultValues: {
       serviceDate: isoToDateInput(record?.serviceDate ?? null),
       serviceType: record?.serviceType ?? 'full_service',
+      expiryDate: isoToDateInput(record?.expiryDate ?? null),
       mileage: record?.mileage ?? null,
       garage: record?.garage ?? '',
       costPounds:
@@ -889,11 +1001,13 @@ function ServiceRecordForm({
   })
 
   const serviceDateValue = watch('serviceDate') ?? ''
+  const expiryDateValue = watch('expiryDate') ?? ''
+  const serviceTypeValue = watch('serviceType')
 
   async function onSubmit(values: ServiceFormValues) {
     const iso = dateInputToIso(values.serviceDate)
     if (!iso) {
-      toast.error('Service date is required')
+      toast.error('Payment date is required')
       return
     }
 
@@ -901,6 +1015,7 @@ function ServiceRecordForm({
       carId,
       serviceDate: iso,
       serviceType: values.serviceType,
+      expiryDate: values.expiryDate ? dateInputToIso(values.expiryDate) : null,
       mileage: values.mileage ?? null,
       garage: values.garage?.trim() ? values.garage.trim() : null,
       costCents:
@@ -927,47 +1042,16 @@ function ServiceRecordForm({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label className="font-body text-sm font-medium text-kinship-on-surface">
-            Service date
-          </label>
-          <DatePicker
-            value={serviceDateValue}
-            onChange={(v) => setValue('serviceDate', v, { shouldDirty: true })}
-            placeholder="Pick a date"
-          />
-          {errors.serviceDate && (
-            <span className="font-body text-xs text-destructive">
-              {errors.serviceDate.message}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="font-body text-sm font-medium text-kinship-on-surface">
-            Service type
+            Type
           </label>
           <select
             {...register('serviceType')}
             className="rounded-lg border border-kinship-outline-variant bg-white px-3 py-2 font-body text-sm outline-none focus:border-kinship-primary focus:ring-1 focus:ring-kinship-primary"
           >
-            <option value="full_service">Full service</option>
-            <option value="mot">MOT</option>
-            <option value="repair">Repair</option>
-            <option value="tyre">Tyre</option>
-            <option value="other">Other</option>
+            <option value="full_service">Maintenance</option>
+            <option value="tyre">Tyre Change</option>
+            <option value="other">Other Service</option>
           </select>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="font-body text-sm font-medium text-kinship-on-surface">
-            Mileage (mi)
-          </label>
-          <input
-            type="number"
-            min={0}
-            {...register('mileage', {
-              setValueAs: (v) =>
-                v === '' || v === null || v === undefined ? null : Number(v),
-            })}
-            className="rounded-lg border border-kinship-outline-variant bg-white px-3 py-2 font-body text-sm outline-none focus:border-kinship-primary focus:ring-1 focus:ring-kinship-primary"
-          />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="font-body text-sm font-medium text-kinship-on-surface">
@@ -984,15 +1068,31 @@ function ServiceRecordForm({
             className="rounded-lg border border-kinship-outline-variant bg-white px-3 py-2 font-body text-sm outline-none focus:border-kinship-primary focus:ring-1 focus:ring-kinship-primary"
           />
         </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="font-body text-sm font-medium text-kinship-on-surface">Garage</label>
-        <input
-          type="text"
-          {...register('garage')}
-          className="rounded-lg border border-kinship-outline-variant bg-white px-3 py-2 font-body text-sm outline-none focus:border-kinship-primary focus:ring-1 focus:ring-kinship-primary"
-        />
+        <div className="flex flex-col gap-1.5">
+          <label className="font-body text-sm font-medium text-kinship-on-surface">
+            Payment date
+          </label>
+          <DatePicker
+            value={serviceDateValue}
+            onChange={(v) => setValue('serviceDate', v, { shouldDirty: true })}
+            placeholder="Pick a date"
+          />
+          {errors.serviceDate && (
+            <span className="font-body text-xs text-destructive">
+              {errors.serviceDate.message}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="font-body text-sm font-medium text-kinship-on-surface">
+            Expiry date
+          </label>
+          <DatePicker
+            value={expiryDateValue}
+            onChange={(v) => setValue('expiryDate', v, { shouldDirty: true })}
+            placeholder="Pick a date"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
