@@ -15,7 +15,7 @@
 - [x] **Phase 3: Kids Activities** - Child profiles, activity tracking, unified calendar (CAL-01–04 pulled forward from Phase 4), reminders
 - [x] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
 - [x] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
-- [ ] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA, camera UX, performance audit
+- [ ] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA installability, performance audit
 
 ---
 
@@ -28,7 +28,7 @@
 | 3. Kids Activities | 6/6 | Complete | 2026-04-09 |
 | 4. Tracker Modules | 9/9 | Complete | 2026-04-11 |
 | 5. AI Chatbot & RAG | 6/6 | Complete | 2026-04-14 |
-| 6. Platform & Polish | 0/TBD | Not started | - |
+| 6. Platform & Polish | 0/3 | Not started | - |
 
 ---
 
@@ -179,7 +179,12 @@ Plans:
 1. All primary flows (managing tasks, viewing calendar, scanning documents, chatting) work on phone browsers without horizontal scrolling or broken layouts.
 2. The app meets PWA installability criteria (manifest, service worker) and can be added to a home screen.
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Viewport meta tag + PWA manifest + service worker + app icons — Wave 1
+- [ ] 06-02-PLAN.md — Mobile responsiveness audit and fixes for all app pages (375px+) — Wave 2
+- [ ] 06-03-PLAN.md — Performance audit (Lighthouse, bundle analyzer, optimization) — Wave 3
 
 ---
 
@@ -288,3 +293,4 @@ Plans:
 *Phase 1 revised: 2026-03-24 — fixed plan checker blockers, split 01-05 into wizard (01-05) + dashboard (01-06), renumbered invite->01-07 and realtime->01-08, total plans 7->8*
 *Phase 3 plans created: 2026-04-07 — CAL-01-04 pulled forward from Phase 4 per 03-CONTEXT.md; 6 plans across 4 waves*
 *Phase 4 plans created: 2026-04-09 — 9 plans across 4 waves; 20 requirements covered*
+*Phase 6 plans created: 2026-04-19 — 3 plans across 3 waves; viewport fix, mobile audit, performance audit*
