@@ -10,11 +10,11 @@
 
 ## Phases
 
-- [ ] **Phase 1: Foundation & Onboarding** - Auth, household setup, onboarding wizard, module-based dashboard, real-time infrastructure, GDPR
+- [x] **Phase 1: Foundation & Onboarding** - Auth, household setup, onboarding wizard, module-based dashboard, real-time infrastructure, GDPR
 - [x] **Phase 2: Home Chores** - Task management, recurring chores, assignments, due date reminders, notifications
 - [x] **Phase 3: Kids Activities** - Child profiles, activity tracking, unified calendar (CAL-01–04 pulled forward from Phase 4), reminders
 - [x] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
-- [ ] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
+- [x] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
 - [ ] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA, camera UX, performance audit
 
 ---
@@ -23,11 +23,11 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Onboarding | 2/8 | In Progress|  |
+| 1. Foundation & Onboarding | 8/8 | Complete | 2026-03-27 |
 | 2. Home Chores | 6/6 | Complete | 2026-04-03 |
 | 3. Kids Activities | 6/6 | Complete | 2026-04-09 |
 | 4. Tracker Modules | 9/9 | Complete | 2026-04-11 |
-| 5. AI Chatbot & RAG | 0/6 | Not started | - |
+| 5. AI Chatbot & RAG | 6/6 | Complete | 2026-04-14 |
 | 6. Platform & Polish | 0/TBD | Not started | - |
 
 ---
@@ -49,17 +49,17 @@
 4. When any household member makes a change, all other members see it update in their browser within seconds without refreshing.
 5. All data is stored in EU infrastructure; a user can request deletion of their personal data and it is removed.
 
-**Plans:** 2/8 plans executed
+**Plans:** 8/8 plans executed
 
 Plans:
-- [ ] 01-01-PLAN.md — Test scaffold (Vitest, Playwright, factory helpers) — Wave 1
-- [ ] 01-02-PLAN.md — Project init (Next.js 15, pnpm, env, Supabase project + checkpoint) — Wave 1
-- [ ] 01-03-PLAN.md — Drizzle schema (all 5 Phase 1 tables + RLS + migrations + RLS helper) — Wave 2
-- [ ] 01-04-PLAN.md — Auth flows (signup, email verify, password reset, Google OAuth) — Wave 2
-- [ ] 01-05-PLAN.md — Onboarding wizard (Zustand store, Server Action, 3 step pages, components) — Wave 2
-- [ ] 01-06-PLAN.md — Module-based dashboard skeleton (Server Component, ModuleCard, DashboardGrid) — Wave 3
-- [ ] 01-07-PLAN.md — Invite system (email + shareable link + accept flow + member removal) — Wave 3
-- [ ] 01-08-PLAN.md — Real-time sync, reconnect indicator, activity feed, GDPR deletion — Wave 4
+- [x] 01-01-PLAN.md — Test scaffold (Vitest, Playwright, factory helpers) — Wave 1
+- [x] 01-02-PLAN.md — Project init (Next.js 15, pnpm, env, Supabase project + checkpoint) — Wave 1
+- [x] 01-03-PLAN.md — Drizzle schema (all 5 Phase 1 tables + RLS + migrations + RLS helper) — Wave 2
+- [x] 01-04-PLAN.md — Auth flows (signup, email verify, password reset, Google OAuth) — Wave 2
+- [x] 01-05-PLAN.md — Onboarding wizard (Zustand store, Server Action, 3 step pages, components) — Wave 2
+- [x] 01-06-PLAN.md — Module-based dashboard skeleton (Server Component, ModuleCard, DashboardGrid) — Wave 3
+- [x] 01-07-PLAN.md — Invite system (email + shareable link + accept flow + member removal) — Wave 3
+- [x] 01-08-PLAN.md — Real-time sync, reconnect indicator, activity feed, GDPR deletion — Wave 4
 
 ---
 
@@ -155,15 +155,15 @@ Plans:
 5. Conversation history persists per household.
 6. Documents are processed asynchronously — user is notified when a document is ready for chatbot queries.
 
-**Plans:** 6 plans
+**Plans:** 6/6 plans executed
 
 Plans:
-- [ ] 05-01-PLAN.md — Schema + migration (pgvector, document_chunks, conversations, messages, documents.ready_for_rag) — Wave 1
-- [ ] 05-02-PLAN.md — Embed infra (Supabase gte-small Edge Function, embed.ts, rag.ts, pdf-parse externals) — Wave 2
-- [ ] 05-03-PLAN.md — Chat server actions (createConversation, listConversations, loadHistory, saveUserMessage, saveAssistantMessage, deleteConversation) — Wave 2
-- [ ] 05-04-PLAN.md — Inngest document pipeline (download → extract → chunk → embed → insert → notify) + confirmUpload event emit + NotificationDropdown document_ready — Wave 3
-- [ ] 05-05-PLAN.md — Chat API route (/api/chat) + system prompt + typed tools (5 live-data + extract_procedure) — Wave 3
-- [ ] 05-06-PLAN.md — Chatbot UI (FAB + 420px dock + MessageList + MessageInput + ProcedurePreviewModal + (app)/layout mount) — Wave 4
+- [x] 05-01-PLAN.md — Schema + migration (pgvector, document_chunks, conversations, messages, documents.ready_for_rag) — Wave 1
+- [x] 05-02-PLAN.md — Embed infra (Supabase gte-small Edge Function, embed.ts, rag.ts, pdf-parse externals) — Wave 2
+- [x] 05-03-PLAN.md — Chat server actions (createConversation, listConversations, loadHistory, saveUserMessage, saveAssistantMessage, deleteConversation) — Wave 2
+- [x] 05-04-PLAN.md — Inngest document pipeline (download → extract → chunk → embed → insert → notify) + confirmUpload event emit + NotificationDropdown document_ready — Wave 3
+- [x] 05-05-PLAN.md — Chat API route (/api/chat) + system prompt + typed tools (5 live-data + extract_procedure) — Wave 3
+- [x] 05-06-PLAN.md — Chatbot UI (FAB + 420px dock + MessageList + MessageInput + ProcedurePreviewModal + (app)/layout mount) — Wave 4
 
 ---
 
@@ -200,34 +200,34 @@ Plans:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| ONBD-01 | Phase 1 | Pending |
-| ONBD-02 | Phase 1 | Pending |
-| ONBD-03 | Phase 1 | Pending |
-| ONBD-04 | Phase 1 | Pending |
-| HSLD-01 | Phase 1 | Pending |
-| HSLD-02 | Phase 1 | Pending |
-| HSLD-03 | Phase 1 | Pending |
-| HSLD-04 | Phase 1 | Pending |
-| HSLD-05 | Phase 1 | Pending |
-| HSLD-06 | Phase 1 | Pending |
-| HSLD-07 | Phase 1 | Pending |
-| HSLD-08 | Phase 1 | Pending |
-| PLAT-01 | Phase 1 | Pending |
-| PLAT-02 | Phase 1 | Pending |
-| PLAT-04 | Phase 1 | Pending |
-| PLAT-05 | Phase 1 | Pending |
-| CHORE-01 | Phase 2 | Pending |
-| CHORE-02 | Phase 2 | Pending |
-| CHORE-03 | Phase 2 | Pending |
-| CHORE-04 | Phase 2 | Pending |
-| CHORE-05 | Phase 2 | Pending |
-| CHORE-06 | Phase 2 | Pending |
-| CHORE-07 | Phase 2 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
+| ONBD-01 | Phase 1 | Complete |
+| ONBD-02 | Phase 1 | Complete |
+| ONBD-03 | Phase 1 | Complete |
+| ONBD-04 | Phase 1 | Complete |
+| HSLD-01 | Phase 1 | Complete |
+| HSLD-02 | Phase 1 | Complete |
+| HSLD-03 | Phase 1 | Complete |
+| HSLD-04 | Phase 1 | Complete |
+| HSLD-05 | Phase 1 | Complete |
+| HSLD-06 | Phase 1 | Complete |
+| HSLD-07 | Phase 1 | Complete |
+| HSLD-08 | Phase 1 | Complete |
+| PLAT-01 | Phase 1 | Complete |
+| PLAT-02 | Phase 1 | Complete |
+| PLAT-04 | Phase 1 | Complete |
+| PLAT-05 | Phase 1 | Complete |
+| CHORE-01 | Phase 2 | Complete |
+| CHORE-02 | Phase 2 | Complete |
+| CHORE-03 | Phase 2 | Complete |
+| CHORE-04 | Phase 2 | Complete |
+| CHORE-05 | Phase 2 | Complete |
+| CHORE-06 | Phase 2 | Complete |
+| CHORE-07 | Phase 2 | Complete |
 | CHORE-08 | Phase 2 | Complete |
 | CHORE-09 | Phase 2 | Complete |
 | CHORE-10 | Phase 2 | Complete |
@@ -243,37 +243,37 @@ Plans:
 | CAL-02 | Phase 3 | Complete |
 | CAL-03 | Phase 3 | Complete |
 | CAL-04 | Phase 3 | Complete |
-| CAR-01 | Phase 4 | Pending |
-| CAR-02 | Phase 4 | Pending |
-| CAR-03 | Phase 4 | Pending |
-| CAR-04 | Phase 4 | Pending |
-| CAR-05 | Phase 4 | Pending |
-| CAR-06 | Phase 4 | Pending |
-| INS-01 | Phase 4 | Pending |
-| INS-02 | Phase 4 | Pending |
-| INS-03 | Phase 4 | Pending |
-| INS-04 | Phase 4 | Pending |
-| INS-05 | Phase 4 | Pending |
-| INS-06 | Phase 4 | Pending |
-| ELEC-01 | Phase 4 | Pending |
-| ELEC-02 | Phase 4 | Pending |
-| ELEC-03 | Phase 4 | Pending |
-| ELEC-04 | Phase 4 | Pending |
-| ELEC-06 | Phase 4 | Pending |
-| COST-01 | Phase 4 | Pending |
-| COST-02 | Phase 4 | Pending |
-| COST-03 | Phase 4 | Pending |
-| AI-01 | Phase 5 | Pending |
-| AI-02 | Phase 5 | Pending |
-| AI-03 | Phase 5 | Pending |
-| AI-04 | Phase 5 | Pending |
-| AI-05 | Phase 5 | Pending |
-| AI-06 | Phase 5 | Pending |
-| AI-07 | Phase 5 | Pending |
-| INS-07 | Phase 5 | Pending |
-| INS-08 | Phase 5 | Pending |
-| INS-09 | Phase 5 | Pending |
-| ELEC-05 | Phase 5 | Pending |
+| CAR-01 | Phase 4 | Complete |
+| CAR-02 | Phase 4 | Complete |
+| CAR-03 | Phase 4 | Complete |
+| CAR-04 | Phase 4 | Complete |
+| CAR-05 | Phase 4 | Complete |
+| CAR-06 | Phase 4 | Complete |
+| INS-01 | Phase 4 | Complete |
+| INS-02 | Phase 4 | Complete |
+| INS-03 | Phase 4 | Complete |
+| INS-04 | Phase 4 | Complete |
+| INS-05 | Phase 4 | Complete |
+| INS-06 | Phase 4 | Complete |
+| ELEC-01 | Phase 4 | Complete |
+| ELEC-02 | Phase 4 | Complete |
+| ELEC-03 | Phase 4 | Complete |
+| ELEC-04 | Phase 4 | Complete |
+| ELEC-06 | Phase 4 | Complete |
+| COST-01 | Phase 4 | Complete |
+| COST-02 | Phase 4 | Complete |
+| COST-03 | Phase 4 | Complete |
+| AI-01 | Phase 5 | Complete |
+| AI-02 | Phase 5 | Complete |
+| AI-03 | Phase 5 | Complete |
+| AI-04 | Phase 5 | Complete |
+| AI-05 | Phase 5 | Complete |
+| AI-06 | Phase 5 | Complete |
+| AI-07 | Phase 5 | Complete |
+| INS-07 | Phase 5 | Complete |
+| INS-08 | Phase 5 | Complete |
+| INS-09 | Phase 5 | Complete |
+| ELEC-05 | Phase 5 | Complete |
 | PLAT-03 | Phase 6 | Pending |
 
 **Total v1 requirements: 75**
