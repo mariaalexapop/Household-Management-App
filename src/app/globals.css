@@ -177,9 +177,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    padding-bottom: env(safe-area-inset-bottom);
   }
   html {
     @apply font-sans;
+  }
+  input, select, textarea {
+    font-size: 16px;
   }
 }
 
@@ -190,6 +194,16 @@
   }
   .shadow-float {
     box-shadow: 0 20px 40px rgba(28, 28, 30, 0.06);
+  }
+}
+
+/* Safe area padding for notched devices (iPhone X+) */
+@layer utilities {
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .safe-area-top {
+    padding-top: max(0px, env(safe-area-inset-top));
   }
 }
 
