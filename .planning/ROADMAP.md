@@ -15,7 +15,7 @@
 - [x] **Phase 3: Kids Activities** - Child profiles, activity tracking, unified calendar (CAL-01–04 pulled forward from Phase 4), reminders
 - [x] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
 - [x] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
-- [ ] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA installability, performance audit
+- [x] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA installability, performance audit
 
 ---
 
@@ -28,7 +28,7 @@
 | 3. Kids Activities | 6/6 | Complete | 2026-04-09 |
 | 4. Tracker Modules | 9/9 | Complete | 2026-04-11 |
 | 5. AI Chatbot & RAG | 6/6 | Complete | 2026-04-14 |
-| 6. Platform & Polish | 0/3 | Not started | - |
+| 6. Platform & Polish | 3/3 | Complete | 2026-04-20 |
 
 ---
 
@@ -179,12 +179,12 @@ Plans:
 1. All primary flows (managing tasks, viewing calendar, scanning documents, chatting) work on phone browsers without horizontal scrolling or broken layouts.
 2. The app meets PWA installability criteria (manifest, service worker) and can be added to a home screen.
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans executed
 
 Plans:
-- [ ] 06-01-PLAN.md — Viewport meta tag + PWA manifest + service worker + app icons — Wave 1
-- [ ] 06-02-PLAN.md — Mobile responsiveness audit and fixes for all app pages (375px+) — Wave 2
-- [ ] 06-03-PLAN.md — Performance audit (Lighthouse, bundle analyzer, optimization) — Wave 3
+- [x] 06-01-PLAN.md — Viewport meta tag + PWA manifest + service worker + app icons — Wave 1
+- [x] 06-02-PLAN.md — Mobile responsiveness audit and fixes for all app pages (375px+) — Wave 2
+- [x] 06-03-PLAN.md — Performance audit (Lighthouse, bundle analyzer, optimization) — Wave 3
 
 ---
 
@@ -279,7 +279,7 @@ Plans:
 | INS-08 | Phase 5 | Complete |
 | INS-09 | Phase 5 | Complete |
 | ELEC-05 | Phase 5 | Complete |
-| PLAT-03 | Phase 6 | Pending |
+| PLAT-03 | Phase 6 | Complete |
 
 **Total v1 requirements: 75**
 **Mapped: 75/75**
