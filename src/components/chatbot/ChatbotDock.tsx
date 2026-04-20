@@ -77,7 +77,7 @@ export function ChatbotDock() {
       />
 
       <aside
-        className="fixed right-0 top-0 bottom-0 z-40 flex w-full max-w-[420px] flex-col bg-white shadow-2xl ring-1 ring-[#e0e2e8]"
+        className="fixed inset-0 z-40 flex flex-col bg-white shadow-2xl ring-1 ring-[#e0e2e8] sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-full sm:max-w-[420px]"
         role="dialog"
         aria-label="Household assistant"
       >

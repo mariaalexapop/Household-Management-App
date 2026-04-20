@@ -45,7 +45,7 @@ export function CostsClient({ monthlyRows, selectedYear, yearOptions }: CostsCli
   return (
     <div className="flex flex-col gap-6">
       {/* Header row with title + year filter */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-2xl font-semibold text-kinship-on-surface">
           Costs for {selectedYear}
         </h2>
@@ -64,7 +64,7 @@ export function CostsClient({ monthlyRows, selectedYear, yearOptions }: CostsCli
       </div>
 
       {/* Section totals */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Card className="bg-kinship-surface-container-lowest p-4">
           <div className="absolute left-0 top-0 h-1 w-full rounded-t-2xl bg-[#ea580c]" aria-hidden="true" />
           <p className="font-body text-xs text-kinship-on-surface-variant">Car</p>
@@ -105,7 +105,7 @@ export function CostsClient({ monthlyRows, selectedYear, yearOptions }: CostsCli
       {/* Monthly breakdown table */}
       <Card className="bg-kinship-surface-container-lowest p-0 ring-miro rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[540px]">
             <thead className="border-b border-kinship-surface-container bg-kinship-surface-container/30">
               <tr>
                 <th className="px-4 py-3 text-left font-display text-sm font-semibold text-kinship-on-surface">Month</th>

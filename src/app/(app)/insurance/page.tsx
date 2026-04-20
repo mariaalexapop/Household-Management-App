@@ -111,7 +111,7 @@ export default async function InsurancePage() {
   return (
     <div className="min-h-screen bg-kinship-surface">
       <AppHeader subtitle="Insurance" />
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
         <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
           ← Go back to main dashboard
         </a>

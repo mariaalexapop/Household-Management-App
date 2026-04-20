@@ -114,12 +114,12 @@ export function KidsClient({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Kids Activities</h2>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">Kids Activities</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setView('list')}
-            className={`rounded-lg p-2 ${
+            className={`min-h-11 min-w-11 rounded-lg p-2 flex items-center justify-center ${
               view === 'list'
                 ? 'bg-module-kids-light text-module-kids-dark'
                 : 'hover:bg-kinship-surface-container text-kinship-on-surface'
@@ -130,14 +130,14 @@ export function KidsClient({
           </button>
           <a
             href="/calendar?filter=kids_activities"
-            className="rounded-lg p-2 hover:bg-kinship-surface-container text-kinship-on-surface"
+            className="min-h-11 min-w-11 rounded-lg p-2 flex items-center justify-center hover:bg-kinship-surface-container text-kinship-on-surface"
             aria-label="View in calendar"
           >
             <Calendar size={18} />
           </a>
           <Button
             onClick={handleAdd}
-            className="ml-2 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
+            className="ml-2 min-h-11 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
           >
             + Add Activity
           </Button>
@@ -153,7 +153,7 @@ export function KidsClient({
           onDelete={handleDelete}
         />
       ) : (
-        <div className="bg-white rounded-2xl ring-miro p-6">
+        <div className="bg-white rounded-2xl ring-miro p-3 sm:p-6">
           <UnifiedCalendar
             events={optimisticActivities
               .filter((a) => a.startsAt !== null)

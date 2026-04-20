@@ -230,9 +230,9 @@ export function ChoresClient({
 
       {/* Add / Edit Task Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto bg-white rounded-2xl ring-miro p-8">
+        <DialogContent className="max-h-[90vh] overflow-y-auto bg-white rounded-2xl ring-miro p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">{editingTask ? 'Edit task' : 'Add a task'}</DialogTitle>
+            <DialogTitle className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">{editingTask ? 'Edit task' : 'Add a task'}</DialogTitle>
           </DialogHeader>
           <TaskForm
             areas={areas}
@@ -250,9 +250,9 @@ export function ChoresClient({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-white rounded-2xl ring-miro p-8">
+        <DialogContent className="bg-white rounded-2xl ring-miro p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">Delete task?</DialogTitle>
+            <DialogTitle className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">Delete task?</DialogTitle>
           </DialogHeader>
           <p className="font-body text-base text-kinship-on-surface-variant">
             Are you sure you want to delete &ldquo;{deletingTaskTitle}&rdquo;? This cannot be undone.

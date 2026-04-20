@@ -34,7 +34,7 @@ function EventCell({ dayProps, events, popoverDate, onOpenPopover, onClosePopove
   return (
     <td
       {...restProps}
-      className={`align-top border border-kinship-outline-variant p-1 relative h-32 ${
+      className={`align-top border border-kinship-outline-variant p-1 relative h-20 sm:h-32 ${
         modifiers.outside ? 'opacity-40' : ''
       }`}
     >
@@ -102,7 +102,7 @@ export function CalendarMonthView({ events, currentMonth, onMonthChange }: Calen
       <div className="flex items-center justify-between mb-3 px-1">
         <button
           onClick={goPrev}
-          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-kinship-surface-container active:bg-kinship-surface-container text-kinship-on-surface transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-kinship-surface-container active:bg-kinship-surface-container text-kinship-on-surface transition-colors"
           aria-label="Previous month"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -112,7 +112,7 @@ export function CalendarMonthView({ events, currentMonth, onMonthChange }: Calen
         </h2>
         <button
           onClick={goNext}
-          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-kinship-surface-container active:bg-kinship-surface-container text-kinship-on-surface transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-kinship-surface-container active:bg-kinship-surface-container text-kinship-on-surface transition-colors"
           aria-label="Next month"
         >
           <ChevronRight className="h-5 w-5" />

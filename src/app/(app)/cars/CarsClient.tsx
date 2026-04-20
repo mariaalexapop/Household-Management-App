@@ -245,20 +245,20 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
   return (
     <div>
       {/* Page header with orange accent */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div
             className="h-8 w-1 rounded-full"
             style={{ backgroundColor: ORANGE }}
             aria-hidden="true"
           />
-          <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
+          <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
             Cars
           </h2>
         </div>
         <Button
           onClick={handleOpenAddCar}
-          className="rounded-full text-white hover:opacity-90"
+          className="min-h-11 rounded-full text-white hover:opacity-90"
           style={{ backgroundColor: ORANGE }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add Car
@@ -293,10 +293,10 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
 
       {/* Service history timeline */}
       {selectedCar && (
-        <div className="mt-8 rounded-xl ring-miro bg-white p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h3 className="font-display text-xl font-semibold text-kinship-on-surface">
+        <div className="mt-8 rounded-xl ring-miro bg-white p-4 sm:p-6">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="font-display text-lg font-semibold text-kinship-on-surface sm:text-xl">
                 Service history — {selectedCar.make} {selectedCar.model}
               </h3>
               <p className="font-body text-sm text-kinship-on-surface-variant">
@@ -304,13 +304,13 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
                 {recordsForSelectedCar.length === 1 ? '' : 's'}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <Button
                 onClick={() => {
                   setEditingService(null)
                   setShowAddService(true)
                 }}
-                className="rounded-full text-white hover:opacity-90"
+                className="min-h-11 rounded-full text-white hover:opacity-90"
                 style={{ backgroundColor: ORANGE }}
               >
                 <Plus className="mr-1 h-4 w-4" /> Add Service Record
@@ -409,9 +409,9 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
 
       {/* Add / Edit Car Dialog */}
       <Dialog open={showAddCar} onOpenChange={setShowAddCar}>
-        <DialogContent className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl ring-miro bg-white p-8">
+        <DialogContent className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl ring-miro bg-white p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="font-display text-[28px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
+            <DialogTitle className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[28px]">
               {editingCar ? 'Edit car' : 'Add a car'}
             </DialogTitle>
           </DialogHeader>
@@ -435,9 +435,9 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
           if (!open) setDeletingCarId(null)
         }}
       >
-        <DialogContent className="rounded-2xl ring-miro bg-white p-8">
+        <DialogContent className="rounded-2xl ring-miro bg-white p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="font-display text-[28px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
+            <DialogTitle className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[28px]">
               Delete car?
             </DialogTitle>
           </DialogHeader>
@@ -465,9 +465,9 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
 
       {/* Add / Edit Service Record Dialog */}
       <Dialog open={showAddService} onOpenChange={setShowAddService}>
-        <DialogContent className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl ring-miro bg-white p-8">
+        <DialogContent className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl ring-miro bg-white p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="font-display text-[28px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
+            <DialogTitle className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[28px]">
               {editingService ? 'Edit service record' : 'Add service record'}
             </DialogTitle>
           </DialogHeader>
@@ -494,9 +494,9 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
           if (!open) setDeletingServiceId(null)
         }}
       >
-        <DialogContent className="rounded-2xl ring-miro bg-white p-8">
+        <DialogContent className="rounded-2xl ring-miro bg-white p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="font-display text-[28px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
+            <DialogTitle className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[28px]">
               Delete service record?
             </DialogTitle>
           </DialogHeader>
@@ -587,15 +587,15 @@ function CarCard({
       </div>
 
       {/* Actions */}
-      <div className="mt-5 flex items-center justify-between border-t border-kinship-outline-variant pt-3">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-kinship-outline-variant pt-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={onViewHistory}
-          className="rounded-full"
+          className="min-h-11 rounded-full text-xs sm:text-sm"
         >
           <History className="mr-1 h-3.5 w-3.5" />
-          {selected ? 'Hide Service Info' : `Show Service Info (${serviceRecordCount})`}
+          {selected ? 'Hide Service Info' : `Service Info (${serviceRecordCount})`}
         </Button>
         <div className="flex items-center gap-1">
           <Button
@@ -632,9 +632,9 @@ function KeyDateBadge({
   costCents?: number | null
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg bg-kinship-surface-container-lowest px-3 py-1.5">
+    <div className="flex flex-wrap items-center justify-between gap-1 rounded-lg bg-kinship-surface-container-lowest px-3 py-1.5">
       <span className="font-body text-xs font-medium text-kinship-on-surface">{label}</span>
-      <div className="flex items-center gap-2 text-right">
+      <div className="flex flex-wrap items-center gap-1.5 text-right sm:gap-2">
         {costCents != null && costCents > 0 && (
           <span className="font-body text-xs text-kinship-on-surface-variant">
             {formatCostFromCents(costCents)}

@@ -175,7 +175,7 @@ export default async function DashboardPage() {
       <AppHeader subtitle={row.householdName} />
 
       {/* Main content */}
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
         <h2 className="mb-6 font-display text-2xl font-semibold text-kinship-on-surface">
           Your household
         </h2>

@@ -229,13 +229,13 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
   return (
     <div>
       {/* Page header with purple accent */}
-      <div className="mb-6 flex items-center justify-between border-l-4 pl-4" style={{ borderColor: PURPLE }}>
-        <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-l-4 pl-4" style={{ borderColor: PURPLE }}>
+        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
           Insurance
         </h2>
         <Button
           onClick={handleAdd}
-          className="rounded-full text-white"
+          className="min-h-11 rounded-full text-white"
           style={{ backgroundColor: PURPLE }}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PURPLE_DARK)}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = PURPLE)}
@@ -326,11 +326,11 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
                     </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1">
+                  <div className="flex shrink-0 items-center gap-0.5">
                     <button
                       type="button"
                       onClick={() => handleEdit(policy)}
-                      className="rounded-lg p-2 text-kinship-on-surface-variant transition-colors hover:bg-kinship-surface-container hover:text-kinship-on-surface"
+                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant transition-colors hover:bg-kinship-surface-container hover:text-kinship-on-surface"
                       title="Edit policy"
                       aria-label="Edit policy"
                     >
@@ -339,7 +339,7 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
                     <button
                       type="button"
                       onClick={() => handleDelete(policy)}
-                      className="rounded-lg p-2 text-kinship-on-surface-variant transition-colors hover:bg-red-50 hover:text-red-600"
+                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Delete policy"
                       aria-label="Delete policy"
                     >
@@ -348,7 +348,7 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
                     <button
                       type="button"
                       onClick={() => setExpandedId(isExpanded ? null : policy.id)}
-                      className="rounded-lg p-2 text-kinship-on-surface-variant transition-colors hover:bg-kinship-surface-container hover:text-kinship-on-surface"
+                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant transition-colors hover:bg-kinship-surface-container hover:text-kinship-on-surface"
                       title={isExpanded ? 'Collapse' : 'Expand documents'}
                       aria-label={isExpanded ? 'Collapse' : 'Expand documents'}
                     >
@@ -832,7 +832,7 @@ function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: Policy
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex shrink-0 items-center justify-center rounded-lg px-2.5 h-8 text-sm font-medium text-white disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg px-4 h-11 text-sm font-medium text-white disabled:pointer-events-none disabled:opacity-50"
           style={{ backgroundColor: PURPLE }}
         >
           {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Policy'}

@@ -274,13 +274,13 @@ export function ElectronicsClient({
   return (
     <div>
       {/* Page header: teal accent bar + title + Add button */}
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <h2 className="font-display text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-[#0d9488] pl-3">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-[#0d9488] pl-3 sm:text-[32px]">
           Electronics
         </h2>
         <Button
           onClick={openAdd}
-          className="bg-[#0d9488] text-white hover:bg-[#0f766e] h-10 px-4 gap-2 rounded-full"
+          className="bg-[#0d9488] text-white hover:bg-[#0f766e] h-11 px-4 gap-2 rounded-full"
         >
           <Plus className="h-4 w-4" />
           Add Item
@@ -378,7 +378,7 @@ export function ElectronicsClient({
                     <button
                       type="button"
                       onClick={() => openEdit(item)}
-                      className="rounded-lg p-1.5 text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-[#0d9488]"
+                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-[#0d9488]"
                       title="Edit"
                     >
                       <Pencil className="h-4 w-4" />
@@ -386,7 +386,7 @@ export function ElectronicsClient({
                     <button
                       type="button"
                       onClick={() => setDeleteTarget(item)}
-                      className="rounded-lg p-1.5 text-kinship-on-surface-variant hover:bg-red-50 hover:text-red-600"
+                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant hover:bg-red-50 hover:text-red-600"
                       title="Delete"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -572,7 +572,7 @@ function ItemDialog({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <Label htmlFor="brand">Brand</Label>
               <Input id="brand" {...register('brand')} className="mt-1" />
@@ -583,7 +583,7 @@ function ItemDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <Label>Purchase date</Label>
               <div className="mt-1">
