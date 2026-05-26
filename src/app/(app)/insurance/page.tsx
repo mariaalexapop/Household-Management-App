@@ -4,8 +4,7 @@ import { db } from '@/lib/db'
 import { insurancePolicies, documents, householdMembers, children, cars } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { InsuranceClient } from './InsuranceClient'
-import { AppHeader } from '@/components/nav/AppHeader'
-import { Breadcrumb } from '@/components/nav/Breadcrumb'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = { title: 'Insurance — Kinship' }
 
@@ -110,10 +109,10 @@ export default async function InsurancePage() {
   }))
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Insurance" />
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Insurance' }]} />
+    <>
+      <TopBar title="Insurance" backHref="/dashboard" backLabel="Dashboard" />
+
+      <main className="flex-1 overflow-auto px-6 py-2">
         <InsuranceClient
           policies={policies}
           documents={docs}
@@ -122,6 +121,6 @@ export default async function InsurancePage() {
           cars={carRows.map((c) => ({ id: c.id, label: `${c.make} ${c.model} (${c.plate})` }))}
         />
       </main>
-    </div>
+    </>
   )
 }

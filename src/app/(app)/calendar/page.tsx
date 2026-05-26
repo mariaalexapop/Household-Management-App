@@ -13,7 +13,7 @@ import {
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { CalendarClient } from './CalendarClient'
-import { AppHeader } from '@/components/nav/AppHeader'
+import { TopBar } from '@/components/nav/TopBar'
 import { MODULE_COLOURS, toCalendarLabel, type CalendarEvent } from '@/lib/calendar/types'
 import { childHex, registerChildren } from '@/lib/kids/child-colours'
 
@@ -298,14 +298,12 @@ export default async function CalendarPage() {
   void windowEnd
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Calendar" />
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
+    <>
+      <TopBar title="Calendar" subtitle="Everything on your household's radar" />
+
+      <main className="flex-1 overflow-auto px-6 py-2">
         <CalendarClient events={allEvents} />
       </main>
-    </div>
+    </>
   )
 }

@@ -26,14 +26,14 @@ function getInitials(name: string | null): string {
 function StatusBadge({ status }: { status: string }) {
   if (status === 'in_progress') {
     return (
-      <Badge className="bg-kinship-primary-surface text-kinship-primary border-0">In Progress</Badge>
+      <Badge className="rounded-full border border-kinship-primary bg-kinship-primary-surface text-kinship-primary font-body text-xs font-medium">In Progress</Badge>
     )
   }
   if (status === 'done') {
-    return <Badge className="bg-kinship-success-surface text-kinship-success border-0">Done</Badge>
+    return <Badge className="rounded-full border border-kinship-success bg-kinship-success-surface text-kinship-success font-body text-xs font-medium">Done</Badge>
   }
   // todo
-  return <Badge variant="secondary">To Do</Badge>
+  return <Badge className="rounded-full border border-kinship-outline bg-kinship-surface text-kinship-on-surface-variant font-body text-xs font-medium">To Do</Badge>
 }
 
 // ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit, selec
 
   return (
     <Card
-      className={`relative overflow-visible bg-white rounded-xl ring-miro border-0 p-4 transition-all ${isDone ? 'opacity-60' : ''} ${selected ? 'ring-2 ring-kinship-primary' : ''}`}
+      className={`relative overflow-visible bg-white rounded-xl ring-miro border-0 px-3.5 py-3 transition-all ${isDone ? 'opacity-60' : ''} ${selected ? 'ring-2 ring-kinship-primary' : ''}`}
     >
       <div className="flex items-start gap-3">
         {/* Select checkbox or Done checkbox */}
@@ -77,10 +77,10 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit, selec
             type="button"
             onClick={() => onToggleSelect?.(task.id)}
             aria-label={`Select ${task.title}`}
-            className={`h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
+            className={`mt-0.5 h-5 w-5 shrink-0 flex items-center justify-center rounded-[5px] border-[1.5px] transition-colors ${
               selected
                 ? 'border-kinship-primary bg-kinship-primary'
-                : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
+                : 'border-kinship-border-strong bg-white hover:border-kinship-primary'
             }`}
           >
             {selected && (
@@ -94,10 +94,10 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit, selec
             type="button"
             onClick={handleCheckbox}
             aria-label={`Mark ${task.title} complete`}
-            className={`h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
+            className={`mt-0.5 h-5 w-5 shrink-0 flex items-center justify-center rounded-[5px] border-[1.5px] transition-colors ${
               isDone
                 ? 'border-kinship-primary bg-kinship-primary'
-                : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
+                : 'border-kinship-border-strong bg-white hover:border-kinship-primary'
             }`}
           >
             {isDone && (
@@ -110,51 +110,42 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit, selec
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          {/* Row 1: Title + Area badge + Due date */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`font-display text-base font-semibold text-kinship-on-surface ${isDone ? 'line-through' : ''}`}
-            >
-              {task.title}
-            </span>
+          {/* Row 1: Title */}
+          <span
+            className={`font-display text-sm font-semibold text-kinship-on-surface ${isDone ? 'line-through' : ''}`}
+          >
+            {task.title}
+          </span>
+
+          {/* Row 2: Area badge + Due date + Recurrence */}
+          <div className="mt-1 flex flex-wrap items-center gap-2">
             {task.areaName && (
-              <Badge className="shrink-0 bg-module-chores-light text-module-chores-dark border-0 rounded-md px-2 py-1 text-sm">
+              <span className="inline-flex shrink-0 rounded-md bg-module-chores-light px-2 py-0.5 font-body text-xs font-medium text-module-chores-dark">
                 {task.areaName}
-              </Badge>
+              </span>
             )}
             {task.startsAt && (
-              <span className="font-body text-sm text-kinship-on-surface-variant">
+              <span className="font-body text-xs text-kinship-on-surface-variant">
                 {format(task.startsAt, 'EEE, d MMM')}
               </span>
             )}
-          </div>
-
-          {/* Row 2: Notes excerpt */}
-          {task.notes && (
-            <p className="mt-1 font-body text-sm text-kinship-on-surface-variant line-clamp-1">
-              {task.notes}
-            </p>
-          )}
-
-          {/* Row 3: Owner */}
-          <div className="mt-2 flex items-center gap-2">
-            {owner ? (
-              <>
-                <Avatar size="sm">
-                  {owner.avatarUrl && <AvatarImage src={owner.avatarUrl} alt={owner.displayName ?? ''} />}
-                  <AvatarFallback>{getInitials(owner.displayName)}</AvatarFallback>
-                </Avatar>
-                <span className="font-body text-sm text-kinship-on-surface-variant">
-                  {owner.displayName ?? 'Unknown'}
-                </span>
-              </>
-            ) : null}
+            {task.isRecurring && (
+              <span className="font-body text-xs text-kinship-on-surface-variant" title="Recurring task">
+                &#x21bb;
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Status + Action menu */}
-        <div className="flex shrink-0 self-center items-center gap-1">
+        {/* Right side: Status + Avatar + Action menu */}
+        <div className="flex shrink-0 items-center gap-2 self-center">
           <StatusBadge status={task.status} />
+          {owner && (
+            <Avatar size="sm">
+              {owner.avatarUrl && <AvatarImage src={owner.avatarUrl} alt={owner.displayName ?? ''} />}
+              <AvatarFallback>{getInitials(owner.displayName)}</AvatarFallback>
+            </Avatar>
+          )}
           <div className="relative">
             <Button
               variant="ghost"

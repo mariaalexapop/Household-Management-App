@@ -1,7 +1,6 @@
-import { Car, Plus } from 'lucide-react'
-import { format, differenceInCalendarDays } from 'date-fns'
+import { Car, ChevronRight } from 'lucide-react'
+import { differenceInCalendarDays } from 'date-fns'
 import Link from 'next/link'
-import { Card } from '@/components/ui/card'
 
 export interface UpcomingCar {
   id: string
@@ -16,97 +15,86 @@ interface CarDashboardCardProps {
   cars: UpcomingCar[]
 }
 
-interface KeyDate {
+interface CountdownChip {
   carLabel: string
   type: 'MOT' | 'Tax' | 'Service'
-  date: Date
+  days: number
 }
 
-function collectKeyDates(cars: UpcomingCar[]): KeyDate[] {
+function collectChips(cars: UpcomingCar[]): CountdownChip[] {
   const today = new Date()
-  const dates: KeyDate[] = []
+  const chips: CountdownChip[] = []
   for (const c of cars) {
     const label = `${c.make} ${c.model}`
-    if (c.motDueDate) dates.push({ carLabel: label, type: 'MOT', date: new Date(c.motDueDate) })
-    if (c.taxDueDate) dates.push({ carLabel: label, type: 'Tax', date: new Date(c.taxDueDate) })
-    if (c.nextServiceDate) dates.push({ carLabel: label, type: 'Service', date: new Date(c.nextServiceDate) })
+    if (c.motDueDate) {
+      const days = differenceInCalendarDays(new Date(c.motDueDate), today)
+      if (days >= -1) chips.push({ carLabel: label, type: 'MOT', days })
+    }
+    if (c.taxDueDate) {
+      const days = differenceInCalendarDays(new Date(c.taxDueDate), today)
+      if (days >= -1) chips.push({ carLabel: label, type: 'Tax', days })
+    }
+    if (c.nextServiceDate) {
+      const days = differenceInCalendarDays(new Date(c.nextServiceDate), today)
+      if (days >= -1) chips.push({ carLabel: label, type: 'Service', days })
+    }
   }
-  return dates
-    .filter((d) => differenceInCalendarDays(d.date, today) >= -1)
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(0, 3)
+  return chips.sort((a, b) => a.days - b.days).slice(0, 4)
+}
+
+function chipColour(days: number): string {
+  if (days <= 0) return 'bg-red-100 text-red-700'
+  if (days <= 14) return 'bg-amber-100 text-amber-700'
+  return 'bg-[#ffe6cd] text-[#7a4000]'
 }
 
 export function CarDashboardCard({ cars }: CarDashboardCardProps) {
-  const upcoming = collectKeyDates(cars)
-  const today = new Date()
+  const chips = collectChips(cars)
 
   return (
-    <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
-      <div className="absolute left-0 top-0 h-1 w-full rounded-t-2xl bg-[#ea580c]" aria-hidden="true" />
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Car className="h-5 w-5 text-[#ea580c]" aria-hidden="true" />
-          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Cars</h3>
-        </div>
+    <div className="bg-white rounded-2xl ring-miro overflow-hidden">
+      {/* Colored header */}
+      <div className="bg-[#ffe6cd] px-3.5 py-2.5 flex items-center gap-2 text-[#7a4000]">
+        <Car className="h-4 w-4" />
+        <span className="font-display font-semibold text-[13px]">Cars</span>
+        <span className="flex-1" />
+        <span className="font-body text-[11px] font-medium opacity-80">
+          {cars.length} {cars.length === 1 ? 'vehicle' : 'vehicles'}
+        </span>
         <Link
-          href="/cars?action=new"
-          className="flex h-7 w-7 items-center justify-center rounded-full text-[#ea580c] hover:bg-[#ea580c]/10 transition-colors"
-          aria-label="Add new car"
+          href="/cars"
+          className="flex items-center gap-0.5 font-body text-[11px] font-medium hover:underline"
         >
-          <Plus className="h-4 w-4" />
+          See all <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
-
-      {cars.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-2">
-          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+      {/* Content - countdown chips */}
+      <div className="px-3.5 py-2.5">
+        {cars.length === 0 ? (
+          <p className="font-body text-sm text-kinship-on-surface-variant py-1">
             No cars tracked.
           </p>
-          <Link
-            href="/cars?action=new"
-            className="rounded-full bg-[#ea580c] px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-[#ea580c]/90 transition-colors"
-          >
-            Add your first car
-          </Link>
-        </div>
-      ) : upcoming.length === 0 ? (
-        <p className="font-body text-sm text-kinship-on-surface-variant">
-          No upcoming key dates.
-        </p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {upcoming.map((d, i) => {
-            const days = differenceInCalendarDays(d.date, today)
-            return (
-              <li key={`${d.carLabel}-${d.type}-${i}`} className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-body text-sm text-kinship-on-surface truncate">
-                    {d.type}: {d.carLabel}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="font-body text-xs text-kinship-on-surface-variant">
-                    {format(d.date, 'EEE d MMM')}
-                  </span>
-                  <span
-                    className="rounded-full px-2 py-px font-medium text-white shrink-0 whitespace-nowrap"
-                    style={{ backgroundColor: '#ea580c', fontSize: '11px', lineHeight: '18px' }}
-                  >
-                    {days <= 0 ? 'today' : `${days}d`}
-                  </span>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-
-      <div className="pt-2 border-t border-kinship-surface-container">
-        <a href="/cars" className="font-body text-sm text-[#ea580c] hover:underline">
-          View all cars →
-        </a>
+        ) : chips.length === 0 ? (
+          <p className="font-body text-sm text-kinship-on-surface-variant py-1">
+            No upcoming key dates.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {chips.map((chip, i) => (
+              <span
+                key={`${chip.carLabel}-${chip.type}-${i}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-body text-[11px] font-medium ${chipColour(chip.days)}`}
+              >
+                <span className="font-semibold">{chip.type}</span>
+                <span className="opacity-70">{chip.carLabel}</span>
+                <span className="ml-0.5 font-semibold">
+                  {chip.days <= 0 ? 'today' : `${chip.days}d`}
+                </span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-    </Card>
+    </div>
   )
 }

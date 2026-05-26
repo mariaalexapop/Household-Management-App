@@ -29,17 +29,30 @@
   --color-kinship-success-surface: #d6f5eb;
   --color-kinship-destructive: #e53e3e;
   --color-kinship-destructive-surface: #fbd4d4;
+  --color-kinship-warn: #d97706;
+  --color-kinship-warn-surface: #fde7c6;
 
-  /* Placeholder / muted */
+  /* Placeholder / muted / faint */
   --color-kinship-placeholder: #a5a8b5;
+  --color-kinship-text-faint: #a5a8b5;
+  --color-kinship-border-strong: #c7cad5;
 
-  /* Module accents — Miro pastel pairs */
+  /* Module accents — Design handoff Direction A */
   --color-module-chores-light: #c3faf5;
   --color-module-chores-dark: #187574;
   --color-module-chores-dot: #187574;
   --color-module-kids-light: #ffc6c6;
   --color-module-kids-dark: #600000;
   --color-module-kids-dot: #e05252;
+  --color-module-car-light: #ffe6cd;
+  --color-module-car-dark: #7a4000;
+  --color-module-car-dot: #c67d2a;
+  --color-module-ins-light: #d9d4ff;
+  --color-module-ins-dark: #3d2a8a;
+  --color-module-ins-dot: #6a55d9;
+  --color-module-elec-light: #d4f5c3;
+  --color-module-elec-dark: #1f5c1f;
+  --color-module-elec-dot: #3f9b3f;
   --color-module-calendar-light: #ffd8f4;
   --color-module-calendar-dark: #7a1060;
   --color-module-calendar-dot: #b34a9c;
@@ -53,12 +66,14 @@
   --color-category-sport-dark: #7a4000;
   --color-category-hobby-light: #ffd8f4;
   --color-category-hobby-dark: #7a1060;
+  --color-category-social-light: #d4f5c3;
+  --color-category-social-dark: #1f5c1f;
 
   /* Kinship typography — references CSS vars set by next/font in layout.tsx */
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-sans: var(--font-body);
-  --font-mono: ui-monospace, monospace;
+  --font-mono: var(--font-mono-code), ui-monospace, monospace;
   --font-heading: var(--font-display);
 
   --color-background: var(--background);

@@ -9,55 +9,62 @@ import { ChatbotProvider } from '@/components/chatbot/ChatbotProvider'
 import { ChatbotFab } from '@/components/chatbot/ChatbotFab'
 import { ChatbotDock } from '@/components/chatbot/ChatbotDock'
 import { BottomNav } from '@/components/nav/BottomNav'
+import { Sidebar } from '@/components/nav/Sidebar'
+import { SearchPalette } from '@/components/search/SearchPalette'
 
-/**
- * Protected (app) layout.
- *
- * Server-queries the current user's household_id. If the user belongs to a
- * household, wraps children with RealtimeProvider so all protected pages get
- * live updates. ConnectionIndicator is rendered inside the provider so it can
- * read the connection status from context.
- *
- * Pages under /onboarding (the wizard) render outside this layout group and
- * therefore do not need realtime subscriptions.
- */
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  // Auth — use getUser() (not getSession()) per security conventions
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) {
-    // Individual pages handle auth redirects; layout is permissive to avoid
-    // double-redirect issues during sign-in flows
     return <>{children}</>
   }
 
-  // Fetch the household_id for this user
-  const memberRow = await db
-    .select({ householdId: householdMembers.householdId })
+  // Fetch user's membership + display info
+  const [memberRow] = await db
+    .select({
+      householdId: householdMembers.householdId,
+      displayName: householdMembers.displayName,
+      avatarUrl: householdMembers.avatarUrl,
+    })
     .from(householdMembers)
     .where(eq(householdMembers.userId, user.id))
     .limit(1)
 
-  const householdId = memberRow[0]?.householdId ?? null
+  const householdId = memberRow?.householdId ?? null
 
-  // If no household yet (user is mid-onboarding), render without realtime
   if (!householdId) {
     return <>{children}</>
   }
+
+  const displayName = memberRow?.displayName ?? user.email?.split('@')[0] ?? 'User'
+  const initials = displayName
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
 
   return (
     <RealtimeProvider householdId={householdId} userId={user.id}>
       <ChatbotProvider>
         <ConnectionIndicator />
-        <div className="mobile-only-pb">
-          {children}
+        <div className="flex min-h-screen bg-kinship-surface">
+          <Sidebar
+            userName={displayName}
+            userInitials={initials}
+            userEmail={user.email}
+          />
+          <main className="flex-1 min-w-0 flex flex-col mobile-only-pb">
+            {children}
+          </main>
         </div>
         <ChatbotFab />
         <ChatbotDock />
         <BottomNav />
+        <SearchPalette />
       </ChatbotProvider>
     </RealtimeProvider>
   )

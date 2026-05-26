@@ -1,7 +1,6 @@
-import { CheckSquare, Plus } from 'lucide-react'
+import { CheckSquare, ChevronRight } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
-import { Card } from '@/components/ui/card'
 
 export interface UpcomingTask {
   id: string
@@ -16,61 +15,52 @@ interface ChoresDashboardCardProps {
 
 export function ChoresDashboardCard({ tasks }: ChoresDashboardCardProps) {
   return (
-    <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CheckSquare className="h-5 w-5 text-kinship-primary" aria-hidden="true" />
-          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Home Chores</h3>
-        </div>
+    <div className="bg-white rounded-2xl ring-miro overflow-hidden">
+      {/* Colored header */}
+      <div className="bg-[#c3faf5] px-3.5 py-2.5 flex items-center gap-2 text-[#187574]">
+        <CheckSquare className="h-4 w-4" />
+        <span className="font-display font-semibold text-[13px]">Home Chores</span>
+        <span className="flex-1" />
+        <span className="font-body text-[11px] font-medium opacity-80">
+          {tasks.length} upcoming
+        </span>
         <Link
-          href="/chores?action=new"
-          className="flex h-7 w-7 items-center justify-center rounded-full text-kinship-primary hover:bg-kinship-primary/10 transition-colors"
-          aria-label="Add new task"
+          href="/chores"
+          className="flex items-center gap-0.5 font-body text-[11px] font-medium hover:underline"
         >
-          <Plus className="h-4 w-4" />
+          See all <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
-
-      {tasks.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-2">
-          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+      {/* Content */}
+      <div className="px-3.5 py-2.5">
+        {tasks.length === 0 ? (
+          <p className="font-body text-sm text-kinship-on-surface-variant py-1">
             No upcoming tasks.
           </p>
-          <Link
-            href="/chores?action=new"
-            className="rounded-full bg-kinship-primary px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-kinship-primary/90 transition-colors"
-          >
-            Add your first task
-          </Link>
-        </div>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {tasks.map(task => (
-            <li key={task.id} className="flex items-center justify-between gap-2">
-              <span className="font-body text-sm text-kinship-on-surface truncate">{task.title}</span>
-              <div className="flex items-center gap-2 shrink-0">
-                {task.areaName && (
-                  <span className="font-body text-xs text-kinship-on-surface-variant">{task.areaName}</span>
-                )}
-                {task.startsAt && (
-                  <span className="font-body text-xs text-kinship-on-surface-variant">
-                    {format(new Date(task.startsAt), 'EEE d MMM')}
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="pt-2 border-t border-kinship-surface-container">
-        <a
-          href="/chores"
-          className="font-body text-sm text-kinship-primary hover:underline"
-        >
-          View all tasks →
-        </a>
+        ) : (
+          <ul className="flex flex-col">
+            {tasks.map((task) => (
+              <li key={task.id} className="flex items-center justify-between gap-2 py-1.5">
+                <span className="font-body text-sm text-kinship-on-surface truncate">
+                  {task.title}
+                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  {task.areaName && (
+                    <span className="font-body text-[11px] text-kinship-on-surface-variant">
+                      {task.areaName}
+                    </span>
+                  )}
+                  {task.startsAt && (
+                    <span className="font-body text-[11px] text-kinship-on-surface-variant">
+                      {format(new Date(task.startsAt), 'EEE d MMM')}
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </Card>
+    </div>
   )
 }

@@ -126,27 +126,30 @@ export function KidsClient({
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">Kids Activities</h2>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setView('list')}
-            className={`min-h-11 min-w-11 rounded-lg p-2 flex items-center justify-center ${
-              view === 'list'
-                ? 'bg-module-kids-light text-module-kids-dark'
-                : 'hover:bg-kinship-surface-container text-kinship-on-surface'
-            }`}
-            aria-label="List view"
-          >
-            <List size={18} />
-          </button>
-          <a
-            href="/calendar?filter=kids_activities"
-            className="min-h-11 min-w-11 rounded-lg p-2 flex items-center justify-center hover:bg-kinship-surface-container text-kinship-on-surface"
-            aria-label="View in calendar"
-          >
-            <Calendar size={18} />
-          </a>
+          {/* List / Calendar pill switcher */}
+          <div className="flex rounded-full border border-kinship-outline-variant bg-white p-0.5">
+            <button
+              onClick={() => setView('list')}
+              className={`flex items-center justify-center rounded-full px-3 py-1.5 transition-colors ${
+                view === 'list'
+                  ? 'bg-module-kids-light text-module-kids-dark'
+                  : 'text-kinship-on-surface-variant hover:text-kinship-on-surface'
+              }`}
+              aria-label="List view"
+            >
+              <List size={16} />
+            </button>
+            <a
+              href="/calendar?filter=kids_activities"
+              className="flex items-center justify-center rounded-full px-3 py-1.5 text-kinship-on-surface-variant hover:text-kinship-on-surface transition-colors"
+              aria-label="View in calendar"
+            >
+              <Calendar size={16} />
+            </a>
+          </div>
           <Button
             onClick={handleAdd}
-            className="ml-2 min-h-11 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
+            className="ml-1 min-h-11 rounded-full bg-module-kids-dot text-white hover:bg-module-kids-dark"
           >
             + Add Activity
           </Button>

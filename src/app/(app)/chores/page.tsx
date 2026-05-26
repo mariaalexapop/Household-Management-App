@@ -5,8 +5,7 @@ import { tasks, choreAreas, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ChoresClient } from './ChoresClient'
 import { seedDefaultAreas } from '@/app/actions/tasks'
-import { AppHeader } from '@/components/nav/AppHeader'
-import { Breadcrumb } from '@/components/nav/Breadcrumb'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = { title: 'Home Chores — Kinship' }
 
@@ -100,16 +99,15 @@ export default async function ChoresPage({
   ).length
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Home Chores" />
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Home Chores' }]} />
-        <div className="mb-6">
-          <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-module-chores-dark pl-3 sm:text-[32px]">Home Chores</h2>
-          <p className="font-body text-base text-kinship-on-surface-variant">
-            {dueThisWeek} {dueThisWeek === 1 ? 'task' : 'tasks'} due this week
-          </p>
-        </div>
+    <>
+      <TopBar
+        title="Home Chores"
+        subtitle={`${dueThisWeek} ${dueThisWeek === 1 ? 'task' : 'tasks'} due this week`}
+        backHref="/dashboard"
+        backLabel="Dashboard"
+      />
+
+      <main className="flex-1 overflow-auto px-6 py-2">
         <ChoresClient
           initialTasks={filtered}
           areas={areas}
@@ -117,6 +115,6 @@ export default async function ChoresPage({
           currentUserId={user.id}
         />
       </main>
-    </div>
+    </>
   )
 }

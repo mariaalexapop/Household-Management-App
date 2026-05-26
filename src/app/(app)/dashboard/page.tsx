@@ -22,7 +22,7 @@ import type { UpcomingActivity } from '@/components/dashboard/KidsDashboardCard'
 import type { UpcomingCar } from '@/components/dashboard/CarDashboardCard'
 import type { UpcomingPolicy } from '@/components/dashboard/InsuranceDashboardCard'
 import type { UpcomingElectronic } from '@/components/dashboard/ElectronicsDashboardCard'
-import { AppHeader } from '@/components/nav/AppHeader'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = {
   title: 'Dashboard — Kinship',
@@ -171,14 +171,10 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle={row.householdName} />
+    <>
+      <TopBar title={row.householdName ?? 'Good afternoon'} subtitle="Your household at a glance" />
 
-      {/* Main content */}
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <h2 className="mb-6 font-display text-2xl font-semibold text-kinship-on-surface">
-          Your household
-        </h2>
+      <main className="flex-1 overflow-auto px-6 py-2">
         <DashboardGrid
           activeModules={activeModules}
           upcomingTasks={upcomingTasks}
@@ -188,6 +184,6 @@ export default async function DashboardPage() {
           upcomingElectronics={upcomingElectronics}
         />
       </main>
-    </div>
+    </>
   )
 }

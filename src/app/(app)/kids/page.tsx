@@ -4,8 +4,7 @@ import { db } from '@/lib/db'
 import { kidActivities, children, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { KidsClient } from './KidsClient'
-import { AppHeader } from '@/components/nav/AppHeader'
-import { Breadcrumb } from '@/components/nav/Breadcrumb'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = { title: 'Kids Activities — Kinship' }
 
@@ -68,10 +67,10 @@ export default async function KidsPage() {
     .where(eq(householdMembers.householdId, householdId))
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Kids Activities" />
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Kids Activities' }]} />
+    <>
+      <TopBar title="Kids Activities" backHref="/dashboard" backLabel="Dashboard" />
+
+      <main className="flex-1 overflow-auto px-6 py-2">
         <KidsClient
           initialActivities={allActivities}
           childList={childList}
@@ -80,6 +79,6 @@ export default async function KidsPage() {
           householdId={householdId}
         />
       </main>
-    </div>
+    </>
   )
 }

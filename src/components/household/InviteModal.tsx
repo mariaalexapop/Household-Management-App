@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +24,11 @@ type TabId = 'email' | 'link'
  * Admin-only dialog with two tabs:
  *   1. "Invite by email" — POST /api/household/invite
  *   2. "Share link"      — POST /api/household/invite/link
+ *
+ * Styled to match the design handoff:
+ *   - Centered card, 560px wide, white bg, rounded-2xl, ring-miro, 32px padding
+ *   - Heading: "Invite someone to the household"
+ *   - Email input, share link section with mono font
  */
 export function InviteModal({ householdId }: InviteModalProps) {
   const [open, setOpen] = useState(false)
@@ -118,139 +124,183 @@ export function InviteModal({ householdId }: InviteModalProps) {
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Invite a member</DialogTitle>
-        </DialogHeader>
+        <DialogContent className="max-w-[560px] rounded-2xl ring-miro bg-white p-8">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="font-display text-xl font-semibold text-kinship-on-surface">
+              Invite someone to the household
+            </DialogTitle>
+            <DialogDescription className="font-body text-sm text-kinship-on-surface-variant mt-1">
+              Send an email invite or share a link so they can join your household.
+            </DialogDescription>
+          </DialogHeader>
 
-        {/* Tabs */}
-        <div className="flex gap-1 border-b border-border mb-4">
-          <button
-            type="button"
-            onClick={() => setActiveTab('email')}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === 'email'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-kinship-on-surface-variant hover:text-foreground'
-            }`}
-          >
-            Invite by email
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('link')}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === 'link'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-kinship-on-surface-variant hover:text-foreground'
-            }`}
-          >
-            Share link
-          </button>
-        </div>
+          {/* Tabs */}
+          <div className="flex gap-1 border-b border-kinship-outline-variant mb-6">
+            <button
+              type="button"
+              onClick={() => setActiveTab('email')}
+              className={`px-4 py-2.5 font-body text-sm font-medium border-b-2 -mb-px transition-colors ${
+                activeTab === 'email'
+                  ? 'border-kinship-primary text-kinship-primary'
+                  : 'border-transparent text-kinship-on-surface-variant hover:text-kinship-on-surface'
+              }`}
+            >
+              Invite by email
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('link')}
+              className={`px-4 py-2.5 font-body text-sm font-medium border-b-2 -mb-px transition-colors ${
+                activeTab === 'link'
+                  ? 'border-kinship-primary text-kinship-primary'
+                  : 'border-transparent text-kinship-on-surface-variant hover:text-kinship-on-surface'
+              }`}
+            >
+              Share link
+            </button>
+          </div>
 
-        {/* Email tab */}
-        {activeTab === 'email' && (
-          <form onSubmit={handleSendEmailInvite} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="invite-email">Email address</Label>
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder="friend@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={emailLoading}
-              />
-            </div>
+          {/* Email tab */}
+          {activeTab === 'email' && (
+            <form onSubmit={handleSendEmailInvite} className="space-y-5">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="invite-email"
+                  className="font-body text-sm font-medium text-kinship-on-surface"
+                >
+                  Email address
+                </Label>
+                <Input
+                  id="invite-email"
+                  type="email"
+                  placeholder="friend@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={emailLoading}
+                  className="h-11 rounded-xl border-kinship-outline-variant font-body text-sm"
+                />
+              </div>
 
-            {emailResult?.success && (
-              <p className="text-sm text-green-600">
-                Invite sent! They will receive a link to create their account and join.
-              </p>
-            )}
-            {emailResult?.error && (
-              <p className="text-sm text-destructive" role="alert">
-                {emailResult.error}
-              </p>
-            )}
+              {emailResult?.success && (
+                <div className="rounded-xl bg-kinship-success-surface p-3">
+                  <p className="font-body text-sm text-kinship-success">
+                    Invite sent! They will receive a link to create their account and join.
+                  </p>
+                </div>
+              )}
+              {emailResult?.error && (
+                <div className="rounded-xl bg-red-50 p-3">
+                  <p className="font-body text-sm text-destructive" role="alert">
+                    {emailResult.error}
+                  </p>
+                </div>
+              )}
 
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={resetAndClose}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={emailLoading || !email}>
-                {emailLoading ? 'Sending...' : 'Send invite'}
-              </Button>
-            </div>
-          </form>
-        )}
-
-        {/* Link tab */}
-        {activeTab === 'link' && (
-          <div className="space-y-4">
-            <p className="text-sm text-kinship-on-surface-variant">
-              Generate a shareable invite link. Anyone with this link can join your household.
-              Links expire after 7 days.
-            </p>
-
-            {!generatedLink ? (
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={resetAndClose}>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={resetAndClose}
+                  className="rounded-xl"
+                >
                   Cancel
                 </Button>
                 <Button
-                  type="button"
-                  onClick={handleGenerateLink}
-                  disabled={linkLoading}
+                  type="submit"
+                  disabled={emailLoading || !email}
+                  className="rounded-xl"
                 >
-                  {linkLoading ? 'Generating...' : 'Generate link'}
+                  {emailLoading ? 'Sending...' : 'Send invite'}
                 </Button>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={generatedLink}
-                    readOnly
-                    className="font-mono text-xs"
-                  />
+            </form>
+          )}
+
+          {/* Link tab */}
+          {activeTab === 'link' && (
+            <div className="space-y-5">
+              <p className="font-body text-sm text-kinship-on-surface-variant">
+                Generate a shareable invite link. Anyone with this link can join your household.
+                Links expire after 7 days.
+              </p>
+
+              {!generatedLink ? (
+                <div className="flex justify-end gap-3 pt-2">
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
-                    onClick={handleCopy}
+                    onClick={resetAndClose}
+                    className="rounded-xl"
                   >
-                    {copied ? 'Copied!' : 'Copy'}
-                  </Button>
-                </div>
-                <p className="text-xs text-kinship-on-surface-variant">
-                  Share this link with anyone you want to invite. It expires in 7 days.
-                </p>
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={resetAndClose}>
-                    Done
+                    Cancel
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
                     onClick={handleGenerateLink}
                     disabled={linkLoading}
+                    className="rounded-xl"
                   >
-                    Generate new link
+                    {linkLoading ? 'Generating...' : 'Generate link'}
                   </Button>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="space-y-4">
+                  {/* Share link display */}
+                  <div className="rounded-xl bg-kinship-surface-container-lowest p-4 ring-1 ring-kinship-outline-variant">
+                    <Label className="font-body text-xs font-medium text-kinship-on-surface-variant mb-2 block">
+                      Invite link
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <code className="flex-1 truncate rounded-lg bg-kinship-surface-container px-3 py-2 font-mono text-xs text-kinship-on-surface">
+                        {generatedLink}
+                      </code>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopy}
+                        className="shrink-0 rounded-xl"
+                      >
+                        {copied ? 'Copied!' : 'Copy link'}
+                      </Button>
+                    </div>
+                    <p className="font-body text-xs text-kinship-on-surface-variant mt-2">
+                      Share this link with anyone you want to invite. It expires in 7 days.
+                    </p>
+                  </div>
 
-            {linkError && (
-              <p className="text-sm text-destructive" role="alert">
-                {linkError}
-              </p>
-            )}
-          </div>
-        )}
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={resetAndClose}
+                      className="rounded-xl"
+                    >
+                      Done
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={handleGenerateLink}
+                      disabled={linkLoading}
+                      className="rounded-xl"
+                    >
+                      Generate new link
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {linkError && (
+                <div className="rounded-xl bg-red-50 p-3">
+                  <p className="font-body text-sm text-destructive" role="alert">
+                    {linkError}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>

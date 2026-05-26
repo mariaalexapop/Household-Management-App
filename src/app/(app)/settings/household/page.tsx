@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { desc, eq, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -8,7 +7,8 @@ import { MembersList } from '@/components/household/MembersList'
 import { InviteModal } from '@/components/household/InviteModal'
 import { ActivityFeedPreview } from './ActivityFeedPreview'
 import { ModuleToggleList } from '../modules/ModuleToggleList'
-import { AppHeader } from '@/components/nav/AppHeader'
+import { TopBar } from '@/components/nav/TopBar'
+import { SettingsSubNav } from '@/components/nav/SettingsSubNav'
 import type { ActivityFeedItem } from '@/components/realtime/RealtimeProvider'
 
 export const metadata = {
@@ -122,74 +122,65 @@ export default async function HouseholdSettingsPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Settings" />
+    <>
+      <TopBar title="Settings" subtitle="Household, members & modules" />
 
-      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 space-y-10">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
-        {/* Navigation links */}
-        <nav className="flex gap-4 text-sm font-medium">
-          <Link
-            href="/settings"
-            className="text-kinship-on-surface-variant hover:text-kinship-on-surface pb-1"
-          >
-            Profile
-          </Link>
-          <Link
-            href="/settings/household"
-            className="text-kinship-primary border-b-2 border-kinship-primary pb-1"
-          >
-            Household
-          </Link>
-        </nav>
-
-        {/* Members section */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
-              Members
-            </h2>
-            {isAdmin && <InviteModal householdId={householdId} />}
+      <div className="flex-1 overflow-auto px-6 py-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr]">
+          {/* Left sub-nav */}
+          <div className="hidden md:block">
+            <SettingsSubNav />
           </div>
 
-          <MembersList
-            members={allMembers}
-            currentUserId={user.id}
-            isAdmin={isAdmin}
-          />
-        </section>
+          {/* Right content */}
+          <main className="space-y-10">
+            {/* Members section */}
+            <section id="members">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
+                  Members
+                </h2>
+                {isAdmin && <InviteModal householdId={householdId} />}
+              </div>
 
-        <hr className="border-border" />
+              <MembersList
+                members={allMembers}
+                currentUserId={user.id}
+                isAdmin={isAdmin}
+              />
+            </section>
 
-        {/* Modules section */}
-        <section>
-          <div className="mb-4">
-            <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
-              Modules
-            </h2>
-            <p className="mt-1 text-sm text-kinship-on-surface-variant">
-              Enable or disable modules to customise your household dashboard.
-            </p>
-          </div>
+            <hr className="border-border" />
 
-          <ModuleToggleList
-            initialActiveModules={activeModules}
-            moduleLabels={MODULE_LABELS}
-          />
-        </section>
+            {/* Modules section */}
+            <section>
+              <div className="mb-4">
+                <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
+                  Modules
+                </h2>
+                <p className="mt-1 text-sm text-kinship-on-surface-variant">
+                  Enable or disable modules to customise your household dashboard.
+                </p>
+              </div>
 
-        <hr className="border-border" />
+              <ModuleToggleList
+                initialActiveModules={activeModules}
+                moduleLabels={MODULE_LABELS}
+              />
+            </section>
 
-        {/* Activity section — preview of 5 items */}
-        <section>
-          <h2 className="font-display text-xl font-semibold text-kinship-on-surface mb-4">
-            Notifications
-          </h2>
-          <ActivityFeedPreview initialItems={initialFeedItems} />
-        </section>
-      </main>
-    </div>
+            <hr className="border-border" />
+
+            {/* Activity section — preview of 5 items */}
+            <section>
+              <h2 className="font-display text-xl font-semibold text-kinship-on-surface mb-4">
+                Notifications
+              </h2>
+              <ActivityFeedPreview initialItems={initialFeedItems} />
+            </section>
+          </main>
+        </div>
+      </div>
+    </>
   )
 }

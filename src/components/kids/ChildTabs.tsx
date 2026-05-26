@@ -14,13 +14,13 @@ export function ChildTabs({ children, selectedChildIds, onToggle, onSelectAll }:
   const allSelected = selectedChildIds.size === 0
 
   return (
-    <div className="mb-4 flex flex-wrap gap-2">
+    <div className="mb-4 flex flex-wrap items-center gap-2">
       <button
         onClick={onSelectAll}
-        className={`rounded-full px-4 py-1.5 text-sm font-body transition-all ${
+        className={`rounded-full px-4 py-1.5 text-sm font-body font-medium transition-all ${
           allSelected
-            ? 'bg-kinship-primary text-white font-semibold shadow-sm'
-            : 'bg-kinship-surface-container text-kinship-on-surface hover:bg-kinship-surface-container-low'
+            ? 'bg-module-kids-light text-module-kids-dark font-semibold shadow-sm border border-module-kids-dark/20'
+            : 'bg-white border border-kinship-outline-variant text-kinship-on-surface hover:bg-kinship-surface-container-low'
         }`}
       >
         All
@@ -31,16 +31,15 @@ export function ChildTabs({ children, selectedChildIds, onToggle, onSelectAll }:
           <button
             key={child.id}
             onClick={() => onToggle(child.id)}
-            className={`rounded-full px-4 py-1.5 text-sm font-body transition-all flex items-center gap-2 ${
+            className={`rounded-full px-4 py-1.5 text-sm font-body font-medium transition-all flex items-center gap-2 ${
               isSelected
-                ? 'text-white font-semibold shadow-sm'
-                : 'bg-kinship-surface-container text-kinship-on-surface hover:bg-kinship-surface-container-low'
+                ? 'bg-module-kids-light text-module-kids-dark font-semibold shadow-sm border border-module-kids-dark/20'
+                : 'bg-white border border-kinship-outline-variant text-kinship-on-surface hover:bg-kinship-surface-container-low'
             }`}
-            style={isSelected ? { backgroundColor: childHex(child.id) } : undefined}
           >
             <span
               className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.5)' : childHex(child.id) }}
+              style={{ backgroundColor: isSelected ? childHex(child.id) : childHex(child.id) }}
             />
             {child.name}
           </button>

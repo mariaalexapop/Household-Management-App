@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Noto_Sans } from "next/font/google";
+import { Space_Grotesk, Noto_Sans, JetBrains_Mono } from "next/font/google";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
@@ -14,6 +14,12 @@ const notoSans = Noto_Sans({
   subsets: ["latin"],
   weight: ["400", "600"],
   style: ["normal"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-mono-code",
+  subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const viewport: Viewport = {
@@ -51,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${notoSans.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${notoSans.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-body">
         <ServiceWorkerRegistration />

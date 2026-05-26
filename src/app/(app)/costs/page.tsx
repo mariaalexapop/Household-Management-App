@@ -11,7 +11,7 @@ import {
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { CostsClient, type MonthlyCostRow } from './CostsClient'
-import { AppHeader } from '@/components/nav/AppHeader'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = { title: 'Costs — Kinship' }
 
@@ -213,18 +213,16 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Costs" />
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
+    <>
+      <TopBar title="Cost Summary" />
+
+      <main className="flex-1 overflow-auto px-6 py-2">
         <CostsClient
           monthlyRows={months}
           selectedYear={selectedYear}
           yearOptions={yearOptions}
         />
       </main>
-    </div>
+    </>
   )
 }

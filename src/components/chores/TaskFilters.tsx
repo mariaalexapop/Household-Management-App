@@ -1,5 +1,6 @@
 'use client'
 
+import { ChevronDown } from 'lucide-react'
 import type { AreaItem, FilterState } from '@/app/(app)/chores/ChoresClient'
 
 interface TaskFiltersProps {
@@ -9,87 +10,82 @@ interface TaskFiltersProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'todo', label: 'To Do' },
-  { value: 'in_progress', label: 'In Progress' },
+  { value: '', label: 'All' },
+  { value: 'todo', label: 'To do' },
+  { value: 'in_progress', label: 'In progress' },
   { value: 'done', label: 'Done' },
 ]
 
 export function TaskFilters({ areas, filters, onFiltersChange }: TaskFiltersProps) {
-  function toggleStatus(status: string) {
-    const current = filters.statusFilter
-    const next = current.includes(status)
-      ? current.filter((s) => s !== status)
-      : [...current, status]
-    onFiltersChange({ ...filters, statusFilter: next })
+  function setStatusFilter(status: string) {
+    if (status === '') {
+      onFiltersChange({ ...filters, statusFilter: [] })
+    } else {
+      onFiltersChange({ ...filters, statusFilter: [status] })
+    }
   }
 
   function handleAreaChange(e: React.ChangeEvent<HTMLSelectElement>) {
     onFiltersChange({ ...filters, areaFilter: e.target.value || null })
   }
 
-  function toggleSort() {
-    onFiltersChange({ ...filters, sortDir: filters.sortDir === 'asc' ? 'desc' : 'asc' })
-  }
-
   function toggleHideDone() {
     onFiltersChange({ ...filters, hideDone: !filters.hideDone })
   }
 
-  const isStatusActive = (status: string) => filters.statusFilter.includes(status)
+  const activeStatus = filters.statusFilter.length === 1 ? filters.statusFilter[0] : ''
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {/* Status multi-select buttons */}
-      <div className="flex items-center gap-1">
-        <span className="font-body text-sm text-kinship-on-surface-variant mr-1">Status:</span>
-        {STATUS_OPTIONS.map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => toggleStatus(value)}
-            className={`rounded-md border px-3 py-1 font-body text-sm transition-colors min-h-[36px] ${
-              isStatusActive(value)
-                ? 'bg-kinship-primary-surface text-kinship-primary border-kinship-primary'
-                : 'border-border text-kinship-on-surface-variant hover:border-kinship-on-surface/40'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+    <div className="flex flex-wrap items-center gap-3">
+      {/* Status pill buttons */}
+      <div className="flex items-center gap-1.5">
+        {STATUS_OPTIONS.map(({ value, label }) => {
+          const isActive = value === activeStatus
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setStatusFilter(value)}
+              className={`rounded-full border px-3.5 py-1.5 font-body text-sm font-medium transition-colors min-h-[36px] ${
+                isActive
+                  ? 'bg-kinship-primary-surface text-kinship-primary border-kinship-primary'
+                  : 'border-kinship-outline-variant text-kinship-on-surface-variant hover:border-kinship-on-surface/40 bg-white'
+              }`}
+            >
+              {label}
+            </button>
+          )
+        })}
       </div>
 
-      {/* Area dropdown */}
-      <select
-        value={filters.areaFilter ?? ''}
-        onChange={handleAreaChange}
-        className="h-9 rounded-md border border-border bg-white px-3 font-body text-sm text-kinship-on-surface focus:outline-none focus:ring-2 focus:ring-ring"
-        aria-label="Filter by area"
-      >
-        <option value="">All areas</option>
-        {areas.map((area) => (
-          <option key={area.id} value={area.id}>
-            {area.name}
-          </option>
-        ))}
-      </select>
+      {/* Separator */}
+      <div className="h-6 w-px bg-kinship-outline-variant" aria-hidden="true" />
 
-      {/* Sort direction toggle */}
-      <button
-        type="button"
-        onClick={toggleSort}
-        className="rounded-md border border-border px-3 py-1 font-body text-sm text-kinship-on-surface-variant hover:border-kinship-on-surface/40 min-h-[36px]"
-        aria-label="Toggle sort direction"
-      >
-        {filters.sortDir === 'asc' ? '↑ Date' : '↓ Date'}
-      </button>
+      {/* Area dropdown pill */}
+      <div className="relative">
+        <select
+          value={filters.areaFilter ?? ''}
+          onChange={handleAreaChange}
+          className="h-9 appearance-none rounded-full border border-kinship-outline-variant bg-white pl-3.5 pr-8 font-body text-sm text-kinship-on-surface-variant focus:outline-none focus:ring-2 focus:ring-kinship-primary"
+          aria-label="Filter by area"
+        >
+          <option value="">Area: All</option>
+          {areas.map((area) => (
+            <option key={area.id} value={area.id}>
+              {area.name}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-kinship-on-surface-variant" />
+      </div>
 
       {/* Hide done toggle */}
-      <label className="flex cursor-pointer items-center gap-2 font-body text-sm text-kinship-on-surface-variant">
+      <label className="flex cursor-pointer items-center gap-2 rounded-full border border-kinship-outline-variant bg-white px-3.5 py-1.5 font-body text-sm text-kinship-on-surface-variant transition-colors hover:border-kinship-on-surface/40">
         <input
           type="checkbox"
           checked={filters.hideDone}
           onChange={toggleHideDone}
-          className="h-4 w-4 rounded border-border"
+          className="h-4 w-4 rounded border-kinship-outline accent-kinship-primary"
         />
         Hide done
       </label>

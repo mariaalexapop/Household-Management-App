@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { desc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -6,7 +5,7 @@ import { activityFeed, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ActivityFeed } from '@/components/household/ActivityFeed'
 import type { ActivityFeedItem } from '@/components/realtime/RealtimeProvider'
-import { AppHeader } from '@/components/nav/AppHeader'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = {
   title: 'All Activity — Kinship',
@@ -60,18 +59,12 @@ export default async function ActivityPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="All Activity" />
+    <>
+      <TopBar title="Activity Feed" />
 
-      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
-        <h2 className="font-display text-xl font-semibold text-kinship-on-surface mb-4">
-          All Activity
-        </h2>
+      <main className="flex-1 overflow-auto px-6 py-2">
         <ActivityFeed initialItems={initialFeedItems} />
       </main>
-    </div>
+    </>
   )
 }

@@ -4,8 +4,7 @@ import { db } from '@/lib/db'
 import { cars, serviceRecords, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { CarsClient } from './CarsClient'
-import { AppHeader } from '@/components/nav/AppHeader'
-import { Breadcrumb } from '@/components/nav/Breadcrumb'
+import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = { title: 'Cars — Kinship' }
 
@@ -73,12 +72,12 @@ export default async function CarsPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-kinship-surface">
-      <AppHeader subtitle="Cars" />
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Cars' }]} />
+    <>
+      <TopBar title="Car Maintenance" backHref="/dashboard" backLabel="Dashboard" />
+
+      <main className="flex-1 overflow-auto px-6 py-2">
         <CarsClient cars={serializedCars} serviceRecords={serializedServiceRecords} />
       </main>
-    </div>
+    </>
   )
 }

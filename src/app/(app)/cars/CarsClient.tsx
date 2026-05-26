@@ -120,8 +120,12 @@ type ServiceFormValues = z.infer<typeof serviceFormSchema>
 // Helpers
 // ---------------------------------------------------------------------------
 
-const ORANGE = '#ea580c'
-const ORANGE_DARK = '#c2410c'
+// Module design tokens
+const CAR_LIGHT = '#ffe6cd'  // module-car-light
+const CAR_DARK = '#7a4000'   // module-car-dark
+const CAR_DOT = '#c67d2a'    // module-car-dot
+const WARN_COLOR = '#d97706'
+const WARN_SURFACE = '#fde7c6'
 
 const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
   full_service: 'Maintenance',
@@ -243,22 +247,15 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
 
   return (
     <div>
-      {/* Page header with orange accent */}
+      {/* Page header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div
-            className="h-8 w-1 rounded-full"
-            style={{ backgroundColor: ORANGE }}
-            aria-hidden="true"
-          />
-          <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
-            Cars
-          </h2>
-        </div>
+        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
+          Cars
+        </h2>
         <Button
           onClick={handleOpenAddCar}
           className="min-h-11 rounded-full text-white hover:opacity-90"
-          style={{ backgroundColor: ORANGE }}
+          style={{ backgroundColor: CAR_DOT }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add Car
         </Button>
@@ -273,7 +270,7 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {cars.map((car) => (
             <CarCard
               key={car.id}
@@ -310,7 +307,7 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
                   setShowAddService(true)
                 }}
                 className="min-h-11 rounded-full text-white hover:opacity-90"
-                style={{ backgroundColor: ORANGE }}
+                style={{ backgroundColor: CAR_DOT }}
               >
                 <Plus className="mr-1 h-4 w-4" /> Add Service Record
               </Button>
@@ -550,7 +547,7 @@ function CarCard({
         <div className="flex items-center gap-3">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-xl"
-            style={{ backgroundColor: `${ORANGE}1A`, color: ORANGE_DARK }}
+            style={{ backgroundColor: `${CAR_DOT}1A`, color: CAR_DARK }}
           >
             <Car className="h-5 w-5" />
           </div>
@@ -645,7 +642,7 @@ function KeyDateBadge({
         {date && (
           <span
             className="rounded-full px-1.5 py-0.5 font-body text-[10px] font-medium"
-            style={{ backgroundColor: `${ORANGE}1A`, color: ORANGE_DARK }}
+            style={{ backgroundColor: `${CAR_DOT}1A`, color: CAR_DARK }}
           >
             {days}d reminder
           </span>
@@ -953,7 +950,7 @@ function CarForm({
         <Button
           type="submit"
           className="rounded-full text-white hover:opacity-90"
-          style={{ backgroundColor: ORANGE }}
+          style={{ backgroundColor: CAR_DOT }}
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Add car'}
@@ -1116,7 +1113,7 @@ function ServiceRecordForm({
         <Button
           type="submit"
           className="rounded-full text-white hover:opacity-90"
-          style={{ backgroundColor: ORANGE }}
+          style={{ backgroundColor: CAR_DOT }}
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Add record'}
