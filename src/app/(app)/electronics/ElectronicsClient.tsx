@@ -137,7 +137,7 @@ function warrantyStatus(iso: string | null): {
   return {
     label: `Warranty expires in ${formatDistanceToNowStrict(expiry)}`,
     icon: ShieldCheck,
-    className: 'text-[#0d9488]',
+    className: 'text-module-elec-dot',
   }
 }
 
@@ -282,14 +282,14 @@ export function ElectronicsClient({
 
   return (
     <div>
-      {/* Page header: teal accent bar + title + Add button */}
+      {/* Page header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-[#0d9488] pl-3 sm:text-[32px]">
+        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
           Electronics
         </h2>
         <Button
           onClick={openAdd}
-          className="bg-[#0d9488] text-white hover:bg-[#0f766e] h-11 px-4 gap-2 rounded-full"
+          className="bg-module-elec-dot text-white hover:bg-module-elec-dark h-11 px-4 gap-2 rounded-full"
         >
           <Plus className="h-4 w-4" />
           Add Item
@@ -308,68 +308,100 @@ export function ElectronicsClient({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {items.map((item) => {
             const status = warrantyStatus(item.warrantyExpiryDate)
             const StatusIcon = status.icon
             const itemDocs = docsByItemId.get(item.id) ?? []
             const isExpanded = expandedItemId === item.id
 
+            // Check if warranty expiring within 6 months
+            const warrantyExpiringSoon = (() => {
+              if (!item.warrantyExpiryDate) return false
+              const expiry = parseISO(item.warrantyExpiryDate)
+              if (isNaN(expiry.getTime())) return false
+              const diff = expiry.getTime() - Date.now()
+              return diff > 0 && diff < 180 * 24 * 60 * 60 * 1000
+            })()
+
+            // Count docs by type
+            const manualDocs = itemDocs.filter((d) => d.documentType === 'manual')
+            const receiptDocs = itemDocs.filter((d) => d.documentType === 'warranty')
+
             return (
               <div
                 key={item.id}
                 className="rounded-xl ring-miro bg-white p-5 flex flex-col gap-3"
               >
-                {/* Header row: icon + name + brand/model */}
+                {/* Header row: icon + name + brand/room */}
                 <div className="flex items-start gap-3">
-                  <div className="rounded-lg bg-[#0d9488]/10 p-2 text-[#0d9488]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-module-elec-light text-module-elec-dark">
                     <Monitor className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-base font-semibold text-kinship-on-surface truncate">
-                      {item.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-display text-sm font-semibold text-kinship-on-surface truncate">
+                        {item.name}
+                      </h3>
+                      {warrantyExpiringSoon && (
+                        <span className="inline-flex shrink-0 rounded-full bg-kinship-warn-surface px-2 py-0.5 font-body text-[10px] font-medium text-kinship-warn">
+                          Expiring
+                        </span>
+                      )}
+                    </div>
                     {(item.brand || item.modelNumber) && (
                       <p className="font-body text-xs text-kinship-on-surface-variant truncate">
-                        {[item.brand, item.modelNumber].filter(Boolean).join(' · ')}
+                        {[item.brand, item.modelNumber].filter(Boolean).join(' \u00b7 ')}
                       </p>
                     )}
                   </div>
                 </div>
 
-                {/* Purchase + cost */}
-                <div className="flex items-center justify-between font-body text-sm">
-                  <span className="text-kinship-on-surface-variant">
-                    {formatDate(item.purchaseDate)}
-                  </span>
-                  <span className="font-medium text-kinship-on-surface">
-                    {formatCostFromCents(item.costCents)}
-                  </span>
+                {/* Grid: warranty date + purchase date */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-kinship-surface-container-lowest border border-kinship-outline-variant p-2.5">
+                    <p className="font-body text-[10px] font-medium uppercase tracking-wider text-kinship-on-surface-variant">Warranty</p>
+                    <p className="mt-0.5 font-body text-xs font-semibold text-kinship-on-surface">
+                      {formatDate(item.warrantyExpiryDate)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-kinship-surface-container-lowest border border-kinship-outline-variant p-2.5">
+                    <p className="font-body text-[10px] font-medium uppercase tracking-wider text-kinship-on-surface-variant">Purchased</p>
+                    <p className="mt-0.5 font-body text-xs font-semibold text-kinship-on-surface">
+                      {formatDate(item.purchaseDate)}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Warranty status */}
                 <div className={`flex items-center gap-2 font-body text-xs ${status.className}`}>
                   <StatusIcon className="h-4 w-4 shrink-0" />
                   <span className="truncate">{status.label}</span>
+                  <span className="ml-auto font-medium text-kinship-on-surface">
+                    {formatCostFromCents(item.costCents)}
+                  </span>
                 </div>
 
-                {/* Coverage summary (truncated, expandable via the item) */}
-                {item.coverageSummary && (
-                  <p
-                    className={`font-body text-xs text-kinship-on-surface-variant ${
-                      isExpanded ? '' : 'line-clamp-2'
-                    }`}
-                  >
-                    {item.coverageSummary}
-                  </p>
-                )}
+                {/* Document badges */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {manualDocs.length > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-module-elec-light px-2 py-0.5 font-body text-xs font-medium text-module-elec-dark">
+                      Manual
+                    </span>
+                  )}
+                  {receiptDocs.length > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-module-elec-light px-2 py-0.5 font-body text-xs font-medium text-module-elec-dark">
+                      Receipt
+                    </span>
+                  )}
+                </div>
 
                 {/* Actions */}
                 <div className="mt-auto flex items-center justify-between gap-2 pt-2 border-t border-kinship-surface-container">
                   <button
                     type="button"
                     onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
-                    className="flex items-center gap-1 font-body text-xs text-kinship-on-surface-variant hover:text-[#0d9488]"
+                    className="flex items-center gap-1 font-body text-xs text-kinship-on-surface-variant hover:text-module-elec-dot"
                   >
                     {isExpanded ? (
                       <>
@@ -387,7 +419,7 @@ export function ElectronicsClient({
                     <button
                       type="button"
                       onClick={() => openEdit(item)}
-                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-[#0d9488]"
+                      className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-kinship-on-surface-variant hover:bg-kinship-surface-container hover:text-module-elec-dot"
                       title="Edit"
                     >
                       <Pencil className="h-4 w-4" />
@@ -617,7 +649,7 @@ function ItemDialog({
             </div>
           </div>
 
-          <div className="rounded-lg bg-[#0d9488]/5 p-3">
+          <div className="rounded-lg bg-module-elec-light/30 p-3">
             <div>
               <Label>Warranty expiry date</Label>
               <div className="mt-1">
@@ -657,7 +689,7 @@ function ItemDialog({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="h-9 px-4 bg-[#0d9488] text-white hover:bg-[#0f766e]"
+              className="h-9 px-4 bg-module-elec-dot text-white hover:bg-module-elec-dark"
             >
               {isSubmitting ? 'Saving...' : editingItem ? 'Save changes' : 'Add item'}
             </Button>

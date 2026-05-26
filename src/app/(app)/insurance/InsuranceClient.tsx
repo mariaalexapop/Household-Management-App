@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
 import { toast } from 'sonner'
-import { Pencil, Trash2, ChevronDown, ChevronUp, Plus } from 'lucide-react'
+import { Pencil, Trash2, ChevronDown, ChevronUp, Plus, Shield, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -81,8 +81,10 @@ interface InsuranceClientProps {
 // Constants — Miro design system
 // ---------------------------------------------------------------------------
 
-const PURPLE = '#9333ea'
-const PURPLE_DARK = '#7e22ce'
+// Module design tokens
+const INS_LIGHT = '#d9d4ff'  // module-ins-light
+const INS_DARK = '#3d2a8a'   // module-ins-dark
+const INS_DOT = '#6a55d9'    // module-ins-dot
 
 const POLICY_TYPE_OPTIONS: { value: PolicyType; label: string }[] = [
   { value: 'home', label: 'Home' },
@@ -237,17 +239,15 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
 
   return (
     <div>
-      {/* Page header with purple accent */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-l-4 pl-4" style={{ borderColor: PURPLE }}>
+      {/* Page header */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
           Insurance
         </h2>
         <Button
           onClick={handleAdd}
-          className="min-h-11 rounded-full text-white"
-          style={{ backgroundColor: PURPLE }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PURPLE_DARK)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = PURPLE)}
+          className="min-h-11 rounded-full text-white hover:opacity-90"
+          style={{ backgroundColor: INS_DOT }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add Policy
         </Button>
@@ -271,70 +271,74 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
 
             return (
               <div key={policy.id} className="rounded-xl ring-miro bg-white p-5">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  {/* Shield icon square */}
+                  <div
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: INS_LIGHT, color: INS_DARK }}
+                  >
+                    <Shield className="h-5 w-5" />
+                  </div>
+
+                  {/* Main content */}
                   <div className="min-w-0 flex-1">
-                    <div className="mb-2 flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-display text-base font-semibold text-kinship-on-surface">
+                        {badge.label} Insurance
+                      </h3>
                       <span
-                        className={`inline-block rounded-md px-2 py-0.5 font-body text-xs font-medium ${badge.bg} ${badge.text}`}
+                        className="inline-flex rounded-md px-2 py-0.5 font-body text-xs font-medium"
+                        style={{ backgroundColor: INS_LIGHT, color: INS_DARK }}
                       >
-                        {badge.label}
+                        {policy.insurer}
                       </span>
-                      {policy.policyNumber && (
-                        <span className="font-body text-xs text-kinship-on-surface-variant">
-                          #{policy.policyNumber}
-                        </span>
+                      {/* Renewal warning badge */}
+                      {expiryDate && expiryDistance && (
+                        (() => {
+                          const daysUntil = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                          if (daysUntil > 0 && daysUntil <= 60) {
+                            return (
+                              <span className="inline-flex rounded-full px-2 py-0.5 font-body text-xs font-medium bg-kinship-warn-surface text-kinship-warn">
+                                Renews {expiryDistance}
+                              </span>
+                            )
+                          }
+                          return null
+                        })()
                       )}
                     </div>
-                    <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
-                      {policy.insurer}
-                      {policy.coveredName && (
-                        <span className="ml-2 font-body text-sm font-normal text-kinship-on-surface-variant">
-                          — {policy.coveredName}
-                        </span>
-                      )}
-                    </h3>
-                    <div className="mt-2 grid gap-1 font-body text-sm text-kinship-on-surface-variant sm:grid-cols-2">
-                      <div>
-                        <span className="font-medium">Expires:</span>{' '}
-                        {expiryDate ? (
-                          <>
-                            {format(expiryDate, 'd MMM yyyy')}{' '}
-                            <span className="text-kinship-on-surface-variant/80">({expiryDistance})</span>
-                          </>
-                        ) : (
-                          <span className="italic">Ongoing</span>
-                        )}
-                      </div>
+                    <p className="mt-1 font-body text-sm text-kinship-on-surface-variant">
+                      {policy.policyNumber ? `#${policy.policyNumber}` : 'No policy number'}
+                      {' \u00b7 '}
+                      {expiryDate ? `Expires ${format(expiryDate, 'd MMM yyyy')}` : 'Ongoing'}
+                    </p>
+
+                    {/* Premium + billing on desktop */}
+                    <div className="mt-2 flex flex-wrap items-center gap-4 font-body text-sm text-kinship-on-surface-variant">
                       {policy.paymentSchedule && (
-                        <div>
-                          <span className="font-medium">
-                            {PAYMENT_SCHEDULE_LABEL[policy.paymentSchedule]} premium:
-                          </span>{' '}
-                          {formatCostFromCents(policy.premiumCents)}
-                        </div>
+                        <span>
+                          <span className="font-medium text-kinship-on-surface">
+                            {formatCostFromCents(policy.premiumCents)}
+                          </span>
+                          {' / '}
+                          {PAYMENT_SCHEDULE_LABEL[policy.paymentSchedule].toLowerCase()}
+                        </span>
                       )}
                       {policy.nextPaymentDate && (
-                        <div>
-                          <span className="font-medium">Next payment:</span>{' '}
-                          {format(parseISO(policy.nextPaymentDate), 'd MMM yyyy')}
-                        </div>
+                        <span>
+                          Next: {format(parseISO(policy.nextPaymentDate), 'd MMM yyyy')}
+                        </span>
                       )}
-                      {policy.renewalContactName && (
-                        <div>
-                          <span className="font-medium">Renewal contact:</span> {policy.renewalContactName}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Reminder configuration display */}
-                    <div className="mt-3 flex flex-wrap gap-3 font-body text-xs text-kinship-on-surface-variant">
-                      <span>Expiry reminder: {policy.expiryReminderDays} days before</span>
-                      {policy.paymentSchedule && (
-                        <span>Payment reminder: {policy.paymentReminderDays} days before</span>
+                      {policyDocs.length > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-kinship-surface-container px-2 py-0.5 text-xs font-medium text-kinship-on-surface-variant">
+                          <FileText className="h-3 w-3" />
+                          {policyDocs.length} PDF{policyDocs.length !== 1 ? 's' : ''}
+                        </span>
                       )}
                     </div>
                   </div>
 
+                  {/* Actions */}
                   <div className="flex shrink-0 items-center gap-0.5">
                     <button
                       type="button"
@@ -652,7 +656,7 @@ function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: Policy
               <a
                 href="/cars?addCar=1"
                 className="mt-2 inline-block font-body text-sm font-medium"
-                style={{ color: PURPLE }}
+                style={{ color: INS_DOT }}
               >
                 Add a car first →
               </a>
@@ -842,7 +846,7 @@ function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: Policy
           type="submit"
           disabled={submitting}
           className="inline-flex shrink-0 items-center justify-center rounded-lg px-4 h-11 text-sm font-medium text-white disabled:pointer-events-none disabled:opacity-50"
-          style={{ backgroundColor: PURPLE }}
+          style={{ backgroundColor: INS_DOT }}
         >
           {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Policy'}
         </button>

@@ -326,74 +326,83 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
               No service records yet.
             </p>
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="relative flex flex-col gap-0">
+              {/* Timeline line */}
+              <div className="absolute left-[11px] top-4 bottom-4 w-0.5 bg-kinship-outline-variant" aria-hidden="true" />
               {recordsForSelectedCar.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-xl border border-kinship-outline-variant bg-kinship-surface-container-lowest p-4"
+                  className="relative flex gap-4 pb-4"
                 >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-body text-sm font-semibold text-kinship-on-surface">
-                          {formatDisplayDate(record.serviceDate)}
-                        </span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 font-body text-xs font-medium ${SERVICE_TYPE_BADGE_CLASSES[record.serviceType]}`}
-                        >
-                          {SERVICE_TYPE_LABELS[record.serviceType]}
-                        </span>
-                      </div>
-                      <div className="mt-2 grid grid-cols-1 gap-1 font-body text-sm text-kinship-on-surface-variant sm:grid-cols-3">
-                        {record.expiryDate && (
-                          <div>
-                            <span className="font-medium text-kinship-on-surface">Expires: </span>
-                            {formatDisplayDate(record.expiryDate)}
-                          </div>
-                        )}
-                        <div>
-                          <span className="font-medium text-kinship-on-surface">Cost: </span>
-                          {formatCostFromCents(record.costCents)}
+                  {/* Timeline dot */}
+                  <div className="relative z-10 mt-1 flex h-6 w-6 shrink-0 items-center justify-center">
+                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: CAR_DOT }} />
+                  </div>
+                  {/* Content card */}
+                  <div className="flex-1 rounded-xl border border-kinship-outline-variant bg-kinship-surface-container-lowest p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-body text-sm font-semibold text-kinship-on-surface">
+                            {formatDisplayDate(record.serviceDate)}
+                          </span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 font-body text-xs font-medium ${SERVICE_TYPE_BADGE_CLASSES[record.serviceType]}`}
+                          >
+                            {SERVICE_TYPE_LABELS[record.serviceType]}
+                          </span>
                         </div>
-                        {record.mileage != null && (
+                        <div className="mt-2 grid grid-cols-1 gap-1 font-body text-sm text-kinship-on-surface-variant sm:grid-cols-3">
+                          {record.expiryDate && (
+                            <div>
+                              <span className="font-medium text-kinship-on-surface">Expires: </span>
+                              {formatDisplayDate(record.expiryDate)}
+                            </div>
+                          )}
                           <div>
-                            <span className="font-medium text-kinship-on-surface">Mileage: </span>
-                            {record.mileage.toLocaleString()} mi
+                            <span className="font-medium text-kinship-on-surface">Cost: </span>
+                            {formatCostFromCents(record.costCents)}
                           </div>
-                        )}
-                        {record.garage && (
-                          <div>
-                            <span className="font-medium text-kinship-on-surface">Garage: </span>
-                            {record.garage}
-                          </div>
+                          {record.mileage != null && (
+                            <div>
+                              <span className="font-medium text-kinship-on-surface">Mileage: </span>
+                              {record.mileage.toLocaleString()} mi
+                            </div>
+                          )}
+                          {record.garage && (
+                            <div>
+                              <span className="font-medium text-kinship-on-surface">Garage: </span>
+                              {record.garage}
+                            </div>
+                          )}
+                        </div>
+                        {record.notes && (
+                          <p className="mt-2 font-body text-sm text-kinship-on-surface-variant">
+                            {record.notes}
+                          </p>
                         )}
                       </div>
-                      {record.notes && (
-                        <p className="mt-2 font-body text-sm text-kinship-on-surface-variant">
-                          {record.notes}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => {
-                          setEditingService(record)
-                          setShowAddService(true)
-                        }}
-                        aria-label="Edit service record"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setDeletingServiceId(record.id)}
-                        aria-label="Delete service record"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => {
+                            setEditingService(record)
+                            setShowAddService(true)
+                          }}
+                          aria-label="Edit service record"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setDeletingServiceId(record.id)}
+                          aria-label="Delete service record"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -539,75 +548,71 @@ function CarCard({
   onDelete: () => void
   onViewHistory: () => void
 }) {
+  // Check if MOT is due within 60 days
+  const motDueSoon = (() => {
+    if (!car.motDueDate) return false
+    const d = parseISO(car.motDueDate)
+    if (!isValid(d)) return false
+    const diff = d.getTime() - Date.now()
+    return diff > 0 && diff < 60 * 24 * 60 * 60 * 1000
+  })()
+
   return (
     <div
-      className={`flex h-full flex-col rounded-xl ring-miro bg-white p-5 transition-shadow ${selected ? 'shadow-lg' : ''}`}
+      className={`flex h-full flex-col rounded-xl ring-miro bg-white overflow-hidden transition-shadow ${selected ? 'shadow-lg' : ''}`}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl"
-            style={{ backgroundColor: `${CAR_DOT}1A`, color: CAR_DARK }}
-          >
-            <Car className="h-5 w-5" />
-          </div>
+      {/* Colored header */}
+      <div className="px-5 py-4" style={{ backgroundColor: CAR_LIGHT }}>
+        <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
+            <h3 className="font-display text-lg font-semibold" style={{ color: CAR_DARK }}>
               {car.make} {car.model}
             </h3>
-            <p className="font-body text-xs text-kinship-on-surface-variant">
-              {car.year} &middot; {car.plate}
+            <p className="mt-0.5 font-body text-sm font-medium" style={{ color: CAR_DARK }}>
+              {car.plate}
             </p>
           </div>
-        </div>
-        {car.colour && (
           <div className="flex items-center gap-1.5">
-            <span
-              className="h-4 w-4 rounded-full border border-kinship-outline-variant"
-              style={{ backgroundColor: car.colour }}
-              aria-hidden="true"
-            />
+            {car.colour && (
+              <span
+                className="h-5 w-5 rounded-full border border-white/50"
+                style={{ backgroundColor: car.colour }}
+                aria-hidden="true"
+              />
+            )}
+            <span className="font-body text-xs" style={{ color: CAR_DARK }}>{car.year}</span>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Key dates */}
-      <div className="mt-4 flex flex-col gap-1.5">
-        <KeyDateBadge label="MOT / ITP" date={car.motDueDate} days={car.motReminderDays} costCents={car.motCostCents} />
-        <KeyDateBadge label="Road Tax" date={car.taxDueDate} days={car.taxReminderDays} costCents={car.taxCostCents} />
-        <KeyDateBadge
-          label="Service"
-          date={car.nextServiceDate}
-          days={car.serviceReminderDays}
+      {/* Stat chips - 3-column grid */}
+      <div className="grid grid-cols-3 gap-2 px-4 py-4">
+        <StatChip label="Mileage" value="\u2014" />
+        <StatChip
+          label="MOT due"
+          value={car.motDueDate ? formatDisplayDate(car.motDueDate) : '\u2014'}
+          warn={motDueSoon}
         />
+        <StatChip label="Tax due" value={car.taxDueDate ? formatDisplayDate(car.taxDueDate) : '\u2014'} />
       </div>
 
-      {/* Actions */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-kinship-outline-variant pt-3">
+      {/* Service history section */}
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-kinship-outline-variant px-5 py-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={onViewHistory}
           className="min-h-11 rounded-full text-xs sm:text-sm"
+          style={{ color: CAR_DOT }}
         >
           <History className="mr-1 h-3.5 w-3.5" />
           {selected ? 'Hide Service Info' : `Service Info (${serviceRecordCount})`}
         </Button>
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onEdit}
-            aria-label="Edit car"
-          >
+          <Button variant="ghost" size="icon-sm" onClick={onEdit} aria-label="Edit car">
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onDelete}
-            aria-label="Delete car"
-          >
+          <Button variant="ghost" size="icon-sm" onClick={onDelete} aria-label="Delete car">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -616,38 +621,27 @@ function CarCard({
   )
 }
 
-function KeyDateBadge({
-  label,
-  date,
-  days,
-  costCents,
-}: {
-  label: string
-  date: string | null
-  days: number
-  costCents?: number | null
-}) {
+function StatChip({ label, value, warn = false }: { label: string; value: string; warn?: boolean }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-1 rounded-lg bg-kinship-surface-container-lowest px-3 py-1.5">
-      <span className="font-body text-xs font-medium text-kinship-on-surface">{label}</span>
-      <div className="flex flex-wrap items-center gap-1.5 text-right sm:gap-2">
-        {costCents != null && costCents > 0 && (
-          <span className="font-body text-xs text-kinship-on-surface-variant">
-            {formatCostFromCents(costCents)}
-          </span>
-        )}
-        <span className="font-body text-xs text-kinship-on-surface">
-          {formatDisplayDate(date)}
-        </span>
-        {date && (
-          <span
-            className="rounded-full px-1.5 py-0.5 font-body text-[10px] font-medium"
-            style={{ backgroundColor: `${CAR_DOT}1A`, color: CAR_DARK }}
-          >
-            {days}d reminder
-          </span>
-        )}
-      </div>
+    <div
+      className="rounded-lg p-2.5 text-center border"
+      style={warn
+        ? { backgroundColor: WARN_SURFACE, borderColor: WARN_COLOR }
+        : { backgroundColor: 'white', borderColor: 'var(--color-kinship-outline-variant)' }
+      }
+    >
+      <p
+        className="font-body text-[10px] font-medium uppercase tracking-wider"
+        style={warn ? { color: WARN_COLOR } : { color: 'var(--color-kinship-on-surface-variant)' }}
+      >
+        {label}
+      </p>
+      <p
+        className="mt-0.5 font-body text-xs font-semibold"
+        style={warn ? { color: WARN_COLOR } : { color: 'var(--color-kinship-on-surface)' }}
+      >
+        {value}
+      </p>
     </div>
   )
 }
