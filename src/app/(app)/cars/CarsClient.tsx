@@ -172,11 +172,10 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null)
   const [showAddCar, setShowAddCar] = useState(false)
 
-  // Auto-open add car dialog when redirected from insurance page
+  // Auto-open add car dialog when redirected from dashboard or insurance page
   useEffect(() => {
-    if (searchParams.get('addCar') === '1') {
+    if (searchParams.get('action') === 'new' || searchParams.get('addCar') === '1') {
       setShowAddCar(true)
-      // Clean up the URL param
       router.replace('/cars', { scroll: false })
     }
   }, [searchParams, router])

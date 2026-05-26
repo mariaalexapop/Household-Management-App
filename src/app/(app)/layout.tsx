@@ -5,11 +5,10 @@ import { householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { ConnectionIndicator } from '@/components/realtime/ConnectionIndicator'
-import { NotificationBell } from '@/components/notifications/NotificationBell'
-import { HamburgerMenu } from '@/components/nav/HamburgerMenu'
 import { ChatbotProvider } from '@/components/chatbot/ChatbotProvider'
 import { ChatbotFab } from '@/components/chatbot/ChatbotFab'
 import { ChatbotDock } from '@/components/chatbot/ChatbotDock'
+import { BottomNav } from '@/components/nav/BottomNav'
 
 /**
  * Protected (app) layout.
@@ -53,9 +52,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <RealtimeProvider householdId={householdId} userId={user.id}>
       <ChatbotProvider>
         <ConnectionIndicator />
-        {children}
+        <div className="mobile-only-pb">
+          {children}
+        </div>
         <ChatbotFab />
         <ChatbotDock />
+        <BottomNav />
       </ChatbotProvider>
     </RealtimeProvider>
   )

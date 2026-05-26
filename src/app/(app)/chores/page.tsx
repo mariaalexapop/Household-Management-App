@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ChoresClient } from './ChoresClient'
 import { seedDefaultAreas } from '@/app/actions/tasks'
 import { AppHeader } from '@/components/nav/AppHeader'
+import { Breadcrumb } from '@/components/nav/Breadcrumb'
 
 export const metadata = { title: 'Home Chores — Kinship' }
 
@@ -102,9 +103,7 @@ export default async function ChoresPage({
     <div className="min-h-screen bg-kinship-surface">
       <AppHeader subtitle="Home Chores" />
       <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
+        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Home Chores' }]} />
         <div className="mb-6">
           <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface border-l-4 border-module-chores-dark pl-3 sm:text-[32px]">Home Chores</h2>
           <p className="font-body text-base text-kinship-on-surface-variant">

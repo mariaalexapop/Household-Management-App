@@ -1,5 +1,6 @@
-import { Car } from 'lucide-react'
+import { Car, Plus } from 'lucide-react'
 import { format, differenceInCalendarDays } from 'date-fns'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 export interface UpcomingCar {
@@ -43,15 +44,32 @@ export function CarDashboardCard({ cars }: CarDashboardCardProps) {
   return (
     <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
       <div className="absolute left-0 top-0 h-1 w-full rounded-t-2xl bg-[#ea580c]" aria-hidden="true" />
-      <div className="flex items-center gap-2">
-        <Car className="h-5 w-5 text-[#ea580c]" aria-hidden="true" />
-        <h3 className="font-display text-base font-semibold text-kinship-on-surface">Cars</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Car className="h-5 w-5 text-[#ea580c]" aria-hidden="true" />
+          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Cars</h3>
+        </div>
+        <Link
+          href="/cars?action=new"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-[#ea580c] hover:bg-[#ea580c]/10 transition-colors"
+          aria-label="Add new car"
+        >
+          <Plus className="h-4 w-4" />
+        </Link>
       </div>
 
       {cars.length === 0 ? (
-        <p className="font-body text-sm text-kinship-on-surface-variant">
-          No cars tracked. Add a car to get started.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+            No cars tracked.
+          </p>
+          <Link
+            href="/cars?action=new"
+            className="rounded-full bg-[#ea580c] px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-[#ea580c]/90 transition-colors"
+          >
+            Add your first car
+          </Link>
+        </div>
       ) : upcoming.length === 0 ? (
         <p className="font-body text-sm text-kinship-on-surface-variant">
           No upcoming key dates.

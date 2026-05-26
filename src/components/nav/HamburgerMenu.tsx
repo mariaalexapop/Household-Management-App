@@ -3,7 +3,10 @@
 import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Menu, LayoutDashboard, CalendarDays, Coins, Settings, LogOut } from 'lucide-react'
+import {
+  Menu, LayoutDashboard, CalendarDays, Coins, Settings, LogOut,
+  CheckSquare, CalendarHeart, Car, Shield, Monitor,
+} from 'lucide-react'
 import Link from 'next/link'
 
 export function HamburgerMenu() {
@@ -52,7 +55,7 @@ export function HamburgerMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-56 rounded-lg border border-kinship-surface-container bg-kinship-surface-container-lowest py-1 shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-kinship-surface-container bg-kinship-surface-container-lowest py-1 shadow-lg">
           <Link
             href="/dashboard"
             onClick={() => setOpen(false)}
@@ -76,6 +79,48 @@ export function HamburgerMenu() {
           >
             <Coins className="h-4 w-4" />
             Cost Summary
+          </Link>
+          <hr className="my-1 border-kinship-on-surface/20" />
+          <p className="px-3 py-1 text-xs font-medium text-kinship-on-surface-variant uppercase tracking-wider">Modules</p>
+          <Link
+            href="/chores"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-kinship-on-surface hover:bg-kinship-surface-container"
+          >
+            <CheckSquare className="h-4 w-4" />
+            Home Chores
+          </Link>
+          <Link
+            href="/kids"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-kinship-on-surface hover:bg-kinship-surface-container"
+          >
+            <CalendarHeart className="h-4 w-4" />
+            Kids Activities
+          </Link>
+          <Link
+            href="/cars"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-kinship-on-surface hover:bg-kinship-surface-container"
+          >
+            <Car className="h-4 w-4" />
+            Cars
+          </Link>
+          <Link
+            href="/insurance"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-kinship-on-surface hover:bg-kinship-surface-container"
+          >
+            <Shield className="h-4 w-4" />
+            Insurance
+          </Link>
+          <Link
+            href="/electronics"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-kinship-on-surface hover:bg-kinship-surface-container"
+          >
+            <Monitor className="h-4 w-4" />
+            Electronics
           </Link>
           <hr className="my-1 border-kinship-on-surface/20" />
           <Link

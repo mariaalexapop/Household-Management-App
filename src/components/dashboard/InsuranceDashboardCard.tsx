@@ -1,5 +1,6 @@
-import { Shield } from 'lucide-react'
+import { Shield, Plus } from 'lucide-react'
 import { format, differenceInCalendarDays } from 'date-fns'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 export interface UpcomingPolicy {
@@ -24,15 +25,32 @@ export function InsuranceDashboardCard({ policies }: InsuranceDashboardCardProps
   return (
     <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
       <div className="absolute left-0 top-0 h-1 w-full rounded-t-2xl bg-[#9333ea]" aria-hidden="true" />
-      <div className="flex items-center gap-2">
-        <Shield className="h-5 w-5 text-[#9333ea]" aria-hidden="true" />
-        <h3 className="font-display text-base font-semibold text-kinship-on-surface">Insurance</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-[#9333ea]" aria-hidden="true" />
+          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Insurance</h3>
+        </div>
+        <Link
+          href="/insurance?action=new"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-[#9333ea] hover:bg-[#9333ea]/10 transition-colors"
+          aria-label="Add new policy"
+        >
+          <Plus className="h-4 w-4" />
+        </Link>
       </div>
 
       {policies.length === 0 ? (
-        <p className="font-body text-sm text-kinship-on-surface-variant">
-          No policies tracked. Add a policy to get started.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+            No policies tracked.
+          </p>
+          <Link
+            href="/insurance?action=new"
+            className="rounded-full bg-[#9333ea] px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-[#9333ea]/90 transition-colors"
+          >
+            Add your first policy
+          </Link>
+        </div>
       ) : upcoming.length === 0 ? (
         <p className="font-body text-sm text-kinship-on-surface-variant">
           No upcoming expiries.

@@ -1,17 +1,9 @@
 /**
  * AI SDK v6 tool definitions for the household assistant.
- *
- * `buildTools(ctx)` returns a map of six tools:
- *   - Five server-side tools with `execute` functions that hit the Drizzle DB,
- *     filter by the caller's householdId, and return JSON-safe results
- *     (Dates serialised to ISO strings — see Phase 5 research Pitfall 7).
- *   - `extract_procedure`, a CLIENT-facing tool declared WITHOUT an `execute`
- *     function. The AI SDK will surface its tool call as a UIMessage part so
- *     the client chat UI can render a confirmation modal (research Pitfall 5).
  */
 import { tool } from 'ai'
 import { z } from 'zod'
-import { and, asc, eq, gte, lte } from 'drizzle-orm'
+import { and, asc, eq, gte, ilike, lte } from 'drizzle-orm'
 
 import { db } from '@/lib/db'
 import {
@@ -33,24 +25,21 @@ export function buildTools(ctx: ToolContext) {
   return {
     get_upcoming_chores: tool({
       description:
-        'Return the next N chore tasks due in this household, soonest first. Use this whenever the user asks about upcoming chores, to-dos, or tasks.',
-      inputSchema: z.object({
-        limit: z.number().int().min(1).max(20).default(5),
-      }),
-      execute: async ({ limit }) => {
+        'Return chore tasks in this household. Use this whenever the user asks about chores, to-dos, or tasks.',
+      inputSchema: z.object({}),
+      execute: async () => {
         const rows = await db
           .select({
             id: tasks.id,
             title: tasks.title,
+            notes: tasks.notes,
             startsAt: tasks.startsAt,
             status: tasks.status,
           })
           .from(tasks)
-          .where(
-            and(eq(tasks.householdId, householdId), gte(tasks.startsAt, new Date()))
-          )
+          .where(eq(tasks.householdId, householdId))
           .orderBy(asc(tasks.startsAt))
-          .limit(limit)
+          .limit(20)
 
         return {
           tasks: rows.map((r) => ({
@@ -63,11 +52,9 @@ export function buildTools(ctx: ToolContext) {
 
     get_upcoming_activities: tool({
       description:
-        'Return the next N upcoming kids activities in this household (school, medical, sport, hobby, social).',
-      inputSchema: z.object({
-        limit: z.number().int().min(1).max(20).default(5),
-      }),
-      execute: async ({ limit }) => {
+        'Return upcoming kids activities in this household (school, medical, sport, hobby, social).',
+      inputSchema: z.object({}),
+      execute: async () => {
         const rows = await db
           .select({
             id: kidActivities.id,
@@ -84,7 +71,7 @@ export function buildTools(ctx: ToolContext) {
             )
           )
           .orderBy(asc(kidActivities.startsAt))
-          .limit(limit)
+          .limit(10)
 
         return {
           activities: rows.map((r) => ({
@@ -95,80 +82,72 @@ export function buildTools(ctx: ToolContext) {
       },
     }),
 
-    get_warranty_expiries: tool({
+    get_electronics: tool({
       description:
-        'List electronics whose warranty expires within the next N days (default 90).',
-      inputSchema: z.object({
-        withinDays: z.number().int().min(1).max(365).default(90),
-      }),
-      execute: async ({ withinDays }) => {
-        const until = new Date(Date.now() + withinDays * 864e5)
+        'Return all electronics and appliances registered in this household with full details including brand, model number, warranty, and purchase info. Use this when the user asks about any appliance, device, warranty, or product they own.',
+      inputSchema: z.object({}),
+      execute: async () => {
         const rows = await db
           .select({
             id: electronics.id,
             name: electronics.name,
             brand: electronics.brand,
+            modelNumber: electronics.modelNumber,
+            purchaseDate: electronics.purchaseDate,
+            costCents: electronics.costCents,
             warrantyExpiryDate: electronics.warrantyExpiryDate,
+            coverageSummary: electronics.coverageSummary,
           })
           .from(electronics)
-          .where(
-            and(
-              eq(electronics.householdId, householdId),
-              lte(electronics.warrantyExpiryDate, until)
-            )
-          )
+          .where(eq(electronics.householdId, householdId))
 
         return {
           items: rows.map((r) => ({
             ...r,
-            warrantyExpiryDate: r.warrantyExpiryDate
-              ? r.warrantyExpiryDate.toISOString()
-              : null,
+            purchaseDate: r.purchaseDate?.toISOString() ?? null,
+            warrantyExpiryDate: r.warrantyExpiryDate?.toISOString() ?? null,
+            costFormatted: r.costCents ? `€${(r.costCents / 100).toFixed(2)}` : null,
           })),
         }
       },
     }),
 
-    get_insurance_expiries: tool({
+    get_insurance_policies: tool({
       description:
-        'List insurance policies that expire within the next N days (default 90).',
-      inputSchema: z.object({
-        withinDays: z.number().int().min(1).max(365).default(90),
-      }),
-      execute: async ({ withinDays }) => {
-        const until = new Date(Date.now() + withinDays * 864e5)
+        'Return all insurance policies in this household with full details including insurer, type, expiry, premium, and payment info.',
+      inputSchema: z.object({}),
+      execute: async () => {
         const rows = await db
           .select({
             id: insurancePolicies.id,
             insurer: insurancePolicies.insurer,
             policyType: insurancePolicies.policyType,
+            policyNumber: insurancePolicies.policyNumber,
             expiryDate: insurancePolicies.expiryDate,
+            premiumCents: insurancePolicies.premiumCents,
+            paymentSchedule: insurancePolicies.paymentSchedule,
+            nextPaymentDate: insurancePolicies.nextPaymentDate,
+            coveredName: insurancePolicies.coveredName,
           })
           .from(insurancePolicies)
-          .where(
-            and(
-              eq(insurancePolicies.householdId, householdId),
-              lte(insurancePolicies.expiryDate, until)
-            )
-          )
+          .where(eq(insurancePolicies.householdId, householdId))
 
         return {
           policies: rows.map((r) => ({
             ...r,
             expiryDate: r.expiryDate?.toISOString() ?? 'ongoing',
+            nextPaymentDate: r.nextPaymentDate?.toISOString() ?? null,
+            premiumFormatted: r.premiumCents ? `€${(r.premiumCents / 100).toFixed(2)}` : null,
           })),
         }
       },
     }),
 
-    get_car_reminders: tool({
+    get_cars: tool({
       description:
-        'Return car MOT, tax, and next-service dates for cars in the household with any of those dates within the next N days (default 30).',
-      inputSchema: z.object({
-        withinDays: z.number().int().min(1).max(365).default(30),
-      }),
-      execute: async ({ withinDays }) => {
-        const until = new Date(Date.now() + withinDays * 864e5)
+        'Return all cars in the household with their MOT, tax, and next-service dates.',
+      inputSchema: z.object({}),
+      execute: async () => {
         const rows = await db
           .select({
             id: cars.id,
@@ -182,15 +161,8 @@ export function buildTools(ctx: ToolContext) {
           .from(cars)
           .where(eq(cars.householdId, householdId))
 
-        const filtered = rows.filter((r) => {
-          const dates = [r.motDueDate, r.taxDueDate, r.nextServiceDate].filter(
-            Boolean
-          ) as Date[]
-          return dates.some((d) => d <= until)
-        })
-
         return {
-          cars: filtered.map((r) => ({
+          cars: rows.map((r) => ({
             ...r,
             motDueDate: r.motDueDate ? r.motDueDate.toISOString() : null,
             taxDueDate: r.taxDueDate ? r.taxDueDate.toISOString() : null,
@@ -202,24 +174,62 @@ export function buildTools(ctx: ToolContext) {
       },
     }),
 
+    search_web: tool({
+      description:
+        'Search the web for information like user manuals, product guides, troubleshooting tips, or forum discussions. When the user asks about a registered product, first call get_electronics to get the brand and model number, then call this tool with those details.',
+      inputSchema: z.object({
+        query: z.string().describe('The search query, e.g. "LG OLED55C52LA user manual"'),
+      }),
+      execute: async ({ query }) => {
+        const apiKey = process.env.TAVILY_API_KEY
+        if (!apiKey) {
+          return { error: 'Web search is not configured', results: [] }
+        }
+
+        try {
+          const res = await fetch('https://api.tavily.com/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              api_key: apiKey,
+              query,
+              max_results: 5,
+              include_answer: true,
+              search_depth: 'basic',
+            }),
+          })
+
+          if (!res.ok) {
+            return { error: `Search failed (${res.status})`, results: [] }
+          }
+
+          const data = await res.json()
+          return {
+            answer: data.answer ?? null,
+            results: (data.results ?? []).map((r: { title: string; url: string; content: string }) => ({
+              title: r.title,
+              url: r.url,
+              snippet: r.content?.slice(0, 500),
+            })),
+          }
+        } catch {
+          return { error: 'Search request failed', results: [] }
+        }
+      },
+    }),
+
     extract_procedure: tool({
       description:
-        'Call this when the user asks to turn the document guidance in the current conversation into tasks. Return the ordered step list you extracted from the retrieved document chunks. DO NOT create tasks yourself — the client will render a preview modal and let the user confirm.',
+        'Call this ONLY when the user explicitly asks to turn guidance into tasks. Return the ordered step list. The client will render a preview modal.',
       inputSchema: z.object({
-        title: z
-          .string()
-          .min(1)
-          .max(200)
-          .describe('Short title for the procedure, e.g. "Report a burst pipe"'),
+        title: z.string().describe('Short title for the procedure'),
         steps: z
           .array(
             z.object({
-              title: z.string().min(1).max(200),
-              description: z.string().max(2000).optional(),
+              title: z.string(),
+              description: z.string().optional(),
             })
-          )
-          .min(1)
-          .max(20),
+          ),
       }),
       // NO execute function → surfaces to client as a UIMessage tool part.
     }),

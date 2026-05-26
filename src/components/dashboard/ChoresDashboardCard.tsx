@@ -1,5 +1,6 @@
-import { CheckSquare } from 'lucide-react'
+import { CheckSquare, Plus } from 'lucide-react'
 import { format } from 'date-fns'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 export interface UpcomingTask {
@@ -16,15 +17,32 @@ interface ChoresDashboardCardProps {
 export function ChoresDashboardCard({ tasks }: ChoresDashboardCardProps) {
   return (
     <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <CheckSquare className="h-5 w-5 text-kinship-primary" aria-hidden="true" />
-        <h3 className="font-display text-base font-semibold text-kinship-on-surface">Home Chores</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CheckSquare className="h-5 w-5 text-kinship-primary" aria-hidden="true" />
+          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Home Chores</h3>
+        </div>
+        <Link
+          href="/chores?action=new"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-kinship-primary hover:bg-kinship-primary/10 transition-colors"
+          aria-label="Add new task"
+        >
+          <Plus className="h-4 w-4" />
+        </Link>
       </div>
 
       {tasks.length === 0 ? (
-        <p className="font-body text-sm text-kinship-on-surface-variant">
-          No upcoming tasks. Add a task to get started.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+            No upcoming tasks.
+          </p>
+          <Link
+            href="/chores?action=new"
+            className="rounded-full bg-kinship-primary px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-kinship-primary/90 transition-colors"
+          >
+            Add your first task
+          </Link>
+        </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {tasks.map(task => (

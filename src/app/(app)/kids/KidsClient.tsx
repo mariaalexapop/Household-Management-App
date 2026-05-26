@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { List, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -69,8 +69,17 @@ export function KidsClient({
   householdId,
 }: KidsClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [optimisticActivities, setOptimisticActivities] = useState(initialActivities)
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Auto-open add dialog from ?action=new
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setDialogOpen(true)
+      router.replace('/kids', { scroll: false })
+    }
+  }, [searchParams, router])
   const [selectedActivity, setSelectedActivity] = useState<ActivityItem | null>(null)
   const [view, setView] = useState<'list' | 'calendar'>('list')
   const [localChildList, setLocalChildList] = useState(childList)

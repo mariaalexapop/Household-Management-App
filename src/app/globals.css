@@ -197,6 +197,21 @@
   }
 }
 
+/* Mobile-only elements — hidden on sm+ (640px+) screens */
+@layer utilities {
+  .mobile-only {
+    @media (width >= 40rem) {
+      display: none !important;
+    }
+  }
+  .mobile-only-pb {
+    padding-bottom: 4rem;
+    @media (width >= 40rem) {
+      padding-bottom: 0;
+    }
+  }
+}
+
 /* Safe area padding for notched devices (iPhone X+) */
 @layer utilities {
   .safe-area-bottom {

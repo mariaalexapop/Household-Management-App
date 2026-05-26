@@ -108,7 +108,7 @@ export function ChatbotDock() {
         />
 
         <MessageInput
-          disabled={status !== 'ready' || !conversationId}
+          disabled={(status === 'streaming' || status === 'submitted') || !conversationId}
           onSend={(text) => {
             void sendMessage({ text })
           }}

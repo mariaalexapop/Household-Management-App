@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
 import { TaskList } from '@/components/chores/TaskList'
 import { TaskForm } from '@/components/chores/TaskForm'
 import { TaskFilters } from '@/components/chores/TaskFilters'
-import { updateTaskStatus, deleteTask } from '@/app/actions/tasks'
+import { updateTaskStatus, deleteTask, bulkUpdateTaskStatus, bulkDeleteTasks } from '@/app/actions/tasks'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -80,6 +80,15 @@ export function ChoresClient({
     setOptimisticTasks(initialTasks)
   }, [initialTasks])
 
+  // Auto-open add dialog from ?action=new
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setIsAddDialogOpen(true)
+      router.replace('/chores', { scroll: false })
+    }
+  }, [searchParams, router])
+
   // Dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<TaskItem | null>(null)
@@ -87,6 +96,52 @@ export function ChoresClient({
   // Delete confirmation state
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  // Bulk selection state
+  const [selectMode, setSelectMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll(taskIds: string[]) {
+    setSelectedIds((prev) => {
+      const allSelected = taskIds.every((id) => prev.has(id))
+      if (allSelected) return new Set()
+      return new Set(taskIds)
+    })
+  }
+
+  function exitSelectMode() {
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
+  async function handleBulkDone() {
+    const ids = Array.from(selectedIds)
+    const previous = optimisticTasks
+    setOptimisticTasks((prev) => prev.map((t) => (ids.includes(t.id) ? { ...t, status: 'done' } : t)))
+    exitSelectMode()
+    const result = await bulkUpdateTaskStatus(ids, 'done')
+    if (!result.success) setOptimisticTasks(previous)
+    startTransition(() => router.refresh())
+  }
+
+  async function handleBulkDelete() {
+    const ids = Array.from(selectedIds)
+    const previous = optimisticTasks
+    setOptimisticTasks((prev) => prev.filter((t) => !ids.includes(t.id)))
+    exitSelectMode()
+    const result = await bulkDeleteTasks(ids)
+    if (!result.success) setOptimisticTasks(previous)
+    startTransition(() => router.refresh())
+  }
 
   // Filter state
   const [filters, setFilters] = useState<FilterState>({
@@ -204,18 +259,73 @@ export function ChoresClient({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Bulk action bar */}
+      {selectMode && (
+        <div className="flex items-center justify-between rounded-xl bg-kinship-primary/10 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => toggleSelectAll(sortedTasks.map((t) => t.id))}
+              className="font-body text-sm text-kinship-primary hover:underline"
+            >
+              {sortedTasks.every((t) => selectedIds.has(t.id)) ? 'Deselect all' : 'Select all'}
+            </button>
+            <span className="font-body text-sm text-kinship-on-surface-variant">
+              {selectedIds.size} selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              disabled={selectedIds.size === 0}
+              onClick={handleBulkDone}
+              className="rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90 disabled:opacity-40"
+            >
+              Mark done
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={selectedIds.size === 0}
+              onClick={handleBulkDelete}
+              className="rounded-full border-destructive text-destructive hover:bg-destructive/10 disabled:opacity-40"
+            >
+              Delete
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={exitSelectMode}
+              className="rounded-full"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Filter bar + Add Task button */}
       <div className="flex flex-col gap-3 bg-kinship-surface-container rounded-xl p-4 sm:flex-row sm:items-end sm:justify-between">
         <TaskFilters areas={areas} filters={filters} onFiltersChange={handleFiltersChange} />
-        <Button
-          onClick={() => {
-            setEditingTask(null)
-            setIsAddDialogOpen(true)
-          }}
-          className="min-h-[44px] shrink-0 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
-        >
-          Add Task
-        </Button>
+        <div className="flex items-center gap-2">
+          {!selectMode && sortedTasks.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => setSelectMode(true)}
+              className="min-h-[44px] shrink-0 rounded-full border-kinship-outline"
+            >
+              Select
+            </Button>
+          )}
+          <Button
+            onClick={() => {
+              setEditingTask(null)
+              setIsAddDialogOpen(true)
+            }}
+            className="min-h-[44px] shrink-0 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
+          >
+            Add Task
+          </Button>
+        </div>
       </div>
 
       {/* Task list */}
@@ -226,6 +336,9 @@ export function ChoresClient({
         onStatusChange={handleStatusChange}
         onDelete={handleDeleteRequest}
         onEdit={handleEdit}
+        selectMode={selectMode}
+        selectedIds={selectedIds}
+        onToggleSelect={toggleSelect}
       />
 
       {/* Add / Edit Task Dialog */}

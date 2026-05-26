@@ -10,6 +10,9 @@ interface TaskListProps {
   onStatusChange: (id: string, status: 'todo' | 'in_progress' | 'done') => void
   onDelete: (id: string) => void
   onEdit: (task: TaskItem) => void
+  selectMode?: boolean
+  selectedIds?: Set<string>
+  onToggleSelect?: (id: string) => void
 }
 
 export function TaskList({
@@ -19,6 +22,9 @@ export function TaskList({
   onStatusChange,
   onDelete,
   onEdit,
+  selectMode = false,
+  selectedIds,
+  onToggleSelect,
 }: TaskListProps) {
   if (tasks.length === 0) {
     return (
@@ -42,6 +48,9 @@ export function TaskList({
           onStatusChange={onStatusChange}
           onDelete={onDelete}
           onEdit={onEdit}
+          selectMode={selectMode}
+          selected={selectedIds?.has(task.id) ?? false}
+          onToggleSelect={onToggleSelect}
         />
       ))}
     </div>

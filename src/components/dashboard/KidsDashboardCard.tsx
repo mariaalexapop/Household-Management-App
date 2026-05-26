@@ -1,5 +1,6 @@
-import { CalendarHeart } from 'lucide-react'
+import { CalendarHeart, Plus } from 'lucide-react'
 import { format } from 'date-fns'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { childHex } from '@/lib/kids/child-colours'
 
@@ -18,15 +19,32 @@ interface KidsDashboardCardProps {
 export function KidsDashboardCard({ activities }: KidsDashboardCardProps) {
   return (
     <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <CalendarHeart className="h-5 w-5 text-[#16a34a]" aria-hidden="true" />
-        <h3 className="font-display text-base font-semibold text-kinship-on-surface">Kids Activities</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CalendarHeart className="h-5 w-5 text-[#16a34a]" aria-hidden="true" />
+          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Kids Activities</h3>
+        </div>
+        <Link
+          href="/kids?action=new"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-[#16a34a] hover:bg-[#16a34a]/10 transition-colors"
+          aria-label="Add new activity"
+        >
+          <Plus className="h-4 w-4" />
+        </Link>
       </div>
 
       {activities.length === 0 ? (
-        <p className="font-body text-sm text-kinship-on-surface-variant">
-          No upcoming activities. Add one to get started.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+            No upcoming activities.
+          </p>
+          <Link
+            href="/kids?action=new"
+            className="rounded-full bg-[#16a34a] px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-[#16a34a]/90 transition-colors"
+          >
+            Add your first activity
+          </Link>
+        </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {activities.map((activity) => (

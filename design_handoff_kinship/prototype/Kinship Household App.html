@@ -1,0 +1,2710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kinship — Household Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #eceef2; color: #1c1c1e; height: 100%; }
+  body { font-family: 'Noto Sans', system-ui, sans-serif; overflow: hidden; }
+  * { box-sizing: border-box; }
+  button { font-family: inherit; }
+  a { color: inherit; text-decoration: none; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react,env" data-file="tokens.jsx">
+//# sourceURL=tokens.jsx
+// Shared tokens for both design directions.
+const TOK = {
+  A: {
+    name: 'A · Miro-faithful',
+    fontDisplay: "'Space Grotesk', system-ui, sans-serif",
+    fontBody: "'Noto Sans', system-ui, sans-serif",
+    fontMono: "'JetBrains Mono', ui-monospace, monospace",
+    canvas: '#ffffff', surface: '#f5f5f7', surface2: '#f0f0f2', surface3: '#e8e8ec',
+    text: '#1c1c1e', textMuted: '#555a6a', textFaint: '#a5a8b5',
+    border: '#e0e2e8', borderStrong: '#c7cad5',
+    primary: '#5b76fe', primaryPressed: '#2a41b6', primarySurface: '#eef0ff',
+    success: '#00b473', successSurface: '#d6f5eb',
+    destructive: '#e53e3e', destructiveSurface: '#fbd4d4',
+    warn: '#d97706', warnSurface: '#fde7c6',
+    accent: '#5b76fe', accentSurface: '#eef0ff',
+    chores: { light: '#c3faf5', dark: '#187574', dot: '#187574' },
+    kids:   { light: '#ffc6c6', dark: '#600000', dot: '#e05252' },
+    car:    { light: '#ffe6cd', dark: '#7a4000', dot: '#c67d2a' },
+    ins:    { light: '#d9d4ff', dark: '#3d2a8a', dot: '#6a55d9' },
+    elec:   { light: '#d4f5c3', dark: '#1f5c1f', dot: '#3f9b3f' },
+    cal:    { light: '#ffd8f4', dark: '#7a1060', dot: '#b34a9c' },
+    ring: '0 0 0 1px rgb(224,226,232)',
+    ringFocus: '0 0 0 1px rgb(224,226,232), 0 0 0 3px #5b76fe',
+    float: '0 20px 40px rgba(28,28,30,0.06), 0 0 0 1px rgb(224,226,232)',
+    radiusCard: 12, radiusLg: 16, radiusHero: 40,
+  },
+  B: {
+    name: 'B · Warm editorial',
+    fontDisplay: "'Fraunces', 'Georgia', serif",
+    fontBody: "'Inter', system-ui, sans-serif",
+    fontMono: "'JetBrains Mono', ui-monospace, monospace",
+    canvas: 'oklch(0.985 0.008 75)', surface: 'oklch(0.965 0.015 75)',
+    surface2: 'oklch(0.93 0.018 72)', surface3: 'oklch(0.89 0.02 70)',
+    text: 'oklch(0.22 0.015 60)', textMuted: 'oklch(0.45 0.015 60)', textFaint: 'oklch(0.62 0.012 60)',
+    border: 'oklch(0.88 0.015 70)', borderStrong: 'oklch(0.78 0.018 70)',
+    primary: 'oklch(0.42 0.08 155)', primaryPressed: 'oklch(0.32 0.07 155)',
+    primarySurface: 'oklch(0.93 0.035 155)',
+    success: 'oklch(0.55 0.12 150)', successSurface: 'oklch(0.93 0.04 145)',
+    destructive: 'oklch(0.52 0.18 25)', destructiveSurface: 'oklch(0.93 0.04 30)',
+    warn: 'oklch(0.58 0.14 55)', warnSurface: 'oklch(0.94 0.04 70)',
+    accent: 'oklch(0.58 0.14 45)', accentSurface: 'oklch(0.93 0.04 55)',
+    chores: { light: 'oklch(0.93 0.04 175)', dark: 'oklch(0.38 0.06 175)', dot: 'oklch(0.48 0.08 175)' },
+    kids:   { light: 'oklch(0.92 0.05 35)',  dark: 'oklch(0.38 0.10 35)',  dot: 'oklch(0.55 0.14 35)' },
+    car:    { light: 'oklch(0.93 0.05 65)',  dark: 'oklch(0.38 0.08 60)',  dot: 'oklch(0.56 0.12 60)' },
+    ins:    { light: 'oklch(0.92 0.04 280)', dark: 'oklch(0.35 0.08 280)', dot: 'oklch(0.50 0.10 280)' },
+    elec:   { light: 'oklch(0.93 0.05 135)', dark: 'oklch(0.35 0.08 140)', dot: 'oklch(0.48 0.10 140)' },
+    cal:    { light: 'oklch(0.92 0.04 335)', dark: 'oklch(0.35 0.08 335)', dot: 'oklch(0.50 0.11 335)' },
+    ring: '0 0 0 1px oklch(0.88 0.015 70)',
+    ringFocus: '0 0 0 1px oklch(0.88 0.015 70), 0 0 0 3px oklch(0.42 0.08 155)',
+    float: '0 8px 24px oklch(0.3 0.03 60 / 0.08), 0 1px 2px oklch(0.3 0.03 60 / 0.06)',
+    radiusCard: 6, radiusLg: 10, radiusHero: 18,
+  },
+};
+
+const DEMO = {
+  household: "The Harper Household",
+  members: [
+    { name: 'Ava Harper', initials: 'AH', role: 'Admin', perm: 'Admin', color: '#e05252' },
+    { name: 'Noah Harper', initials: 'NH', role: 'Member', perm: 'Member', color: '#5b76fe' },
+  ],
+  kids: [
+    { name: 'Iris Harper', initials: 'I', role: 'Child', age: 9, perm: 'View only', color: '#b34a9c' },
+    { name: 'Finn Harper', initials: 'F', role: 'Child', age: 6, perm: 'View only', color: '#187574' },
+  ],
+  chores: [
+    { title: 'Take out the recycling', area: 'Kitchen', due: 'Today, 6pm', assignee: 'Noah', status: 'todo' },
+    { title: 'Water the houseplants', area: 'Living', due: 'Tomorrow', assignee: 'Ava', status: 'progress', recur: true },
+    { title: 'Hoover the stairs', area: 'Cleaning', due: 'Wed · Apr 23', assignee: 'Noah', status: 'todo' },
+    { title: 'Bins out — black', area: 'Admin', due: 'Thu · Apr 24', assignee: 'Ava', status: 'todo', recur: true },
+    { title: 'Change bedsheets', area: 'Cleaning', due: 'Sat · Apr 26', assignee: 'Noah', status: 'todo' },
+    { title: 'Clean the oven', area: 'Kitchen', due: 'Apr 20', assignee: 'Ava', status: 'done' },
+  ],
+  activities: [
+    { child: 'Iris', title: 'Swimming · Aquatics Centre', date: 'Today · 4:30pm', cat: 'sport', parent: 'Noah', loc: 'Manchester Aquatics' },
+    { child: 'Finn', title: 'Reception class pickup', date: 'Today · 3:15pm', cat: 'school', parent: 'Ava', loc: "St Paul's Primary" },
+    { child: 'Iris', title: 'Dentist check-up', date: 'Wed · 2:00pm', cat: 'medical', parent: 'Ava', loc: 'Chorlton Dental' },
+    { child: 'Finn', title: 'Birthday party — Theo', date: 'Sat · 11:00am', cat: 'social', parent: 'Noah', loc: 'Gymboree Didsbury' },
+    { child: 'Iris', title: 'Violin lesson', date: 'Mon · 5:00pm', cat: 'hobby', parent: 'Ava', loc: 'Home' },
+  ],
+  cars: [
+    { name: 'Ford Focus 2019', reg: 'MK19 ZFR', mileage: 42118, mot: 'Jun 14', tax: 'Sep 01', service: 'Nov 02', hotMot: true,
+      history: [
+        { when: 'Nov 2025', what: 'Full service + timing belt', cost: '£420' },
+        { when: 'Jun 2025', what: 'MOT — passed', cost: '£54' },
+        { when: 'Feb 2025', what: 'Front tyres (pair)', cost: '£180' },
+        { when: 'Nov 2024', what: 'Interim service', cost: '£165' },
+      ]},
+    { name: 'VW Polo 2016', reg: 'BK16 HJN', mileage: 68420, mot: 'Oct 08', tax: 'Dec 01', service: 'Jul 14',
+      history: [
+        { when: 'Oct 2025', what: 'MOT + brake pads', cost: '£210' },
+        { when: 'Jul 2025', what: 'Interim service', cost: '£145' },
+        { when: 'Mar 2025', what: 'Battery replacement', cost: '£120' },
+      ]},
+  ],
+  policies: [
+    { type: 'Home insurance', insurer: 'Aviva', num: 'HM-4472-9', expiry: 'Jul 03, 2026', premium: '£42.80', billing: 'monthly', soon: true },
+    { type: 'Car insurance', insurer: 'Direct Line', num: 'DL-88211', expiry: 'Sep 14, 2026', premium: '£61.20', billing: 'monthly' },
+    { type: 'Life insurance', insurer: 'Legal & General', num: 'LG-90823', expiry: 'Mar 02, 2027', premium: '£18.40', billing: 'monthly' },
+    { type: 'Travel insurance', insurer: 'Post Office', num: 'PO-4488', expiry: 'May 08, 2026', premium: '£86', billing: 'annual' },
+  ],
+  electronics: [
+    { name: 'Bosch Series 6 dishwasher', brand: 'Bosch', room: 'Kitchen', warranty: 'Mar 2026', receipt: 'Mar 2024', status: 'expiring' },
+    { name: 'Samsung The Frame 55"', brand: 'Samsung', room: 'Living room', warranty: 'Nov 2025', receipt: 'Nov 2023', status: 'expiring' },
+    { name: 'Dyson V15 Detect', brand: 'Dyson', room: 'Kitchen', warranty: 'Jan 2027', receipt: 'Jan 2025', status: 'ok' },
+    { name: 'Worcester Bosch boiler', brand: 'Worcester', room: 'Office', warranty: 'Aug 2031', receipt: 'Aug 2021', status: 'ok' },
+    { name: 'Sonos Beam Gen 2', brand: 'Sonos', room: 'Living room', warranty: 'Jun 2026', receipt: 'Jun 2024', status: 'ok' },
+  ],
+  activity: [
+    { who: 'Noah', what: 'added car service · Ford Focus', when: '2h ago' },
+    { who: 'Ava', what: 'completed "Clean the oven"', when: 'Yesterday' },
+    { who: 'Kinship AI', what: 'extracted 4 renewal steps from Aviva Home PDF', when: 'Yesterday' },
+    { who: 'Noah', what: 'added "Bosch Series 6 dishwasher" to Electronics', when: '2d ago' },
+    { who: 'Ava', what: 'invited Noah to the household', when: '5d ago' },
+  ],
+};
+
+Object.assign(window, { TOK, DEMO });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="primitives.jsx">
+//# sourceURL=primitives.jsx
+// Shared primitives used by both A and B designs.
+// All React-only; read tokens via `t` prop (tokens.jsx TOK.A or TOK.B).
+
+const Ic = {
+  // simple lucide-style inline icons @ 18x18 stroke 1.75
+  home: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>,
+  check: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>,
+  plus: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>,
+  bell: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>,
+  search: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>,
+  cal: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>,
+  car: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.4L19 11M5 11h14v6H5zM7 17v2M17 17v2"/><circle cx="8" cy="14" r="1"/><circle cx="16" cy="14" r="1"/></svg>,
+  shield: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"/></svg>,
+  plug: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M9 2v4M15 2v4M7 6h10v6a5 5 0 0 1-10 0zM12 17v5"/></svg>,
+  users: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 22c0-4 3-7 7-7s7 3 7 7M17 11a3 3 0 1 0 0-6M22 22c0-3-2-5-5-5"/></svg>,
+  gear: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  spark: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2zM19 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg>,
+  chat: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-11.7 7l-5.3 1 1-4.7A8 8 0 1 1 21 12z"/></svg>,
+  doc: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>,
+  more: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>,
+  filter: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5h18M6 12h12M10 19h4"/></svg>,
+  chevD: (p) => <svg width={p.s||14} height={p.s||14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 9l6 6 6-6"/></svg>,
+  chevR: (p) => <svg width={p.s||14} height={p.s||14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>,
+  chevL: (p) => <svg width={p.s||14} height={p.s||14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>,
+  upload: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>,
+  trend: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>,
+  clock: (p) => <svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>,
+  x: (p) => <svg width={p.s||16} height={p.s||16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>,
+  pin: (p) => <svg width={p.s||14} height={p.s||14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>,
+};
+
+function Avatar({ name, initials, color, size=28, t }) {
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: color || t.primary, color: '#fff',
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: t.fontBody, fontSize: size*0.38, fontWeight: 600, letterSpacing: 0.2,
+      flexShrink: 0,
+    }} title={name}>{initials}</div>
+  );
+}
+
+function Badge({ children, bg, fg, border, t, radius }) {
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      padding: '3px 8px',
+      borderRadius: radius ?? 6,
+      background: bg ?? t.surface2,
+      color: fg ?? t.textMuted,
+      border: border ? `1px solid ${border}` : 'none',
+      fontFamily: t.fontBody, fontSize: 12, fontWeight: 500,
+      lineHeight: 1.4, whiteSpace: 'nowrap',
+    }}>{children}</span>
+  );
+}
+
+function Btn({ children, variant='primary', t, full, size='md', icon, style, onClick }) {
+  const bases = {
+    primary:    { bg: t.primary, fg: '#fff', border: 'transparent' },
+    outline:    { bg: 'transparent', fg: t.text, border: t.borderStrong },
+    ghost:      { bg: 'transparent', fg: t.primary, border: 'transparent' },
+    destructive:{ bg: t.destructive, fg: '#fff', border: 'transparent' },
+    soft:       { bg: t.surface2, fg: t.text, border: 'transparent' },
+  };
+  const s = bases[variant];
+  const sizes = { sm: {px:10,py:5,fs:12,r:999}, md:{px:16,py:8,fs:13,r:999}, lg:{px:20,py:10,fs:14,r:999} };
+  const sz = sizes[size];
+  const r = variant==='outline' || variant==='soft' ? 8 : sz.r;
+  return (
+    <button onClick={onClick} style={{
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+      padding: `${sz.py}px ${sz.px}px`, borderRadius: r,
+      background: s.bg, color: s.fg, border: `1px solid ${s.border}`,
+      fontFamily: t.fontDisplay, fontSize: sz.fs, fontWeight: 600, letterSpacing: 0.01,
+      width: full ? '100%' : 'auto', cursor: 'pointer',
+      ...style,
+    }}>{icon && <span style={{display:'flex'}}>{icon}</span>}{children}</button>
+  );
+}
+
+// Placeholder for imagery / PDF thumbs
+function Placeholder({ label, h=120, t, accent }) {
+  const color = accent || t.borderStrong;
+  return (
+    <div style={{
+      height: h, borderRadius: 8, overflow: 'hidden',
+      background: `repeating-linear-gradient(45deg, ${t.surface2} 0 6px, ${t.surface} 6px 12px)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      border: `1px dashed ${color}`,
+      color: t.textMuted, fontFamily: t.fontMono, fontSize: 11, letterSpacing: 0.5,
+    }}>{label}</div>
+  );
+}
+
+// Module chip — small icon tile used in nav and cards
+function ModChip({ icon, color, bg, size=28, t, radius=8 }) {
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: radius,
+      background: bg, color: color,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>{icon}</div>
+  );
+}
+
+// Screen shell — provides a fixed-size artboard background + optional padded area.
+function Screen({ children, t, bg, pad=0, style }) {
+  return (
+    <div style={{
+      width: '100%', height: '100%',
+      background: bg ?? t.surface,
+      color: t.text,
+      fontFamily: t.fontBody, fontSize: 13,
+      overflow: 'hidden', position: 'relative',
+      padding: pad,
+      ...style,
+    }}>{children}</div>
+  );
+}
+
+// Desktop sidebar used in dashboard + module pages.
+function Sidebar({ t, active, onNav }) {
+  const go = onNav || (()=>{});
+  const sections = [
+    { key: 'dash', label: 'Dashboard', icon: <Ic.home s={16}/>, color: t.primary },
+    { key: 'calendar',  label: 'Calendar',   icon: <Ic.cal s={16}/>,  color: t.cal.dot, group: 'Modules' },
+    { key: 'chores', label: 'Home Chores', icon: <Ic.check s={16}/>, color: t.chores.dot },
+    { key: 'kids',   label: 'Kids Activities', icon: <Ic.users s={16}/>, color: t.kids.dot },
+    { key: 'car',    label: 'Car Maintenance', icon: <Ic.car s={16}/>, color: t.car.dot },
+    { key: 'insurance',    label: 'Insurance', icon: <Ic.shield s={16}/>, color: t.ins.dot },
+    { key: 'electronics',   label: 'Electronics', icon: <Ic.plug s={16}/>, color: t.elec.dot },
+    { key: 'chat',     label: 'Ask Kinship', icon: <Ic.spark s={16}/>, color: t.primary, group: 'AI' },
+    { key: 'settings', label: 'Settings', icon: <Ic.gear s={16}/>, color: t.textMuted, group: 'Account' },
+  ];
+  return (
+    <div style={{
+      width: 232, height: '100%', flexShrink: 0,
+      background: 'rgba(255,255,255,0.72)',
+      backdropFilter: 'blur(12px)',
+      borderRight: `1px solid ${t.border}`,
+      display: 'flex', flexDirection: 'column',
+      padding: '20px 14px',
+    }}>
+      {/* Brand */}
+      <div onClick={()=>go('dash')} style={{ padding: '4px 8px 18px', display: 'flex', alignItems: 'center', gap: 10, cursor:'pointer' }}>
+        <div style={{
+          width: 26, height: 26, borderRadius: 8,
+          background: t.primary, color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: t.fontDisplay, fontWeight: 700, fontSize: 14,
+        }}>K</div>
+        <div style={{ fontFamily: t.fontDisplay, fontWeight: 600, fontSize: 17, letterSpacing: -0.3 }}>Kinship</div>
+      </div>
+
+      {/* Nav */}
+      <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {sections.map((s, i) => (
+          <React.Fragment key={s.key}>
+            {s.group && (
+              <div style={{
+                padding: '14px 8px 6px', fontFamily: t.fontBody, fontSize: 10,
+                fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase',
+                color: t.textFaint,
+              }}>{s.group}</div>
+            )}
+            <div onClick={()=>go(s.key)} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '8px 10px', borderRadius: 8,
+              background: active === s.key ? t.primarySurface : 'transparent',
+              color: active === s.key ? t.primary : t.textMuted,
+              fontFamily: t.fontBody, fontSize: 13,
+              fontWeight: active === s.key ? 600 : 400,
+              cursor: 'pointer',
+            }}>
+              <span style={{ display: 'flex', color: active === s.key ? s.color : t.textFaint }}>{s.icon}</span>
+              <span style={{ flex: 1 }}>{s.label}</span>
+              {s.key === 'chores' && <span style={{ fontSize: 11, color: t.textFaint }}>6</span>}
+              {s.key === 'kids' && <span style={{ fontSize: 11, color: t.textFaint }}>5</span>}
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div onClick={()=>go('settings')} style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 8px', borderTop: `1px solid ${t.border}`, marginTop: 10,
+        cursor:'pointer',
+      }}>
+        <Avatar initials="AH" color="#e05252" size={28} t={t} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>Ava Harper</div>
+          <div style={{ fontSize: 11, color: t.textFaint }}>ava@harper.fam</div>
+        </div>
+        <span style={{ color: t.textFaint }}><Ic.gear s={15}/></span>
+      </div>
+    </div>
+  );
+}
+
+// Top bar used in dashboard + pages (search, bell, chatbot fab is floating).
+function TopBar({ t, title, subtitle, cta, onNav, backTo, backLabel }) {
+  const go = onNav || (()=>{});
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 16,
+      padding: '16px 24px',
+      background: 'transparent',
+    }}>
+      <div style={{ flex: 1 }}>
+        {backTo && (
+          <div onClick={()=>go(backTo)} style={{
+            display:'inline-flex', alignItems:'center', gap:4,
+            fontFamily:t.fontBody, fontSize:12, color:t.textMuted, cursor:'pointer',
+            marginBottom:4,
+          }}><Ic.chevL s={12}/> {backLabel || 'Back'}</div>
+        )}
+        <div style={{
+          fontFamily: t.fontDisplay, fontSize: 22, fontWeight: 600,
+          letterSpacing: -0.4,
+          color: t.text, lineHeight: 1.1,
+        }}>{title}</div>
+        {subtitle && (
+          <div style={{ fontFamily: t.fontBody, fontSize: 13, color: t.textMuted, marginTop: 4 }}>{subtitle}</div>
+        )}
+      </div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '6px 10px', borderRadius: 999,
+        background: t.surface2, color: t.textMuted,
+        fontFamily: t.fontBody, fontSize: 12, minWidth: 180,
+      }}>
+        <Ic.search s={14}/><span style={{ color: t.textFaint }}>Ask Kinship or search…</span>
+      </div>
+      <div onClick={()=>go('notifications')} style={{ position:'relative', color: t.textMuted, cursor:'pointer' }}>
+        <Ic.bell s={18}/>
+        <div style={{ position:'absolute', top:-3, right:-4, width: 12, height: 12, borderRadius: 6, background: t.primary, color: '#fff', fontSize: 9, fontWeight: 700, display:'flex', alignItems:'center', justifyContent:'center' }}>3</div>
+      </div>
+      {cta}
+    </div>
+  );
+}
+
+// Floating AI assistant bubble — bottom right corner
+function AiFab({ t, onClick, hint }) {
+  return (
+    <div style={{
+      position: 'absolute', right: 20, bottom: 20,
+      display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10,
+      pointerEvents:'none',
+    }}>
+      {hint !== false && (
+        <div onClick={onClick} style={{
+          background: t.canvas, borderRadius: 16,
+          boxShadow: t.float, padding: '10px 14px',
+          display: 'flex', alignItems: 'center', gap: 8,
+          fontFamily: t.fontBody, fontSize: 12, color: t.textMuted,
+          maxWidth: 230, cursor:'pointer', pointerEvents:'auto',
+        }}>
+          <Ic.spark s={14} /> <span>Ask about Aviva home renewal?</span>
+        </div>
+      )}
+      <div onClick={onClick} style={{
+        width: 52, height: 52, borderRadius: 26,
+        background: t.primary, color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: t.float, cursor:'pointer', pointerEvents:'auto',
+      }}>
+        <Ic.spark s={22}/>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Ic, Avatar, Badge, Btn, Placeholder, ModChip, Screen, Sidebar, TopBar, AiFab });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="design-canvas.jsx">
+//# sourceURL=design-canvas.jsx
+
+// DesignCanvas.jsx — Figma-ish design canvas wrapper
+// Warm gray grid bg + Sections + Artboards + PostIt notes.
+// Artboards are reorderable (grip-drag), labels/titles are inline-editable,
+// and any artboard can be opened in a fullscreen focus overlay (←/→/Esc).
+// State persists to a .design-canvas.state.json sidecar via the host
+// bridge. No assets, no deps.
+//
+// Usage:
+//   <DesignCanvas>
+//     <DCSection id="onboarding" title="Onboarding" subtitle="First-run variants">
+//       <DCArtboard id="a" label="A · Dusk" width={260} height={480}>…</DCArtboard>
+//       <DCArtboard id="b" label="B · Minimal" width={260} height={480}>…</DCArtboard>
+//     </DCSection>
+//   </DesignCanvas>
+
+const DC = {
+  bg: '#f0eee9',
+  grid: 'rgba(0,0,0,0.06)',
+  label: 'rgba(60,50,40,0.7)',
+  title: 'rgba(40,30,20,0.85)',
+  subtitle: 'rgba(60,50,40,0.6)',
+  postitBg: '#fef4a8',
+  postitText: '#5a4a2a',
+  font: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+};
+
+// One-time CSS injection (classes are dc-prefixed so they don't collide with
+// the hosted design's own styles).
+if (typeof document !== 'undefined' && !document.getElementById('dc-styles')) {
+  const s = document.createElement('style');
+  s.id = 'dc-styles';
+  s.textContent = [
+    '.dc-editable{cursor:text;outline:none;white-space:nowrap;border-radius:3px;padding:0 2px;margin:0 -2px}',
+    '.dc-editable:focus{background:#fff;box-shadow:0 0 0 1.5px #c96442}',
+    '[data-dc-slot]{transition:transform .18s cubic-bezier(.2,.7,.3,1)}',
+    '[data-dc-slot].dc-dragging{transition:none;z-index:10;pointer-events:none}',
+    '[data-dc-slot].dc-dragging .dc-card{box-shadow:0 12px 40px rgba(0,0,0,.25),0 0 0 2px #c96442;transform:scale(1.02)}',
+    '.dc-card{transition:box-shadow .15s,transform .15s}',
+    '.dc-card *{scrollbar-width:none}',
+    '.dc-card *::-webkit-scrollbar{display:none}',
+    '.dc-labelrow{display:flex;align-items:center;gap:4px;height:24px}',
+    '.dc-grip{cursor:grab;display:flex;align-items:center;padding:5px 4px;border-radius:4px;transition:background .12s}',
+    '.dc-grip:hover{background:rgba(0,0,0,.08)}',
+    '.dc-grip:active{cursor:grabbing}',
+    '.dc-labeltext{cursor:pointer;border-radius:4px;padding:3px 6px;display:flex;align-items:center;transition:background .12s}',
+    '.dc-labeltext:hover{background:rgba(0,0,0,.05)}',
+    '.dc-expand{position:absolute;bottom:100%;right:0;margin-bottom:5px;z-index:2;opacity:0;transition:opacity .12s,background .12s;',
+    '  width:22px;height:22px;border-radius:5px;border:none;cursor:pointer;padding:0;',
+    '  background:transparent;color:rgba(60,50,40,.7);display:flex;align-items:center;justify-content:center}',
+    '.dc-expand:hover{background:rgba(0,0,0,.06);color:#2a251f}',
+    '[data-dc-slot]:hover .dc-expand{opacity:1}',
+  ].join('\n');
+  document.head.appendChild(s);
+}
+
+const DCCtx = React.createContext(null);
+
+// ─────────────────────────────────────────────────────────────
+// DesignCanvas — stateful wrapper around the pan/zoom viewport.
+// Owns runtime state (per-section order, renamed titles/labels, focused
+// artboard). Order/titles/labels persist to a .design-canvas.state.json
+// sidecar next to the HTML. Reads go via plain fetch() so the saved
+// arrangement is visible anywhere the HTML + sidecar are served together
+// (omelette preview, direct link, downloaded zip). Writes go through the
+// host's window.omelette bridge — editing requires the omelette runtime.
+// Focus is ephemeral.
+// ─────────────────────────────────────────────────────────────
+const DC_STATE_FILE = '.design-canvas.state.json';
+
+function DesignCanvas({ children, minScale, maxScale, style }) {
+  const [state, setState] = React.useState({ sections: {}, focus: null });
+  // Hold rendering until the sidecar read settles so the saved order/titles
+  // appear on first paint (no source-order flash). didRead gates writes until
+  // the read settles so the empty initial state can't clobber a slow read;
+  // skipNextWrite suppresses the one echo-write that would otherwise follow
+  // hydration.
+  const [ready, setReady] = React.useState(false);
+  const didRead = React.useRef(false);
+  const skipNextWrite = React.useRef(false);
+
+  React.useEffect(() => {
+    let off = false;
+    fetch('./' + DC_STATE_FILE)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((saved) => {
+        if (off || !saved || !saved.sections) return;
+        skipNextWrite.current = true;
+        setState((s) => ({ ...s, sections: saved.sections }));
+      })
+      .catch(() => {})
+      .finally(() => { didRead.current = true; if (!off) setReady(true); });
+    const t = setTimeout(() => { if (!off) setReady(true); }, 150);
+    return () => { off = true; clearTimeout(t); };
+  }, []);
+
+  React.useEffect(() => {
+    if (!didRead.current) return;
+    if (skipNextWrite.current) { skipNextWrite.current = false; return; }
+    const t = setTimeout(() => {
+      window.omelette?.writeFile(DC_STATE_FILE, JSON.stringify({ sections: state.sections })).catch(() => {});
+    }, 250);
+    return () => clearTimeout(t);
+  }, [state.sections]);
+
+  // Build registries synchronously from children so FocusOverlay can read
+  // them in the same render. Only direct DCSection > DCArtboard children are
+  // walked — wrapping them in other elements opts out of focus/reorder.
+  const registry = {};     // slotId -> { sectionId, artboard }
+  const sectionMeta = {};  // sectionId -> { title, subtitle, slotIds[] }
+  const sectionOrder = [];
+  React.Children.forEach(children, (sec) => {
+    if (!sec || sec.type !== DCSection) return;
+    const sid = sec.props.id ?? sec.props.title;
+    if (!sid) return;
+    sectionOrder.push(sid);
+    const persisted = state.sections[sid] || {};
+    const srcIds = [];
+    React.Children.forEach(sec.props.children, (ab) => {
+      if (!ab || ab.type !== DCArtboard) return;
+      const aid = ab.props.id ?? ab.props.label;
+      if (!aid) return;
+      registry[`${sid}/${aid}`] = { sectionId: sid, artboard: ab };
+      srcIds.push(aid);
+    });
+    const kept = (persisted.order || []).filter((k) => srcIds.includes(k));
+    sectionMeta[sid] = {
+      title: persisted.title ?? sec.props.title,
+      subtitle: sec.props.subtitle,
+      slotIds: [...kept, ...srcIds.filter((k) => !kept.includes(k))],
+    };
+  });
+
+  const api = React.useMemo(() => ({
+    state,
+    section: (id) => state.sections[id] || {},
+    patchSection: (id, p) => setState((s) => ({
+      ...s,
+      sections: { ...s.sections, [id]: { ...s.sections[id], ...(typeof p === 'function' ? p(s.sections[id] || {}) : p) } },
+    })),
+    setFocus: (slotId) => setState((s) => ({ ...s, focus: slotId })),
+  }), [state]);
+
+  // Esc exits focus; any outside pointerdown commits an in-progress rename.
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') api.setFocus(null); };
+    const onPd = (e) => {
+      const ae = document.activeElement;
+      if (ae && ae.isContentEditable && !ae.contains(e.target)) ae.blur();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPd, true);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPd, true);
+    };
+  }, [api]);
+
+  return (
+    <DCCtx.Provider value={api}>
+      <DCViewport minScale={minScale} maxScale={maxScale} style={style}>{ready && children}</DCViewport>
+      {state.focus && registry[state.focus] && (
+        <DCFocusOverlay entry={registry[state.focus]} sectionMeta={sectionMeta} sectionOrder={sectionOrder} />
+      )}
+    </DCCtx.Provider>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DCViewport — transform-based pan/zoom (internal)
+//
+// Input mapping (Figma-style):
+//   • trackpad pinch  → zoom   (ctrlKey wheel; Safari gesture* events)
+//   • trackpad scroll → pan    (two-finger)
+//   • mouse wheel     → zoom   (notched; distinguished from trackpad scroll)
+//   • middle-drag / primary-drag-on-bg → pan
+//
+// Transform state lives in a ref and is written straight to the DOM
+// (translate3d + will-change) so wheel ticks don't go through React —
+// keeps pans at 60fps on dense canvases.
+// ─────────────────────────────────────────────────────────────
+function DCViewport({ children, minScale = 0.1, maxScale = 8, style = {} }) {
+  const vpRef = React.useRef(null);
+  const worldRef = React.useRef(null);
+  const tf = React.useRef({ x: 0, y: 0, scale: 1 });
+
+  const apply = React.useCallback(() => {
+    const { x, y, scale } = tf.current;
+    const el = worldRef.current;
+    if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  }, []);
+
+  React.useEffect(() => {
+    const vp = vpRef.current;
+    if (!vp) return;
+
+    const zoomAt = (cx, cy, factor) => {
+      const r = vp.getBoundingClientRect();
+      const px = cx - r.left, py = cy - r.top;
+      const t = tf.current;
+      const next = Math.min(maxScale, Math.max(minScale, t.scale * factor));
+      const k = next / t.scale;
+      // keep the world point under the cursor fixed
+      t.x = px - (px - t.x) * k;
+      t.y = py - (py - t.y) * k;
+      t.scale = next;
+      apply();
+    };
+
+    // Mouse-wheel vs trackpad-scroll heuristic. A physical wheel sends
+    // line-mode deltas (Firefox) or large integer pixel deltas with no X
+    // component (Chrome/Safari, typically multiples of 100/120). Trackpad
+    // two-finger scroll sends small/fractional pixel deltas, often with
+    // non-zero deltaX. ctrlKey is set by the browser for trackpad pinch.
+    const isMouseWheel = (e) =>
+      e.deltaMode !== 0 ||
+      (e.deltaX === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      if (isGesturing) return; // Safari: gesture* owns the pinch — discard concurrent wheels
+      if (e.ctrlKey) {
+        // trackpad pinch (or explicit ctrl+wheel)
+        zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+      } else if (isMouseWheel(e)) {
+        // notched mouse wheel — fixed-ratio step per click
+        zoomAt(e.clientX, e.clientY, Math.exp(-Math.sign(e.deltaY) * 0.18));
+      } else {
+        // trackpad two-finger scroll — pan
+        tf.current.x -= e.deltaX;
+        tf.current.y -= e.deltaY;
+        apply();
+      }
+    };
+
+    // Safari sends native gesture* events for trackpad pinch with a smooth
+    // e.scale; preferring these over the ctrl+wheel fallback gives a much
+    // better feel there. No-ops on other browsers. Safari also fires
+    // ctrlKey wheel events during the same pinch — isGesturing makes
+    // onWheel drop those entirely so they neither zoom nor pan.
+    let gsBase = 1;
+    let isGesturing = false;
+    const onGestureStart = (e) => { e.preventDefault(); isGesturing = true; gsBase = tf.current.scale; };
+    const onGestureChange = (e) => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, (gsBase * e.scale) / tf.current.scale);
+    };
+    const onGestureEnd = (e) => { e.preventDefault(); isGesturing = false; };
+
+    // Drag-pan: middle button anywhere, or primary button on canvas
+    // background (anything that isn't an artboard or an inline editor).
+    let drag = null;
+    const onPointerDown = (e) => {
+      const onBg = !e.target.closest('[data-dc-slot], .dc-editable');
+      if (!(e.button === 1 || (e.button === 0 && onBg))) return;
+      e.preventDefault();
+      vp.setPointerCapture(e.pointerId);
+      drag = { id: e.pointerId, lx: e.clientX, ly: e.clientY };
+      vp.style.cursor = 'grabbing';
+    };
+    const onPointerMove = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      tf.current.x += e.clientX - drag.lx;
+      tf.current.y += e.clientY - drag.ly;
+      drag.lx = e.clientX; drag.ly = e.clientY;
+      apply();
+    };
+    const onPointerUp = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      vp.releasePointerCapture(e.pointerId);
+      drag = null;
+      vp.style.cursor = '';
+    };
+
+    vp.addEventListener('wheel', onWheel, { passive: false });
+    vp.addEventListener('gesturestart', onGestureStart, { passive: false });
+    vp.addEventListener('gesturechange', onGestureChange, { passive: false });
+    vp.addEventListener('gestureend', onGestureEnd, { passive: false });
+    vp.addEventListener('pointerdown', onPointerDown);
+    vp.addEventListener('pointermove', onPointerMove);
+    vp.addEventListener('pointerup', onPointerUp);
+    vp.addEventListener('pointercancel', onPointerUp);
+    return () => {
+      vp.removeEventListener('wheel', onWheel);
+      vp.removeEventListener('gesturestart', onGestureStart);
+      vp.removeEventListener('gesturechange', onGestureChange);
+      vp.removeEventListener('gestureend', onGestureEnd);
+      vp.removeEventListener('pointerdown', onPointerDown);
+      vp.removeEventListener('pointermove', onPointerMove);
+      vp.removeEventListener('pointerup', onPointerUp);
+      vp.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [apply, minScale, maxScale]);
+
+  const gridSvg = `url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M120 0H0v120' fill='none' stroke='${encodeURIComponent(DC.grid)}' stroke-width='1'/%3E%3C/svg%3E")`;
+  return (
+    <div
+      ref={vpRef}
+      className="design-canvas"
+      style={{
+        height: '100vh', width: '100vw',
+        background: DC.bg,
+        overflow: 'hidden',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
+        position: 'relative',
+        fontFamily: DC.font,
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      <div
+        ref={worldRef}
+        style={{
+          position: 'absolute', top: 0, left: 0,
+          transformOrigin: '0 0',
+          willChange: 'transform',
+          width: 'max-content', minWidth: '100%',
+          minHeight: '100%',
+          padding: '60px 0 80px',
+        }}
+      >
+        <div style={{ position: 'absolute', inset: -6000, backgroundImage: gridSvg, backgroundSize: '120px 120px', pointerEvents: 'none', zIndex: -1 }} />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DCSection — editable title + h-row of artboards in persisted order
+// ─────────────────────────────────────────────────────────────
+function DCSection({ id, title, subtitle, children, gap = 48 }) {
+  const ctx = React.useContext(DCCtx);
+  const sid = id ?? title;
+  const all = React.Children.toArray(children);
+  const artboards = all.filter((c) => c && c.type === DCArtboard);
+  const rest = all.filter((c) => !(c && c.type === DCArtboard));
+  const srcOrder = artboards.map((a) => a.props.id ?? a.props.label);
+  const sec = (ctx && sid && ctx.section(sid)) || {};
+
+  const order = React.useMemo(() => {
+    const kept = (sec.order || []).filter((k) => srcOrder.includes(k));
+    return [...kept, ...srcOrder.filter((k) => !kept.includes(k))];
+  }, [sec.order, srcOrder.join('|')]);
+
+  const byId = Object.fromEntries(artboards.map((a) => [a.props.id ?? a.props.label, a]));
+
+  return (
+    <div data-dc-section={sid} style={{ marginBottom: 80, position: 'relative' }}>
+      <div style={{ padding: '0 60px 56px' }}>
+        <DCEditable tag="div" value={sec.title ?? title}
+          onChange={(v) => ctx && sid && ctx.patchSection(sid, { title: v })}
+          style={{ fontSize: 28, fontWeight: 600, color: DC.title, letterSpacing: -0.4, marginBottom: 6, display: 'inline-block' }} />
+        {subtitle && <div style={{ fontSize: 16, color: DC.subtitle }}>{subtitle}</div>}
+      </div>
+      <div style={{ display: 'flex', gap, padding: '0 60px', alignItems: 'flex-start', width: 'max-content' }}>
+        {order.map((k) => (
+          <DCArtboardFrame key={k} sectionId={sid} artboard={byId[k]} order={order}
+            label={(sec.labels || {})[k] ?? byId[k].props.label}
+            onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
+            onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
+            onFocus={() => ctx && ctx.setFocus(`${sid}/${k}`)} />
+        ))}
+      </div>
+      {rest}
+    </div>
+  );
+}
+
+// DCArtboard — marker; rendered by DCArtboardFrame via DCSection.
+function DCArtboard() { return null; }
+
+function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorder, onFocus }) {
+  const { id: rawId, label: rawLabel, width = 260, height = 480, children, style = {} } = artboard.props;
+  const id = rawId ?? rawLabel;
+  const ref = React.useRef(null);
+
+  // Live drag-reorder: dragged card sticks to cursor; siblings slide into
+  // their would-be slots in real time via transforms. DOM order only
+  // changes on drop.
+  const onGripDown = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const me = ref.current;
+    // translateX is applied in local (pre-scale) space but pointer deltas and
+    // getBoundingClientRect().left are screen-space — divide by the viewport's
+    // current scale so the dragged card tracks the cursor at any zoom level.
+    const scale = me.getBoundingClientRect().width / me.offsetWidth || 1;
+    const peers = Array.from(document.querySelectorAll(`[data-dc-section="${sectionId}"] [data-dc-slot]`));
+    const homes = peers.map((el) => ({ el, id: el.dataset.dcSlot, x: el.getBoundingClientRect().left }));
+    const slotXs = homes.map((h) => h.x);
+    const startIdx = order.indexOf(id);
+    const startX = e.clientX;
+    let liveOrder = order.slice();
+    me.classList.add('dc-dragging');
+
+    const layout = () => {
+      for (const h of homes) {
+        if (h.id === id) continue;
+        const slot = liveOrder.indexOf(h.id);
+        h.el.style.transform = `translateX(${(slotXs[slot] - h.x) / scale}px)`;
+      }
+    };
+
+    const move = (ev) => {
+      const dx = ev.clientX - startX;
+      me.style.transform = `translateX(${dx / scale}px)`;
+      const cur = homes[startIdx].x + dx;
+      let nearest = 0, best = Infinity;
+      for (let i = 0; i < slotXs.length; i++) {
+        const d = Math.abs(slotXs[i] - cur);
+        if (d < best) { best = d; nearest = i; }
+      }
+      if (liveOrder.indexOf(id) !== nearest) {
+        liveOrder = order.filter((k) => k !== id);
+        liveOrder.splice(nearest, 0, id);
+        layout();
+      }
+    };
+
+    const up = () => {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      const finalSlot = liveOrder.indexOf(id);
+      me.classList.remove('dc-dragging');
+      me.style.transform = `translateX(${(slotXs[finalSlot] - homes[startIdx].x) / scale}px)`;
+      // After the settle transition, kill transitions + clear transforms +
+      // commit the reorder in the same frame so there's no visual snap-back.
+      setTimeout(() => {
+        for (const h of homes) { h.el.style.transition = 'none'; h.el.style.transform = ''; }
+        if (liveOrder.join('|') !== order.join('|')) onReorder(liveOrder);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          for (const h of homes) h.el.style.transition = '';
+        }));
+      }, 180);
+    };
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  };
+
+  return (
+    <div ref={ref} data-dc-slot={id} style={{ position: 'relative', flexShrink: 0 }}>
+      <div className="dc-labelrow" style={{ position: 'absolute', bottom: '100%', left: -4, marginBottom: 4, color: DC.label }}>
+        <div className="dc-grip" onPointerDown={onGripDown} title="Drag to reorder">
+          <svg width="9" height="13" viewBox="0 0 9 13" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="7" cy="2" r="1.1"/><circle cx="2" cy="6.5" r="1.1"/><circle cx="7" cy="6.5" r="1.1"/><circle cx="2" cy="11" r="1.1"/><circle cx="7" cy="11" r="1.1"/></svg>
+        </div>
+        <div className="dc-labeltext" onClick={onFocus} title="Click to focus">
+          <DCEditable value={label} onChange={onRename} onClick={(e) => e.stopPropagation()}
+            style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }} />
+        </div>
+      </div>
+      <button className="dc-expand" onClick={onFocus} onPointerDown={(e) => e.stopPropagation()} title="Focus">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 1h4v4M5 11H1V7M11 1L7.5 4.5M1 11l3.5-3.5"/></svg>
+      </button>
+      <div className="dc-card"
+        style={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)', overflow: 'hidden', width, height, background: '#fff', ...style }}>
+        {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13, fontFamily: DC.font }}>{id}</div>}
+      </div>
+    </div>
+  );
+}
+
+// Inline rename — commits on blur or Enter.
+function DCEditable({ value, onChange, style, tag = 'span', onClick }) {
+  const T = tag;
+  return (
+    <T className="dc-editable" contentEditable suppressContentEditableWarning
+      onClick={onClick}
+      onPointerDown={(e) => e.stopPropagation()}
+      onBlur={(e) => onChange && onChange(e.currentTarget.textContent)}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+      style={style}>{value}</T>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Focus mode — overlay one artboard; ←/→ within section, ↑/↓ across
+// sections, Esc or backdrop click to exit.
+// ─────────────────────────────────────────────────────────────
+function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
+  const ctx = React.useContext(DCCtx);
+  const { sectionId, artboard } = entry;
+  const sec = ctx.section(sectionId);
+  const meta = sectionMeta[sectionId];
+  const peers = meta.slotIds;
+  const aid = artboard.props.id ?? artboard.props.label;
+  const idx = peers.indexOf(aid);
+  const secIdx = sectionOrder.indexOf(sectionId);
+
+  const go = (d) => { const n = peers[(idx + d + peers.length) % peers.length]; if (n) ctx.setFocus(`${sectionId}/${n}`); };
+  const goSection = (d) => {
+    const ns = sectionOrder[(secIdx + d + sectionOrder.length) % sectionOrder.length];
+    const first = sectionMeta[ns] && sectionMeta[ns].slotIds[0];
+    if (first) ctx.setFocus(`${ns}/${first}`);
+  };
+
+  React.useEffect(() => {
+    const k = (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); goSection(-1); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); goSection(1); }
+    };
+    document.addEventListener('keydown', k);
+    return () => document.removeEventListener('keydown', k);
+  });
+
+  const { width = 260, height = 480, children } = artboard.props;
+  const [vp, setVp] = React.useState({ w: window.innerWidth, h: window.innerHeight });
+  React.useEffect(() => { const r = () => setVp({ w: window.innerWidth, h: window.innerHeight }); window.addEventListener('resize', r); return () => window.removeEventListener('resize', r); }, []);
+  const scale = Math.max(0.1, Math.min((vp.w - 200) / width, (vp.h - 260) / height, 2));
+
+  const [ddOpen, setDd] = React.useState(false);
+  const Arrow = ({ dir, onClick }) => (
+    <button onClick={(e) => { e.stopPropagation(); onClick(); }}
+      style={{ position: 'absolute', top: '50%', [dir]: 28, transform: 'translateY(-50%)',
+        border: 'none', background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.9)',
+        width: 44, height: 44, borderRadius: 22, fontSize: 18, cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.18)')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d={dir === 'left' ? 'M11 3L5 9l6 6' : 'M7 3l6 6-6 6'} /></svg>
+    </button>
+  );
+
+  // Portal to body so position:fixed is the real viewport regardless of any
+  // transform on DesignCanvas's ancestors (including the canvas zoom itself).
+  return ReactDOM.createPortal(
+    <div onClick={() => ctx.setFocus(null)}
+      onWheel={(e) => e.preventDefault()}
+      style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(24,20,16,.6)', backdropFilter: 'blur(14px)',
+        fontFamily: DC.font, color: '#fff' }}>
+
+      {/* top bar: section dropdown (left) · close (right) */}
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 72, display: 'flex', alignItems: 'flex-start', padding: '16px 20px 0', gap: 16 }}>
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setDd((o) => !o)}
+            style={{ border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer', padding: '6px 8px',
+              borderRadius: 6, textAlign: 'left', fontFamily: 'inherit' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{meta.title}</span>
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" style={{ opacity: .7 }}><path d="M2 4l3.5 3.5L9 4"/></svg>
+            </span>
+            {meta.subtitle && <span style={{ display: 'block', fontSize: 13, opacity: .6, fontWeight: 400, marginTop: 2 }}>{meta.subtitle}</span>}
+          </button>
+          {ddOpen && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#2a251f', borderRadius: 8,
+              boxShadow: '0 8px 32px rgba(0,0,0,.4)', padding: 4, minWidth: 200, zIndex: 10 }}>
+              {sectionOrder.map((sid) => (
+                <button key={sid} onClick={() => { setDd(false); const f = sectionMeta[sid].slotIds[0]; if (f) ctx.setFocus(`${sid}/${f}`); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer',
+                    background: sid === sectionId ? 'rgba(255,255,255,.1)' : 'transparent', color: '#fff',
+                    padding: '8px 12px', borderRadius: 5, fontSize: 14, fontWeight: sid === sectionId ? 600 : 400, fontFamily: 'inherit' }}>
+                  {sectionMeta[sid].title}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1 }} />
+        <button onClick={() => ctx.setFocus(null)}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.12)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,.7)', width: 32, height: 32,
+            borderRadius: 16, fontSize: 20, cursor: 'pointer', lineHeight: 1, transition: 'background .12s' }}>×</button>
+      </div>
+
+      {/* card centered, label + index below — only the card itself stops
+          propagation so any backdrop click (including the margins around
+          the card) exits focus */}
+      <div
+        style={{ position: 'absolute', top: 64, bottom: 56, left: 100, right: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <div onClick={(e) => e.stopPropagation()} style={{ width: width * scale, height: height * scale, position: 'relative' }}>
+          <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
+            boxShadow: '0 20px 80px rgba(0,0,0,.4)' }}>
+            {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>{aid}</div>}
+          </div>
+        </div>
+        <div onClick={(e) => e.stopPropagation()} style={{ fontSize: 14, fontWeight: 500, opacity: .85, textAlign: 'center' }}>
+          {(sec.labels || {})[aid] ?? artboard.props.label}
+          <span style={{ opacity: .5, marginLeft: 10, fontVariantNumeric: 'tabular-nums' }}>{idx + 1} / {peers.length}</span>
+        </div>
+      </div>
+
+      <Arrow dir="left" onClick={() => go(-1)} />
+      <Arrow dir="right" onClick={() => go(1)} />
+
+      {/* dots */}
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8 }}>
+        {peers.map((p, i) => (
+          <button key={p} onClick={() => ctx.setFocus(`${sectionId}/${p}`)}
+            style={{ border: 'none', padding: 0, cursor: 'pointer', width: 6, height: 6, borderRadius: 3,
+              background: i === idx ? '#fff' : 'rgba(255,255,255,.3)' }} />
+        ))}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Post-it — absolute-positioned sticky note
+// ─────────────────────────────────────────────────────────────
+function DCPostIt({ children, top, left, right, bottom, rotate = -2, width = 180 }) {
+  return (
+    <div style={{
+      position: 'absolute', top, left, right, bottom, width,
+      background: DC.postitBg, padding: '14px 16px',
+      fontFamily: '"Comic Sans MS", "Marker Felt", "Segoe Print", cursive',
+      fontSize: 14, lineHeight: 1.4, color: DC.postitText,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+      transform: `rotate(${rotate}deg)`,
+      zIndex: 5,
+    }}>{children}</div>
+  );
+}
+
+Object.assign(window, { DesignCanvas, DCSection, DCArtboard, DCPostIt });
+
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-intro.jsx">
+//# sourceURL=screens-intro.jsx
+// Marketing, Auth, Onboarding — A-only, clickable.
+
+function Marketing({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.canvas}>
+      <div style={{ display:'flex', alignItems:'center', padding:'18px 40px', borderBottom:`1px solid ${t.border}` }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{ width:28, height:28, borderRadius:8, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:t.fontDisplay, fontWeight:700, fontSize:15 }}>K</div>
+          <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:18 }}>Kinship</div>
+        </div>
+        <div style={{ flex:1, display:'flex', gap:28, justifyContent:'center', fontFamily:t.fontBody, fontSize:13, color:t.textMuted }}>
+          <span>Product</span><span>Modules</span><span>AI assistant</span><span>Pricing</span><span>Privacy</span>
+        </div>
+        <div style={{ display:'flex', gap:10 }}>
+          <Btn t={t} variant="ghost" size="sm" onClick={()=>go('auth')}>Sign in</Btn>
+          <Btn t={t} size="sm" onClick={()=>go('auth')}>Get started</Btn>
+        </div>
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'1.1fr 1fr', gap:40, padding:'56px 64px 40px' }}>
+        <div>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'4px 10px', borderRadius:999, background:t.primarySurface, color:t.primary, fontSize:12, fontWeight:600, fontFamily:t.fontBody }}>
+            <Ic.spark s={12}/> Your household, one place
+          </div>
+          <div style={{ fontFamily:t.fontDisplay, fontSize:56, fontWeight:600, letterSpacing:-1.4, lineHeight:1.05, marginTop:20, color:t.text }}>
+            The family command<br/>centre, with a brain.
+          </div>
+          <div style={{ fontFamily:t.fontBody, fontSize:16, color:t.textMuted, marginTop:18, maxWidth:440, lineHeight:1.5 }}>
+            Track chores, cars, insurance, warranties and kids' activities in one home.
+            Upload a policy PDF — Kinship reads it, answers your questions, and turns the
+            steps into tasks.
+          </div>
+          <div style={{ display:'flex', gap:10, marginTop:28 }}>
+            <Btn t={t} size="lg" onClick={()=>go('auth')}>Start your household</Btn>
+            <Btn t={t} variant="outline" size="lg">See how it works</Btn>
+          </div>
+          <div style={{ display:'flex', gap:16, marginTop:20, fontFamily:t.fontBody, fontSize:12, color:t.textFaint }}>
+            <span>✓ GDPR · EU data</span><span>✓ Free for one household</span><span>✓ Web, iOS soon</span>
+          </div>
+        </div>
+
+        <div style={{ position:'relative', height:420 }}>
+          <div style={{ position:'absolute', left:30, top:20, right:0, background:t.canvas, borderRadius:16, boxShadow:t.ring, padding:16, transform:'rotate(-2deg)' }}>
+            <div style={{ fontFamily:t.fontDisplay, fontSize:13, fontWeight:600, marginBottom:10 }}>This week</div>
+            {[
+              {c:t.chores.dot, l:'Take out recycling · 6pm'},
+              {c:t.kids.dot, l:'Iris swimming · 4:30pm'},
+              {c:t.car.dot, l:'Ford Focus MOT · Jun 14'},
+              {c:t.ins.dot, l:'Aviva home renewal · Jul 3'},
+            ].map((r,i)=>(
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:i<3?`1px solid ${t.border}`:'none' }}>
+                <div style={{ width:8, height:8, borderRadius:4, background:r.c }}/>
+                <div style={{ fontSize:12, color:t.text }}>{r.l}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ position:'absolute', right:0, bottom:0, width:300, background:t.canvas, borderRadius:16, boxShadow:t.float, padding:16 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+              <div style={{ width:22, height:22, borderRadius:11, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}><Ic.spark s={12}/></div>
+              <div style={{ fontFamily:t.fontDisplay, fontSize:13, fontWeight:600 }}>Kinship AI</div>
+            </div>
+            <div style={{ background:t.surface2, padding:'8px 10px', borderRadius:10, fontSize:12, color:t.text, marginBottom:8 }}>What do I need to do to renew home insurance?</div>
+            <div style={{ background:t.primarySurface, padding:'10px 12px', borderRadius:10, fontSize:12, color:t.text, lineHeight:1.5 }}>
+              From your Aviva PDF — 4 steps. Want me to add them to <b>Home Chores</b>?
+              <div style={{ marginTop:10, display:'flex', gap:6 }}>
+                <Btn t={t} size="sm">Add tasks</Btn>
+                <Btn t={t} variant="outline" size="sm">Preview</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:12, padding:'8px 64px 24px' }}>
+        {[
+          {c:t.chores, n:'Chores', d:'Recurring, fair, done'},
+          {c:t.kids,   n:'Kids', d:'Who takes them where'},
+          {c:t.car,    n:'Car',  d:'MOT, tax, service'},
+          {c:t.ins,    n:'Insurance', d:'Policies & renewals'},
+          {c:t.elec,   n:'Electronics', d:'Warranties & manuals'},
+        ].map((m,i)=>(
+          <div key={i} style={{ padding:14, borderRadius:12, background:m.c.light, color:m.c.dark }}>
+            <div style={{ fontFamily:t.fontDisplay, fontSize:14, fontWeight:600 }}>{m.n}</div>
+            <div style={{ fontFamily:t.fontBody, fontSize:11, opacity:0.85, marginTop:2 }}>{m.d}</div>
+          </div>
+        ))}
+      </div>
+    </Screen>
+  );
+}
+
+function Auth({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', height:'100%' }}>
+        <div style={{ background:t.primary, color:'#fff', padding:'40px 36px', display:'flex', flexDirection:'column', justifyContent:'space-between', position:'relative', overflow:'hidden' }}>
+          <div onClick={()=>go('marketing')} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
+            <div style={{ width:26, height:26, borderRadius:8, background:'#fff', color:t.primary, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, fontFamily:t.fontDisplay }}>K</div>
+            <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:17 }}>Kinship</div>
+          </div>
+          <div>
+            <div style={{ fontFamily:t.fontDisplay, fontSize:30, fontWeight:600, letterSpacing:-0.8, lineHeight:1.1 }}>
+              Welcome back to<br/>your household.
+            </div>
+            <div style={{ fontFamily:t.fontBody, fontSize:13, opacity:0.8, marginTop:12, maxWidth:260 }}>
+              Chores, cars, insurance, kids — everything waiting where you left it.
+            </div>
+          </div>
+          <div style={{ position:'absolute', bottom:-60, left:-40, width:220, height:220, borderRadius:'50%', background:t.kids.light, opacity:0.5 }}/>
+          <div style={{ position:'absolute', top:120, right:-80, width:180, height:180, borderRadius:'50%', background:t.chores.light, opacity:0.35 }}/>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:40 }}>
+          <div style={{ width:'100%', maxWidth:320 }}>
+            <div style={{ fontFamily:t.fontDisplay, fontSize:26, fontWeight:600, letterSpacing:-0.5 }}>Sign in</div>
+            <div style={{ fontFamily:t.fontBody, fontSize:13, color:t.textMuted, marginTop:4, marginBottom:22 }}>to your Kinship account</div>
+
+            <Btn t={t} variant="outline" full size="lg" onClick={()=>go('dash')} icon={<svg width={14} height={14} viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.8-.1-1.6-.2-2.4H12v4.5h5.9c-.3 1.4-1 2.5-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.7 3.2-8z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6L15.6 18c-1 .7-2.2 1.1-3.6 1.1-2.8 0-5.1-1.9-5.9-4.4H2.4v2.8C4.3 20.9 7.9 23 12 23z"/><path fill="#FBBC05" d="M6.1 14.6c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.9H2.4A11 11 0 0 0 1 12.6c0 1.7.4 3.3 1.4 4.7l3.7-2.7z"/><path fill="#EA4335" d="M12 6.1c1.6 0 3 .5 4.1 1.6l3.1-3.1C17.3 2.9 14.8 2 12 2 7.9 2 4.3 4.1 2.4 7.4l3.7 2.8C6.9 7.9 9.2 6.1 12 6.1z"/></svg>}>Continue with Google</Btn>
+
+            <div style={{ display:'flex', alignItems:'center', gap:8, margin:'20px 0', color:t.textFaint, fontSize:11 }}>
+              <div style={{ flex:1, height:1, background:t.border }}/>or<div style={{ flex:1, height:1, background:t.border }}/>
+            </div>
+
+            <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textMuted, marginBottom:6 }}>Email</div>
+            <div style={{ height:40, borderRadius:8, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.canvas }}>ava@harper.fam</div>
+
+            <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textMuted, marginTop:14, marginBottom:6, display:'flex' }}>Password <span style={{ flex:1 }}/><span style={{ color:t.primary, cursor:'pointer' }} onClick={()=>go('reset')}>Forgot?</span></div>
+            <div style={{ height:40, borderRadius:8, border:`1px solid ${t.primary}`, boxShadow:`0 0 0 3px ${t.primarySurface}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.canvas, color:t.textFaint, letterSpacing:2 }}>••••••••••</div>
+
+            <div style={{ marginTop:20 }}><Btn t={t} full size="lg" onClick={()=>go('dash')}>Sign in</Btn></div>
+
+            <div style={{ textAlign:'center', marginTop:18, fontFamily:t.fontBody, fontSize:12, color:t.textMuted }}>
+              New to Kinship? <span style={{ color:t.primary, fontWeight:600, cursor:'pointer' }} onClick={()=>go('onboarding')}>Create account</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function Onboarding({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const steps = ['Household', 'Type', 'Modules', 'Members'];
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'grid', gridTemplateColumns:'260px 1fr', gap:24, padding:24, height:'100%' }}>
+        <div style={{ background:t.canvas, borderRadius:16, boxShadow:t.ring, padding:20, display:'flex', flexDirection:'column' }}>
+          <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:16, marginBottom:20, display:'flex', alignItems:'center', gap:8 }}>
+            <div style={{ width:22, height:22, borderRadius:6, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700 }}>K</div>
+            Kinship
+          </div>
+          {steps.map((s,i)=>{
+            const state = i < 2 ? 'done' : i === 2 ? 'active' : 'pending';
+            const color = state === 'done' ? t.success : state === 'active' ? t.primary : t.textFaint;
+            return (
+              <div key={s} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 8px', fontFamily:t.fontBody, fontSize:13, color:state==='active'?t.text:t.textMuted, fontWeight: state==='active'?600:400 }}>
+                <div style={{ width:22, height:22, borderRadius:11, background: state==='done'?t.successSurface: state==='active'?t.primarySurface: t.surface2, color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:700 }}>
+                  {state==='done' ? <Ic.check s={12}/> : i+1}
+                </div>
+                {s}
+              </div>
+            );
+          })}
+          <div style={{ flex:1 }}/>
+          <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textFaint }}>Step 3 of 4</div>
+        </div>
+
+        <div style={{ background:t.canvas, borderRadius:t.radiusHero, boxShadow:t.ring, padding:48, display:'flex', flexDirection:'column' }}>
+          <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textFaint, fontWeight:600, letterSpacing:0.5, textTransform:'uppercase' }}>Step 3 of 4</div>
+          <div style={{ fontFamily:t.fontDisplay, fontSize:30, fontWeight:600, letterSpacing:-0.6, marginTop:8 }}>Which modules do you need?</div>
+          <div style={{ fontFamily:t.fontBody, fontSize:14, color:t.textMuted, marginTop:6, maxWidth:420 }}>
+            Pick what your household actually tracks — you can add or remove any of these later from settings.
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:24 }}>
+            {[
+              { n:'Home Chores', d:'Tasks, recurring chores, reminders', c:t.chores, icon:<Ic.check s={18}/>, on:true },
+              { n:'Kids Activities', d:'Schedules, school, sport, medical', c:t.kids, icon:<Ic.users s={18}/>, on:true },
+              { n:'Car Maintenance', d:'MOT, tax, service, history', c:t.car, icon:<Ic.car s={18}/>, on:true },
+              { n:'Insurance', d:'Policies, renewals, premium schedule', c:t.ins, icon:<Ic.shield s={18}/>, on:true },
+              { n:'Electronics', d:'Warranties, manuals, expiry dates', c:t.elec, icon:<Ic.plug s={18}/>, on:false },
+            ].map(m=>(
+              <div key={m.n} style={{
+                display:'flex', alignItems:'flex-start', gap:12,
+                padding:'14px 14px', borderRadius:12,
+                background: m.on ? t.primarySurface : t.canvas,
+                boxShadow: m.on ? `0 0 0 2px ${t.primary}` : t.ring,
+                cursor:'pointer',
+              }}>
+                <ModChip icon={m.icon} color={m.c.dark} bg={m.c.light} t={t}/>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:14 }}>{m.n}</div>
+                  <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textMuted, marginTop:2 }}>{m.d}</div>
+                </div>
+                <div style={{
+                  width:18, height:18, borderRadius:4,
+                  background: m.on ? t.primary : 'transparent',
+                  border: m.on ? 'none' : `1px solid ${t.borderStrong}`,
+                  color:'#fff', display:'flex', alignItems:'center', justifyContent:'center',
+                  flexShrink:0, marginTop:2,
+                }}>{m.on && <Ic.check s={12}/>}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ flex:1 }}/>
+          <div style={{ display:'flex', gap:10, marginTop:24 }}>
+            <Btn t={t} variant="ghost" size="lg" onClick={()=>go('auth')}>Back</Btn>
+            <div style={{ flex:1 }}/>
+            <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textFaint, alignSelf:'center' }}>4 modules selected</div>
+            <Btn t={t} size="lg" onClick={()=>go('welcome')}>Continue</Btn>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+Object.assign(window, { Marketing, Auth, Onboarding });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-dashboard.jsx">
+//# sourceURL=screens-dashboard.jsx
+// Dashboard — hero screen. Module cards with "See all →" links.
+// Recent activity removed — now lives under Notifications.
+
+function DashA({ t, onNav }) {
+  const d = DEMO;
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="dash" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
+          <TopBar t={t} title="Good afternoon, Ava" subtitle="5 things on the household's radar today"
+                  cta={<Btn t={t} onClick={()=>go('chores/new')}>+ Quick add</Btn>}
+                  onNav={go}/>
+
+          <div style={{ flex:1, overflow:'auto', padding:'8px 24px 24px', display:'grid', gridTemplateColumns:'1.6fr 1fr', gap:16 }}>
+            {/* LEFT column */}
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+
+              {/* hero strip — this week */}
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, overflow:'hidden' }}>
+                <div style={{ display:'flex', alignItems:'center', padding:'14px 18px', borderBottom:`1px solid ${t.border}` }}>
+                  <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:14 }}>This week</div>
+                  <div style={{ flex:1 }}/>
+                  <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textFaint, marginRight:12 }}>Apr 21 – 27</div>
+                  <SeeAll t={t} onClick={()=>go('calendar')}/>
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)' }}>
+                  {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day, i)=>{
+                    const dots = [
+                      [t.chores.dot, t.kids.dot], [t.kids.dot], [t.chores.dot, t.kids.dot],
+                      [t.chores.dot, t.ins.dot], [], [t.kids.dot, t.kids.dot], [t.chores.dot],
+                    ][i];
+                    const today = i === 0;
+                    return (
+                      <div key={day} style={{ padding:'12px 10px', borderRight: i<6 ? `1px solid ${t.border}` : 'none' }}>
+                        <div style={{ fontFamily:t.fontBody, fontSize:10, fontWeight:600, letterSpacing:0.8, textTransform:'uppercase', color:t.textFaint }}>{day}</div>
+                        <div style={{ fontFamily:t.fontDisplay, fontSize:20, fontWeight:600, color: today ? t.primary : t.text, marginTop:2 }}>{21+i}</div>
+                        <div style={{ display:'flex', gap:3, marginTop:6, minHeight:8 }}>
+                          {dots.map((c,j)=><div key={j} style={{ width:6, height:6, borderRadius:3, background:c }}/>)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* module cards grid */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+                <ModuleCardA t={t} color={t.chores} icon={<Ic.check s={16}/>} title="Home Chores"
+                             meta="3 due this week" onSeeAll={()=>go('chores')}>
+                  {[
+                    {n:'Take out the recycling', m:'Today · 6pm', who:'NH', wc:'#5b76fe'},
+                    {n:'Water the houseplants', m:'Tomorrow', who:'AH', wc:'#e05252'},
+                    {n:'Hoover the stairs', m:'Wed', who:'NH', wc:'#5b76fe'},
+                  ].map((r,i)=>(
+                    <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderTop: i===0?'none':`1px solid ${t.border}` }}>
+                      <div style={{ width:16, height:16, borderRadius:4, border:`1.5px solid ${t.borderStrong}`, flexShrink:0 }}/>
+                      <div style={{ flex:1, fontSize:12, color:t.text, fontWeight:500 }}>{r.n}</div>
+                      <div style={{ fontSize:11, color:t.textFaint }}>{r.m}</div>
+                      <Avatar initials={r.who} color={r.wc} size={20} t={t}/>
+                    </div>
+                  ))}
+                </ModuleCardA>
+
+                <ModuleCardA t={t} color={t.kids} icon={<Ic.users s={16}/>} title="Kids Activities"
+                             meta="Iris & Finn · 5 this week" onSeeAll={()=>go('kids')}>
+                  {d.activities.slice(0,3).map((a,i)=>(
+                    <div key={i} style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'8px 0', borderTop: i===0?'none':`1px solid ${t.border}` }}>
+                      <div style={{ width:8, height:8, borderRadius:4, background: a.cat==='sport'?t.car.dot:a.cat==='school'?t.chores.dot:a.cat==='medical'?t.kids.dot:a.cat==='social'?t.elec.dot:t.cal.dot, marginTop:4 }}/>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:12, color:t.text, fontWeight:500 }}>{a.title.split(' · ')[0]}</div>
+                        <div style={{ fontSize:10.5, color:t.textFaint, marginTop:1 }}>{a.child} · {a.date}</div>
+                      </div>
+                    </div>
+                  ))}
+                </ModuleCardA>
+
+                <ModuleCardA t={t} color={t.car} icon={<Ic.car s={16}/>} title="Car Maintenance"
+                             meta="Ford Focus · 42,118 mi" onSeeAll={()=>go('car')}>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, paddingTop:4 }}>
+                    {[
+                      {l:'MOT', d:'Jun 14', hot:true},
+                      {l:'Tax',  d:'Sep 01'},
+                      {l:'Service', d:'Nov 02'},
+                    ].map((r,i)=>(
+                      <div key={i} style={{ padding:'8px 10px', borderRadius:8, background: r.hot? t.warnSurface : t.surface2 }}>
+                        <div style={{ fontSize:10, color:t.textFaint, textTransform:'uppercase', letterSpacing:0.6, fontWeight:600 }}>{r.l}</div>
+                        <div style={{ fontSize:13, fontWeight:600, color:r.hot?t.warn:t.text, fontFamily:t.fontDisplay }}>{r.d}</div>
+                      </div>
+                    ))}
+                  </div>
+                </ModuleCardA>
+
+                <ModuleCardA t={t} color={t.ins} icon={<Ic.shield s={16}/>} title="Insurance"
+                             meta="4 policies" onSeeAll={()=>go('insurance')}>
+                  {d.policies.slice(0,3).map((p,i)=>(
+                    <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'7px 0', borderTop: i===0?'none':`1px solid ${t.border}`, cursor:'pointer' }}
+                         onClick={()=>go('insurance/policy')}>
+                      <div style={{ fontSize:12, fontWeight:600, color:t.text, minWidth:52 }}>{p.type.split(' ')[0]}</div>
+                      <div style={{ fontSize:11, color:t.textMuted, flex:1 }}>{p.insurer}</div>
+                      <div style={{ fontSize:11, color:t.textFaint }}>{p.expiry.split(', ')[0]}</div>
+                    </div>
+                  ))}
+                </ModuleCardA>
+              </div>
+            </div>
+
+            {/* RIGHT column */}
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              {/* Ask Kinship pinned */}
+              <div style={{ background:t.primarySurface, borderRadius:t.radiusLg, padding:16 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, fontFamily:t.fontDisplay, fontSize:13, fontWeight:600, color:t.primary }}>
+                  <Ic.spark s={14}/> Ask Kinship
+                </div>
+                <div style={{ fontFamily:t.fontDisplay, fontSize:17, fontWeight:600, color:t.text, marginTop:10, lineHeight:1.25 }}>
+                  Aviva home insurance renews in 73 days.
+                </div>
+                <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textMuted, marginTop:8, lineHeight:1.5 }}>
+                  I read the policy. Want me to add the 4 renewal steps to <b>Home Chores</b> so you don't miss it?
+                </div>
+                <div style={{ display:'flex', gap:8, marginTop:12 }}>
+                  <Btn t={t} size="sm" onClick={()=>go('chores')}>Add tasks</Btn>
+                  <Btn t={t} variant="outline" size="sm" onClick={()=>go('chat')}>Preview steps</Btn>
+                </div>
+              </div>
+
+              {/* Electronics warranty watch */}
+              <ModuleCardA t={t} color={t.elec} icon={<Ic.plug s={16}/>} title="Electronics"
+                           meta="4 items · 2 expiring" onSeeAll={()=>go('electronics')} compact>
+                {d.electronics.slice(0,4).map((e,i)=>(
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'7px 0', borderTop: i===0?'none':`1px solid ${t.border}` }}>
+                    <div style={{ fontSize:12, fontWeight:500, color:t.text, flex:1 }}>{e.name}</div>
+                    {e.status==='expiring'
+                      ? <Badge t={t} bg={t.warnSurface} fg={t.warn}>{e.warranty}</Badge>
+                      : <span style={{ fontSize:11, color:t.textFaint }}>{e.warranty}</span>}
+                  </div>
+                ))}
+              </ModuleCardA>
+
+              {/* Upcoming across modules — compact */}
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, overflow:'hidden' }}>
+                <div style={{ display:'flex', alignItems:'center', padding:'10px 14px', background:t.surface2 }}>
+                  <div style={{ fontFamily:t.fontDisplay, fontSize:13, fontWeight:600, flex:1 }}>Coming up</div>
+                  <SeeAll t={t} onClick={()=>go('calendar')}/>
+                </div>
+                <div style={{ padding:'6px 14px 10px' }}>
+                  {[
+                    {d:'May 8',  mod:t.ins,    title:'Travel insurance expires'},
+                    {d:'Jun 14', mod:t.car,    title:'Ford Focus MOT'},
+                    {d:'Jul 3',  mod:t.ins,    title:'Aviva home renews'},
+                    {d:'Nov 2',  mod:t.car,    title:'Ford Focus service'},
+                  ].map((r,i)=>(
+                    <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'7px 0', borderTop: i===0?'none':`1px solid ${t.border}` }}>
+                      <div style={{ width:6, height:6, borderRadius:3, background:r.mod.dot }}/>
+                      <div style={{ fontSize:11.5, color:t.text, flex:1, fontWeight:500 }}>{r.title}</div>
+                      <div style={{ fontSize:11, color:t.textFaint }}>{r.d}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+function SeeAll({ t, onClick }) {
+  return (
+    <a onClick={onClick} style={{
+      display:'inline-flex', alignItems:'center', gap:3,
+      fontFamily:t.fontBody, fontSize:11.5, fontWeight:600,
+      color:t.primary, cursor:'pointer', textDecoration:'none',
+    }}>See all <Ic.chevR s={11}/></a>
+  );
+}
+
+function ModuleCardA({ t, color, icon, title, meta, children, compact, onSeeAll }) {
+  return (
+    <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+      <div style={{ background:color.light, padding:'10px 14px', display:'flex', alignItems:'center', gap:8, color:color.dark }}>
+        <span style={{ display:'flex' }}>{icon}</span>
+        <span style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}>{title}</span>
+        <div style={{ flex:1 }}/>
+        <span style={{ fontFamily:t.fontBody, fontSize:11, fontWeight:500, opacity:0.8 }}>{meta}</span>
+        {onSeeAll && <span onClick={onSeeAll} style={{
+          marginLeft: 10,
+          display:'inline-flex', alignItems:'center', gap:3,
+          fontFamily:t.fontBody, fontSize:11, fontWeight:600,
+          color: color.dark, cursor:'pointer', opacity:0.85,
+          paddingLeft: 10, borderLeft: `1px solid ${color.dark}22`,
+        }}>See all <Ic.chevR s={10}/></span>}
+      </div>
+      <div style={{ padding:'10px 14px', flex:1 }}>{children}</div>
+    </div>
+  );
+}
+
+Object.assign(window, { DashA, ModuleCardA, SeeAll });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-core.jsx">
+//# sourceURL=screens-core.jsx
+// Chores, Kids, Calendar — A-only, clickable.
+
+function Chores({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="chores" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
+          <TopBar t={t} title="Home Chores" subtitle="6 tasks this week · 4 recurring"
+                  cta={<Btn t={t} onClick={()=>go('chores/new')}>+ Add Task</Btn>} onNav={go}/>
+
+          <div style={{ flex:1, overflow:'hidden', padding:'8px 24px 24px', display:'flex', flexDirection:'column', gap:12 }}>
+            <div style={{ background:t.surface2, borderRadius:12, padding:10, display:'flex', gap:8, alignItems:'center' }}>
+              {['All','To do','In progress','Done'].map((s,i)=>(
+                <div key={s} style={{ padding:'5px 12px', borderRadius:999, background: i===1?t.primarySurface:t.canvas, color: i===1?t.primary:t.textMuted, border: i===1?`1px solid ${t.primary}`:`1px solid ${t.border}`, fontSize:12, fontWeight: i===1?600:400, cursor:'pointer' }}>{s}</div>
+              ))}
+              <div style={{ width:1, height:18, background:t.border }}/>
+              <div style={{ padding:'5px 12px', borderRadius:8, background:t.canvas, border:`1px solid ${t.border}`, fontSize:12, color:t.textMuted, display:'flex', gap:6, alignItems:'center' }}>Area: All <Ic.chevD s={11}/></div>
+              <div style={{ padding:'5px 12px', borderRadius:8, background:t.canvas, border:`1px solid ${t.border}`, fontSize:12, color:t.textMuted, display:'flex', gap:6, alignItems:'center' }}>Assignee: Anyone <Ic.chevD s={11}/></div>
+              <div style={{ flex:1 }}/>
+              <div style={{ fontSize:11, color:t.textFaint }}>Hide done</div>
+              <div style={{ width:28, height:16, borderRadius:8, background:t.primary, position:'relative' }}>
+                <div style={{ position:'absolute', top:2, left:14, width:12, height:12, borderRadius:6, background:'#fff' }}/>
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8, overflow:'auto' }}>
+              {d.chores.map((c,i)=>{
+                const done = c.status==='done';
+                return (
+                  <div key={i} style={{ background:t.canvas, borderRadius:12, boxShadow:t.ring, padding:'12px 14px', display:'flex', alignItems:'center', gap:12, opacity: done?0.6:1, cursor:'pointer' }}>
+                    <div style={{ width:20, height:20, borderRadius:5, background: done?t.primary:'transparent', border: done?'none':`1.5px solid ${t.borderStrong}`, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{done && <Ic.check s={12}/>}</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontFamily:t.fontDisplay, fontSize:14, fontWeight:600, color:t.text, textDecoration: done?'line-through':'none' }}>{c.title}</div>
+                      <div style={{ display:'flex', gap:8, alignItems:'center', marginTop:4 }}>
+                        <Badge t={t} bg={t.chores.light} fg={t.chores.dark}>{c.area}</Badge>
+                        <span style={{ fontSize:11, color:t.textMuted }}>{c.due}</span>
+                        {c.recur && <span style={{ fontSize:11, color:t.textFaint, display:'inline-flex', alignItems:'center', gap:3 }}>↻ weekly</span>}
+                      </div>
+                    </div>
+                    {c.status==='progress' && <Badge t={t} bg={t.primarySurface} fg={t.primary}>In progress</Badge>}
+                    {c.status==='todo' && <Badge t={t} border={t.border} fg={t.text}>To do</Badge>}
+                    {done && <Badge t={t} bg={t.successSurface} fg={t.success}>Done</Badge>}
+                    <Avatar initials={c.assignee==='Ava'?'AH':'NH'} color={c.assignee==='Ava'?'#e05252':'#5b76fe'} size={26} t={t}/>
+                    <span style={{ color:t.textFaint }}><Ic.more s={16}/></span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+function Kids({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="kids" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
+          <TopBar t={t} title="Kids Activities" subtitle="Iris (9) · Finn (6) — 5 this week"
+                  cta={<Btn t={t} onClick={()=>go('kids/new')}>+ Add Activity</Btn>} onNav={go}/>
+          <div style={{ padding:'8px 24px 24px', flex:1, display:'flex', flexDirection:'column', gap:12, overflow:'hidden' }}>
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              {['All', 'Iris', 'Finn'].map((n,i)=>(
+                <div key={n} style={{ padding:'6px 14px', borderRadius:999, background: i===0?t.kids.light:'transparent', color: i===0?t.kids.dark:t.textMuted, fontSize:13, fontWeight: i===0?600:400, cursor:'pointer' }}>{n}</div>
+              ))}
+              <div style={{ padding:'6px 12px', borderRadius:999, border:`1px dashed ${t.borderStrong}`, color:t.textFaint, fontSize:12, display:'flex', alignItems:'center', gap:4 }}><Ic.plus s={12}/> Add child</div>
+              <div style={{ flex:1 }}/>
+              <div style={{ padding:3, borderRadius:999, background:t.surface2, display:'flex', gap:2 }}>
+                <div style={{ padding:'5px 12px', borderRadius:999, background:t.canvas, boxShadow:t.ring, fontSize:12, fontWeight:600 }}>List</div>
+                <div onClick={()=>go('calendar')} style={{ padding:'5px 12px', borderRadius:999, color:t.textMuted, fontSize:12, cursor:'pointer' }}>Calendar</div>
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8, overflow:'auto' }}>
+              {d.activities.map((a,i)=>{
+                const catColor = { school:t.chores, medical:t.kids, sport:t.car, hobby:t.cal, social:t.elec }[a.cat] || t.chores;
+                return (
+                  <div key={i} style={{ background:t.canvas, borderRadius:12, boxShadow:t.ring, padding:'12px 14px', display:'flex', alignItems:'center', gap:12, cursor:'pointer' }}>
+                    <div style={{ width:14, height:14, borderRadius:7, background:catColor.dot, flexShrink:0 }}/>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontFamily:t.fontDisplay, fontSize:14, fontWeight:600, color:t.text }}>{a.title}</div>
+                      <div style={{ display:'flex', gap:8, alignItems:'center', marginTop:4 }}>
+                        <Badge t={t} bg={catColor.light} fg={catColor.dark}>{a.cat}</Badge>
+                        <span style={{ fontSize:11, color:t.textMuted }}>{a.date}</span>
+                        <span style={{ fontSize:11, color:t.textFaint }}>· {a.loc}</span>
+                      </div>
+                    </div>
+                    <Badge t={t} bg={t.kids.light} fg={t.kids.dark}>{a.child}</Badge>
+                    <Avatar initials={a.parent==='Ava'?'AH':'NH'} color={a.parent==='Ava'?'#e05252':'#5b76fe'} size={24} t={t}/>
+                    <span style={{ color:t.textFaint }}><Ic.more s={16}/></span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+function Calendar({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const evs = {
+    2: [{c:t.chores,l:'Recycling'}, {c:t.kids,l:'Iris swim'}],
+    3: [{c:t.kids,l:'Finn pickup'}],
+    4: [{c:t.chores,l:'Hoover stairs'}, {c:t.kids,l:'Dentist'}],
+    5: [{c:t.chores,l:'Bins · black'}, {c:t.ins,l:'Direct Line DD'}],
+    7: [{c:t.kids,l:'Theo party'}, {c:t.kids,l:'Violin'}],
+    8: [{c:t.chores,l:'Bedsheets'}],
+    14:[{c:t.ins,l:'Travel expires'}],
+    23:[{c:t.car,l:'MOT due'}],
+  };
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="calendar" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Calendar" subtitle="Everything on your household's radar"
+                  cta={<div style={{ display:'flex', gap:8 }}><Btn t={t} variant="outline" size="sm">Today</Btn><Btn t={t} size="sm" onClick={()=>go('chores/new')}>+ Event</Btn></div>} onNav={go}/>
+          <div style={{ flex:1, padding:'8px 24px 24px' }}>
+            <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:20, height:'100%', display:'flex', flexDirection:'column' }}>
+              <div style={{ display:'flex', alignItems:'center', marginBottom:14 }}>
+                <span style={{ color:t.textFaint, cursor:'pointer' }}><Ic.chevL/></span>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:18, margin:'0 14px' }}>April 2026</div>
+                <span style={{ color:t.textFaint, cursor:'pointer' }}><Ic.chevR/></span>
+                <div style={{ flex:1 }}/>
+                <div style={{ padding:3, borderRadius:999, background:t.surface2, display:'flex' }}>
+                  <div style={{ padding:'5px 12px', borderRadius:999, background:t.canvas, boxShadow:t.ring, fontSize:12, fontWeight:600 }}>Month</div>
+                  <div style={{ padding:'5px 12px', borderRadius:999, color:t.textMuted, fontSize:12 }}>Week</div>
+                </div>
+                <div style={{ marginLeft:16, display:'flex', gap:12, fontSize:11, color:t.textMuted }}>
+                  {[['Chores',t.chores.dot],['Kids',t.kids.dot],['Car',t.car.dot],['Ins.',t.ins.dot],['Elec.',t.elec.dot]].map(([n,c])=>(
+                    <div key={n} style={{ display:'flex', alignItems:'center', gap:4 }}><div style={{ width:8, height:8, borderRadius:4, background:c }}/>{n}</div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:4, marginBottom:4 }}>
+                {days.map(d=><div key={d} style={{ fontSize:10, fontWeight:600, letterSpacing:1, textTransform:'uppercase', color:t.textFaint, padding:'4px 6px' }}>{d}</div>)}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gridAutoRows:'1fr', gap:4, flex:1 }}>
+                {Array.from({length:35}).map((_,i)=>{
+                  const dayNum = i - 1;
+                  const today = dayNum === 20;
+                  const outOfMonth = dayNum < 1 || dayNum > 30;
+                  const ev = evs[i] || [];
+                  return (
+                    <div key={i} style={{ background: today?t.primarySurface:t.surface, borderRadius:8, padding:6, minHeight:0, display:'flex', flexDirection:'column', gap:2 }}>
+                      <div style={{ fontFamily:t.fontDisplay, fontSize:12, fontWeight: today?700:500, color: today?t.primary: outOfMonth?t.textFaint:t.text }}>{outOfMonth?'':dayNum}</div>
+                      {ev.slice(0,2).map((e,j)=>(
+                        <div key={j} style={{ display:'flex', alignItems:'center', gap:4, fontSize:10, color:e.c.dark, background:e.c.light, padding:'1px 4px', borderRadius:3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                          <div style={{ width:5, height:5, borderRadius:3, background:e.c.dot, flexShrink:0 }}/>{e.l}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+Object.assign(window, { Chores, Kids, Calendar });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-modules.jsx">
+//# sourceURL=screens-modules.jsx
+// Car, Insurance, Electronics — A-only, clickable.
+
+function Car({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="car" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Car Maintenance" subtitle="2 vehicles · 1 item due soon"
+                  cta={<Btn t={t} onClick={()=>go('car/service')}>+ Log Service</Btn>} onNav={go}/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, overflow:'auto' }}>
+            {d.cars.map((car,i)=>(
+              <div key={i} style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+                <div style={{ padding:'14px 16px', display:'flex', alignItems:'center', gap:10, background:t.car.light, color:t.car.dark }}>
+                  <Ic.car s={18}/>
+                  <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:15 }}>{car.name}</div>
+                  <div style={{ flex:1 }}/>
+                  <div style={{ fontFamily:t.fontBody, fontSize:11, opacity:0.8 }}>{car.reg}</div>
+                </div>
+                <div style={{ padding:'14px 16px', display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, borderBottom:`1px solid ${t.border}` }}>
+                  {[
+                    {l:'Mileage', v:`${car.mileage.toLocaleString()} mi`},
+                    {l:'MOT due', v:car.mot, hot:car.hotMot},
+                    {l:'Tax due', v:car.tax},
+                  ].map((s,j)=>(
+                    <div key={j} style={{ padding:'8px 10px', borderRadius:8, background: s.hot?t.warnSurface:t.surface2 }}>
+                      <div style={{ fontSize:10, color:t.textFaint, letterSpacing:0.6, textTransform:'uppercase', fontWeight:600 }}>{s.l}</div>
+                      <div style={{ fontFamily:t.fontDisplay, fontSize:14, fontWeight:600, color: s.hot?t.warn:t.text, marginTop:2 }}>{s.v}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding:'10px 16px 4px', fontFamily:t.fontDisplay, fontSize:12, fontWeight:600, color:t.textMuted, display:'flex', alignItems:'center' }}>
+                  <span>Service history</span>
+                  <div style={{ flex:1 }}/>
+                  {i===0 && <span onClick={()=>go('car/service')} style={{ fontSize:11, color:t.primary, fontWeight:600, cursor:'pointer' }}>+ Log</span>}
+                </div>
+                <div style={{ padding:'0 16px 14px' }}>
+                  {car.history.map((h,j)=>(
+                    <div key={j} style={{ display:'flex', alignItems:'center', gap:10, padding:'7px 0', borderBottom: j<car.history.length-1?`1px solid ${t.border}`:'none' }}>
+                      <div style={{ width:6, height:6, borderRadius:3, background:t.car.dot }}/>
+                      <div style={{ fontSize:12, fontWeight:500, flex:1 }}>{h.what}</div>
+                      <div style={{ fontSize:11, color:t.textFaint }}>{h.when}</div>
+                      <div style={{ fontSize:11, color:t.textMuted, width:60, textAlign:'right' }}>{h.cost}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+function Insurance({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="insurance" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Insurance" subtitle="4 policies · 1 renewal in 73 days"
+                  cta={<div style={{ display:'flex', gap:8 }}><Btn t={t} variant="outline" onClick={()=>go('insurance/policy')}>↑ Upload PDF</Btn><Btn t={t} onClick={()=>go('insurance/policy')}>+ Add Policy</Btn></div>} onNav={go}/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'flex', flexDirection:'column', gap:12, overflow:'auto' }}>
+            {d.policies.map((p,i)=>(
+              <div key={i} onClick={()=>go('insurance/policy')} style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:'14px 16px', display:'flex', alignItems:'center', gap:16, cursor:'pointer' }}>
+                <div style={{ width:44, height:44, borderRadius:10, background:t.ins.light, color:t.ins.dark, display:'flex', alignItems:'center', justifyContent:'center' }}><Ic.shield s={22}/></div>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:15 }}>{p.type}</div>
+                    <Badge t={t} bg={t.surface2} fg={t.textMuted}>{p.insurer}</Badge>
+                    {p.soon && <Badge t={t} bg={t.warnSurface} fg={t.warn}>Renewal in 73 days</Badge>}
+                  </div>
+                  <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textMuted, marginTop:4 }}>Policy {p.num} · Expires {p.expiry}</div>
+                </div>
+                <div style={{ textAlign:'right' }}>
+                  <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:15 }}>{p.premium}</div>
+                  <div style={{ fontFamily:t.fontBody, fontSize:10, color:t.textFaint }}>{p.billing}</div>
+                </div>
+                <div style={{ display:'flex', gap:6 }}>
+                  <Badge t={t} border={t.border} fg={t.text}>📄 PDF</Badge>
+                  <span style={{ color:t.textFaint }}><Ic.more s={16}/></span>
+                </div>
+              </div>
+            ))}
+
+            <div style={{ background:t.primarySurface, borderRadius:t.radiusLg, border:`2px dashed ${t.primary}`, padding:20, display:'flex', alignItems:'center', gap:14 }}>
+              <div style={{ width:44, height:44, borderRadius:10, background:t.canvas, color:t.primary, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:t.ring }}><Ic.spark s={20}/></div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontSize:14, fontWeight:600, color:t.text }}>Drop a policy PDF here</div>
+                <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textMuted, marginTop:2 }}>Kinship extracts your cover, renewal, excess and claim steps — then lets you ask questions.</div>
+              </div>
+              <Btn t={t} size="sm" onClick={()=>go('insurance/policy')}>Choose file</Btn>
+            </div>
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+function Electronics({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="electronics" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Electronics" subtitle={`${d.electronics.length} items · 2 warranties expiring`}
+                  cta={<Btn t={t}>+ Add Item</Btn>} onNav={go}/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, overflow:'auto', alignContent:'start' }}>
+            {d.electronics.map((e,i)=>(
+              <div key={i} style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:'14px 16px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                  <div style={{ width:40, height:40, borderRadius:10, background:t.elec.light, color:t.elec.dark, display:'flex', alignItems:'center', justifyContent:'center' }}><Ic.plug s={18}/></div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:14 }}>{e.name}</div>
+                    <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textMuted, marginTop:1 }}>{e.brand} · {e.room}</div>
+                  </div>
+                  {e.status==='expiring' && <Badge t={t} bg={t.warnSurface} fg={t.warn}>Expiring</Badge>}
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginTop:12, fontSize:11 }}>
+                  <div><div style={{ color:t.textFaint }}>Warranty until</div><div style={{ color: e.status==='expiring'?t.warn:t.text, fontWeight:600, marginTop:2 }}>{e.warranty}</div></div>
+                  <div><div style={{ color:t.textFaint }}>Receipt</div><div style={{ color:t.text, fontWeight:600, marginTop:2 }}>{e.receipt}</div></div>
+                </div>
+                <div style={{ display:'flex', gap:6, marginTop:10 }}>
+                  <Badge t={t} border={t.border} fg={t.textMuted}>📄 Manual</Badge>
+                  <Badge t={t} border={t.border} fg={t.textMuted}>🧾 Receipt</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+Object.assign(window, { Car, Insurance, Electronics });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-extras.jsx">
+//# sourceURL=screens-extras.jsx
+// Chat, Settings — A-only, clickable.
+
+function Chat({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const msgs = [
+    { who:'me', text:"What do I need to do to renew our home insurance?" },
+    { who:'ai', text:"From the Aviva policy you uploaded in March — renewal is 3 July 2026 (73 days). Here are the 4 steps the document lists:",
+      steps:[
+        'Review current cover level (currently £60k contents, £350k buildings).',
+        'Compare quotes from at least 2 other insurers by 12 June.',
+        "Decide on Aviva's offered renewal premium by 26 June.",
+        'Update direct debit details if renewing.',
+      ]},
+    { who:'me', text:'Turn those into tasks please' },
+    { who:'ai', text:"Added to Home Chores, assigned to you, first one due 12 June. Want me to put a reminder in the household calendar too?", actions:['Yes, add to calendar','No thanks']},
+  ];
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="chat" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Kinship AI" subtitle="Reads your household's documents · privately" onNav={go}/>
+          <div style={{ flex:1, display:'grid', gridTemplateColumns:'1.4fr 1fr', gap:16, padding:'8px 24px 24px', overflow:'hidden' }}>
+            <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+              <div style={{ padding:'14px 18px', borderBottom:`1px solid ${t.border}`, display:'flex', alignItems:'center', gap:10 }}>
+                <div style={{ width:26, height:26, borderRadius:13, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}><Ic.spark s={14}/></div>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:14 }}>Chat</div>
+                <div style={{ flex:1 }}/>
+                <Badge t={t} bg={t.successSurface} fg={t.success}>● 6 docs indexed</Badge>
+              </div>
+              <div style={{ flex:1, padding:'18px 18px 0', overflow:'auto', display:'flex', flexDirection:'column', gap:12 }}>
+                {msgs.map((m,i)=>(
+                  <div key={i} style={{ alignSelf: m.who==='me'?'flex-end':'flex-start', maxWidth:'78%' }}>
+                    <div style={{
+                      background: m.who==='me'?t.primary:t.surface2,
+                      color: m.who==='me'?'#fff':t.text,
+                      padding:'10px 14px', borderRadius:14,
+                      fontFamily:t.fontBody, fontSize:13, lineHeight:1.5,
+                    }}>{m.text}</div>
+                    {m.steps && (
+                      <div style={{ marginTop:8, background:t.canvas, borderRadius:12, border:`1px solid ${t.border}`, padding:10 }}>
+                        {m.steps.map((s,j)=>(
+                          <div key={j} style={{ display:'flex', gap:10, padding:'6px 0', borderBottom: j<m.steps.length-1?`1px solid ${t.border}`:'none', fontSize:12 }}>
+                            <div style={{ width:18, height:18, borderRadius:4, background:t.primarySurface, color:t.primary, fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{j+1}</div>
+                            <div style={{ flex:1, color:t.text }}>{s}</div>
+                          </div>
+                        ))}
+                        <div style={{ display:'flex', gap:6, marginTop:10 }}>
+                          <Btn t={t} size="sm" onClick={()=>go('chores')}>Add all to Chores</Btn>
+                          <Btn t={t} size="sm" variant="outline">Edit first</Btn>
+                        </div>
+                      </div>
+                    )}
+                    {m.actions && (
+                      <div style={{ marginTop:8, display:'flex', gap:6 }}>
+                        {m.actions.map((a,j)=><Btn key={j} t={t} size="sm" variant={j===0?'primary':'outline'} onClick={()=>go('calendar')}>{a}</Btn>)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding:14, borderTop:`1px solid ${t.border}`, display:'flex', gap:8, alignItems:'center' }}>
+                <div style={{ flex:1, height:40, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, color:t.textFaint, background:t.surface }}>Ask about any policy, warranty or activity…</div>
+                <div style={{ width:40, height:40, borderRadius:10, background:t.surface2, color:t.textMuted, display:'flex', alignItems:'center', justifyContent:'center' }}>📎</div>
+                <div style={{ width:40, height:40, borderRadius:10, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}>↑</div>
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:12, overflow:'hidden' }}>
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:16 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}>Sources used</div>
+                <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textFaint, marginTop:2 }}>What I read to answer this</div>
+                <div style={{ marginTop:12 }}>
+                  {[
+                    {n:'Aviva Home Policy 2025.pdf', p:'p.3–5', m:'renewal, excess, cover'},
+                    {n:'Aviva renewal letter.pdf', p:'p.1', m:'offered premium'},
+                  ].map((s,i)=>(
+                    <div key={i} onClick={()=>go('insurance/policy')} style={{ display:'flex', gap:10, padding:'10px 0', borderTop: i===0?'none':`1px solid ${t.border}`, cursor:'pointer' }}>
+                      <div style={{ width:30, height:36, background:t.ins.light, color:t.ins.dark, borderRadius:4, display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:700 }}>PDF</div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:12, fontWeight:600 }}>{s.n}</div>
+                        <div style={{ fontSize:11, color:t.textMuted, marginTop:1 }}>{s.p} · {s.m}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:16, flex:1 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}>Try asking</div>
+                {[
+                  'When does Finn\'s dental check renew?',
+                  'Is the dishwasher still under warranty?',
+                  'Am I covered for accidental damage?',
+                  'What\'s the total we pay in insurance a month?',
+                ].map((q,i)=>(
+                  <div key={i} style={{ marginTop:8, padding:'8px 10px', background:t.primarySurface, borderRadius:8, fontSize:12, color:t.text, cursor:'pointer' }}>{q}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function Settings({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="settings" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Settings" subtitle="Household, members & modules" onNav={go}/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'grid', gridTemplateColumns:'200px 1fr', gap:16, overflow:'hidden' }}>
+            <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:12, height:'fit-content' }}>
+              {['Household','Members','Modules','Notifications','Integrations','Data & Privacy','Billing'].map((s,i)=>(
+                <div key={s} style={{ padding:'8px 10px', borderRadius:8, background: i===1?t.primarySurface:'transparent', color: i===1?t.primary:t.textMuted, fontSize:13, fontWeight: i===1?600:400, cursor:'pointer' }}>{s}</div>
+              ))}
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:16, overflow:'auto' }}>
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:20 }}>
+                <div style={{ display:'flex', alignItems:'baseline' }}>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:16 }}>Members</div>
+                    <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.textMuted, marginTop:2 }}>Who's in the Harper household</div>
+                  </div>
+                  <Btn t={t} size="sm" variant="outline" onClick={()=>go('invite')}>+ Invite</Btn>
+                </div>
+                <div style={{ marginTop:16 }}>
+                  {[...d.members, ...d.kids].map((m,i)=>(
+                    <div key={i} style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 0', borderTop: i===0?'none':`1px solid ${t.border}` }}>
+                      <Avatar initials={m.initials} color={m.color} size={36} t={t}/>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:14 }}>{m.name}</div>
+                        <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textMuted }}>{m.role}{m.age?` · ${m.age}`:''}</div>
+                      </div>
+                      <Badge t={t} bg={t.surface2} fg={t.textMuted}>{m.perm}</Badge>
+                      <span style={{ color:t.textFaint }}><Ic.more s={16}/></span>
+                    </div>
+                  ))}
+                  <div onClick={()=>go('invite')} style={{ padding:12, marginTop:8, border:`1px dashed ${t.borderStrong}`, borderRadius:10, color:t.textMuted, fontSize:12, textAlign:'center', cursor:'pointer' }}>+ Invite member</div>
+                </div>
+              </div>
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:20 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:16 }}>Modules</div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginTop:12 }}>
+                  {[
+                    {n:'Home Chores', on:true, c:t.chores},
+                    {n:'Kids Activities', on:true, c:t.kids},
+                    {n:'Car Maintenance', on:true, c:t.car},
+                    {n:'Insurance', on:true, c:t.ins},
+                    {n:'Electronics', on:false, c:t.elec},
+                  ].map(m=>(
+                    <div key={m.n} style={{ padding:'10px 12px', borderRadius:10, background:m.c.light, color:m.c.dark, display:'flex', alignItems:'center', gap:10 }}>
+                      <span style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13, flex:1 }}>{m.n}</span>
+                      <div style={{ width:28, height:16, borderRadius:8, background: m.on?m.c.dark:t.border, position:'relative' }}>
+                        <div style={{ position:'absolute', top:2, left: m.on?14:2, width:12, height:12, borderRadius:6, background:'#fff' }}/>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <AiFab t={t} onClick={()=>go('chat')}/>
+    </Screen>
+  );
+}
+
+Object.assign(window, { Chat, Settings });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-support.jsx">
+//# sourceURL=screens-support.jsx
+// New supporting screens: Notifications, Invite, AddTask, PolicyDetail, CarService, Reset, Welcome.
+
+function Notifications({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const items = [
+    { c:t.ins, icon:<Ic.shield s={14}/>, title:'Aviva home insurance renews in 73 days', time:'Today', action:'Review', to:'insurance/policy', unread:true },
+    { c:t.chores, icon:<Ic.check s={14}/>, title:'Noah completed "Water the houseplants"', time:'2h ago', unread:true },
+    { c:t.car, icon:<Ic.car s={14}/>, title:'Ford Focus MOT due Jun 14 — 54 days', time:'Yesterday', action:'Book', to:'car', unread:true },
+    { c:t.kids, icon:<Ic.users s={14}/>, title:'Iris dentist moved to Thu 3:40pm', time:'Yesterday' },
+    { c:t.elec, icon:<Ic.plug s={14}/>, title:'Samsung dishwasher warranty expires in 11 days', time:'2 days ago', action:'View', to:'electronics' },
+    { c:t.ins, icon:<Ic.shield s={14}/>, title:'Direct Line DD collected £38.40', time:'3 days ago' },
+    { c:t.chores, icon:<Ic.check s={14}/>, title:'Ava added 3 new recurring chores', time:'Last week' },
+  ];
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="dash" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Notifications" subtitle="Everything Kinship has noticed for you"
+                  cta={<Btn t={t} variant="outline" size="sm">Mark all read</Btn>}
+                  onNav={go} backTo="dash" backLabel="Dashboard"/>
+          <div style={{ flex:1, padding:'8px 24px 24px', overflow:'auto' }}>
+            <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, overflow:'hidden' }}>
+              {items.map((n,i)=>(
+                <div key={i} onClick={()=>n.to && go(n.to)} style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 18px', borderTop:i===0?'none':`1px solid ${t.border}`, background: n.unread?t.primarySurface+'40':'transparent', cursor: n.to?'pointer':'default' }}>
+                  <div style={{ width:32, height:32, borderRadius:8, background:n.c.light, color:n.c.dark, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{n.icon}</div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontFamily:t.fontBody, fontSize:13, color:t.text, fontWeight: n.unread?600:500 }}>{n.title}</div>
+                    <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textFaint, marginTop:2 }}>{n.time}</div>
+                  </div>
+                  {n.unread && <div style={{ width:8, height:8, borderRadius:4, background:t.primary }}/>}
+                  {n.action && <Btn t={t} size="sm" variant="outline">{n.action}</Btn>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function Invite({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="settings" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Invite to household" onNav={go} backTo="settings" backLabel="Settings"/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'flex', justifyContent:'center', alignItems:'flex-start', overflow:'auto' }}>
+            <div style={{ width:560, background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:32 }}>
+              <div style={{ fontFamily:t.fontDisplay, fontSize:22, fontWeight:600, letterSpacing:-0.4 }}>Invite someone to the Harper household</div>
+              <div style={{ fontFamily:t.fontBody, fontSize:13, color:t.textMuted, marginTop:6 }}>They'll see the modules you've given them access to, and can be reassigned chores.</div>
+              <div style={{ marginTop:22 }}>
+                <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Email address</div>
+                <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface, color:t.textFaint }}>name@example.com</div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:14 }}>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Role</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface }}>Parent <div style={{ flex:1 }}/><Ic.chevD s={12}/></div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Permissions</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface }}>Full access <div style={{ flex:1 }}/><Ic.chevD s={12}/></div>
+                </div>
+              </div>
+              <div style={{ marginTop:22 }}>
+                <div style={{ fontSize:12, color:t.textMuted, marginBottom:10, fontWeight:500 }}>Modules they can see</div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                  {[
+                    {n:'Home Chores', c:t.chores, on:true},
+                    {n:'Kids Activities', c:t.kids, on:true},
+                    {n:'Car Maintenance', c:t.car, on:true},
+                    {n:'Insurance', c:t.ins, on:false},
+                    {n:'Electronics', c:t.elec, on:true},
+                  ].map(m=>(
+                    <div key={m.n} style={{ padding:'10px 12px', borderRadius:10, background:m.c.light, color:m.c.dark, display:'flex', alignItems:'center', gap:10 }}>
+                      <span style={{ flex:1, fontFamily:t.fontDisplay, fontSize:13, fontWeight:600 }}>{m.n}</span>
+                      <div style={{ width:26, height:15, borderRadius:8, background: m.on?m.c.dark:t.border, position:'relative' }}>
+                        <div style={{ position:'absolute', top:2, left: m.on?13:2, width:11, height:11, borderRadius:6, background:'#fff' }}/>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginTop:22, padding:12, background:t.primarySurface, borderRadius:10, fontSize:12, color:t.text, display:'flex', gap:8 }}>
+                <Ic.spark s={14}/> <span>Or share the household link — <span style={{ fontFamily:t.fontMono, color:t.primary }}>kinship.app/join/8Hx42P</span></span>
+              </div>
+              <div style={{ display:'flex', gap:10, marginTop:24 }}>
+                <Btn t={t} variant="ghost" size="lg" onClick={()=>go('settings')}>Cancel</Btn>
+                <div style={{ flex:1 }}/>
+                <Btn t={t} variant="outline" size="lg">Copy link</Btn>
+                <Btn t={t} size="lg" onClick={()=>go('settings')}>Send invite</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function AddTask({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="chores" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="New task" onNav={go} backTo="chores" backLabel="Home Chores"/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'grid', gridTemplateColumns:'1.3fr 1fr', gap:16, overflow:'auto' }}>
+            <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:24 }}>
+              <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Task</div>
+              <div style={{ height:48, borderRadius:10, border:`1px solid ${t.primary}`, boxShadow:`0 0 0 3px ${t.primarySurface}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:15, fontWeight:500, color:t.text, background:t.canvas }}>Change the bathroom towels</div>
+
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginTop:18 }}>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Area</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface, gap:8 }}><div style={{ width:8, height:8, borderRadius:4, background:t.chores.dot }}/>Home <div style={{ flex:1 }}/><Ic.chevD s={12}/></div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Priority</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface }}>Normal <div style={{ flex:1 }}/><Ic.chevD s={12}/></div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Assign to</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface, gap:8 }}><Avatar initials="AH" color="#e05252" size={22} t={t}/> Ava <div style={{ flex:1 }}/><Ic.chevD s={12}/></div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Due</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface, gap:8 }}><Ic.cal s={14}/> Sun, Apr 26 · 9:00</div>
+                </div>
+              </div>
+
+              <div style={{ marginTop:18 }}>
+                <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Repeat</div>
+                <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                  {['Never','Daily','Weekly','Every 2 weeks','Monthly','Custom…'].map((r,i)=>(
+                    <div key={r} style={{ padding:'7px 12px', borderRadius:999, background: i===2?t.primarySurface:t.surface2, color: i===2?t.primary:t.textMuted, fontSize:12, fontWeight: i===2?600:400, border: i===2?`1px solid ${t.primary}`:'none', cursor:'pointer' }}>{r}</div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ marginTop:18 }}>
+                <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Notes (optional)</div>
+                <div style={{ minHeight:80, borderRadius:10, border:`1px solid ${t.border}`, padding:'10px 14px', fontSize:13, background:t.surface, color:t.textFaint }}>Add any detail — e.g. "use the linen cupboard on landing"</div>
+              </div>
+
+              <div style={{ display:'flex', gap:10, marginTop:24 }}>
+                <Btn t={t} variant="ghost" size="lg" onClick={()=>go('chores')}>Cancel</Btn>
+                <div style={{ flex:1 }}/>
+                <Btn t={t} variant="outline" size="lg">Save & add another</Btn>
+                <Btn t={t} size="lg" onClick={()=>go('chores')}>Save task</Btn>
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              <div style={{ background:t.primarySurface, borderRadius:t.radiusLg, padding:16 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, color:t.primary, fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}><Ic.spark s={14}/> Ask Kinship</div>
+                <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.text, marginTop:10, lineHeight:1.5 }}>
+                  Create recurring weekly tasks for <b>bedroom, bathroom and kitchen linen</b> — alternating assignees?
+                </div>
+                <Btn t={t} size="sm" style={{ marginTop:10 }}>Draft 3 tasks</Btn>
+              </div>
+
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:16 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}>Preview</div>
+                <div style={{ marginTop:12, padding:10, borderRadius:10, background:t.surface2, display:'flex', alignItems:'center', gap:10 }}>
+                  <div style={{ width:18, height:18, borderRadius:4, border:`1.5px solid ${t.borderStrong}` }}/>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:600 }}>Change the bathroom towels</div>
+                    <div style={{ fontSize:11, color:t.textMuted, marginTop:2 }}>Sun, Apr 26 · Home · ↻ weekly</div>
+                  </div>
+                  <Avatar initials="AH" color="#e05252" size={22} t={t}/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function PolicyDetail({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="insurance" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Home insurance — Aviva" subtitle="Policy 8842-HH-2025 · Expires 3 Jul 2026"
+                  cta={<div style={{ display:'flex', gap:8 }}><Btn t={t} variant="outline" size="sm">Download PDF</Btn><Btn t={t} size="sm" onClick={()=>go('chat')}>Ask about this</Btn></div>}
+                  onNav={go} backTo="insurance" backLabel="Insurance"/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, overflow:'hidden' }}>
+            <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+              <div style={{ padding:'10px 14px', borderBottom:`1px solid ${t.border}`, display:'flex', alignItems:'center', gap:8 }}>
+                <Badge t={t} bg={t.ins.light} fg={t.ins.dark}>Aviva Home Policy 2025.pdf</Badge>
+                <div style={{ flex:1 }}/>
+                <span style={{ fontSize:11, color:t.textFaint }}>Page 3 of 14</span>
+              </div>
+              <div style={{ flex:1, padding:24, background:t.surface2, overflow:'auto' }}>
+                <div style={{ background:'#fff', padding:'32px 36px', borderRadius:6, boxShadow:'0 2px 10px rgba(0,0,0,.08)', fontFamily:t.fontBody, fontSize:11, lineHeight:1.6, color:'#333' }}>
+                  <div style={{ fontFamily:t.fontDisplay, fontSize:16, fontWeight:700, color:'#7a0e4d', marginBottom:12 }}>3. Your Cover — Buildings & Contents</div>
+                  <p><b>Buildings sum insured:</b> £350,000. Standard perils include fire, flood, storm damage, subsidence (subject to the excess in section 3.4), theft and malicious damage.</p>
+                  <p style={{ marginTop:10 }}><b>Contents sum insured:</b> £60,000, on a new-for-old basis. Single-article limit £2,000 unless specified under section 4.</p>
+                  <div style={{ background:'#fff6d6', padding:10, borderLeft:'3px solid #d4a017', marginTop:14, borderRadius:2 }}>
+                    <b>Renewal:</b> Policy renews on <b>3 July 2026</b>. We'll issue your renewal invitation 28 days before expiry. To renew, confirm your details and pay by the due date.
+                  </div>
+                  <p style={{ marginTop:12 }}><b>Excess:</b> standard £150; subsidence £1,000; accidental damage £100. See section 3.4 for full table.</p>
+                  <p style={{ marginTop:10 }}><b>Optional cover in force:</b> accidental damage (£0 — not selected), personal possessions away from home (£0 — not selected), home emergency (£5.40/mo).</p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:12, overflow:'auto' }}>
+              <div style={{ background:t.warnSurface, borderRadius:t.radiusLg, padding:16, border:`1px solid ${t.warn}33` }}>
+                <div style={{ fontFamily:t.fontDisplay, fontSize:14, fontWeight:600, color:t.warn, display:'flex', alignItems:'center', gap:6 }}>⚠ Renewal in 73 days</div>
+                <div style={{ fontFamily:t.fontBody, fontSize:12, color:t.text, marginTop:8, lineHeight:1.5 }}>Aviva's renewal invitation will arrive around 5 June. Compare quotes before then to keep negotiating power.</div>
+                <div style={{ display:'flex', gap:8, marginTop:10 }}>
+                  <Btn t={t} size="sm" onClick={()=>go('chores')}>Add 4 renewal tasks</Btn>
+                  <Btn t={t} variant="outline" size="sm">Snooze</Btn>
+                </div>
+              </div>
+
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:16 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}>Key facts</div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:12 }}>
+                  {[
+                    ['Insurer','Aviva'],['Policy #','8842-HH-2025'],
+                    ['Premium','£42.80/mo'],['Billing','Monthly DD'],
+                    ['Buildings','£350,000'],['Contents','£60,000'],
+                    ['Excess (std)','£150'],['Excess (subs.)','£1,000'],
+                    ['Renewal','3 Jul 2026'],['Started','3 Jul 2025'],
+                  ].map(([l,v])=>(
+                    <div key={l}><div style={{ fontSize:10, color:t.textFaint, fontWeight:600, letterSpacing:0.5, textTransform:'uppercase' }}>{l}</div><div style={{ fontSize:13, fontWeight:600, color:t.text, marginTop:2 }}>{v}</div></div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:16 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:13 }}>If you need to claim</div>
+                {[
+                  'Call Aviva claims: 0800 015 1498 (24h)',
+                  'Have your policy number to hand: 8842-HH-2025',
+                  'Photograph damage before any repairs',
+                  'For emergencies (burst pipe, etc.) use home emergency line: 0800 051 0457',
+                ].map((step,i)=>(
+                  <div key={i} style={{ display:'flex', gap:10, padding:'7px 0', borderTop:i===0?'none':`1px solid ${t.border}`, fontSize:12 }}>
+                    <div style={{ width:18, height:18, borderRadius:9, background:t.primarySurface, color:t.primary, fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>{i+1}</div>
+                    <div style={{ flex:1 }}>{step}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function CarService({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', height:'100%' }}>
+        <Sidebar t={t} active="car" onNav={go}/>
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          <TopBar t={t} title="Log a service" subtitle="Ford Focus · AB15 XYZ" onNav={go} backTo="car" backLabel="Car Maintenance"/>
+          <div style={{ flex:1, padding:'8px 24px 24px', display:'flex', justifyContent:'center', overflow:'auto' }}>
+            <div style={{ width:640, background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:32 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Type</div>
+                  <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                    {['MOT','Full service','Interim','Tyres','Repair'].map((r,i)=>(
+                      <div key={r} style={{ padding:'7px 12px', borderRadius:999, background: i===1?t.car.light:t.surface2, color: i===1?t.car.dark:t.textMuted, fontSize:12, fontWeight: i===1?600:400, border: i===1?`1px solid ${t.car.dot}`:'none' }}>{r}</div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Date</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface, gap:8 }}><Ic.cal s={14}/> Fri, 14 Mar 2026</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Garage</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface }}>Halfords Autocentre, Reading</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Mileage at service</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface }}>42,118 mi</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Cost</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface }}>£245.00</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Next service due</div>
+                  <div style={{ height:42, borderRadius:10, border:`1px solid ${t.border}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.surface, gap:8 }}><Ic.cal s={14}/> Mar 2027 · or +10,000 mi</div>
+                </div>
+              </div>
+
+              <div style={{ marginTop:20 }}>
+                <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Work done</div>
+                <div style={{ minHeight:80, borderRadius:10, border:`1px solid ${t.border}`, padding:'10px 14px', fontSize:13, background:t.surface, color:t.text, lineHeight:1.5 }}>
+                  Oil & filter change. Brake pads replaced (front). Air filter replaced. All fluids topped up. Advisory: rear tyres approaching minimum tread within 6 months.
+                </div>
+              </div>
+
+              <div style={{ marginTop:18 }}>
+                <div style={{ fontSize:12, color:t.textMuted, marginBottom:6, fontWeight:500 }}>Attach invoice</div>
+                <div style={{ border:`2px dashed ${t.borderStrong}`, borderRadius:10, padding:'20px 16px', display:'flex', alignItems:'center', gap:12, background:t.surface }}>
+                  <div style={{ width:40, height:40, borderRadius:8, background:t.primarySurface, color:t.primary, display:'flex', alignItems:'center', justifyContent:'center' }}><Ic.upload s={18}/></div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:600 }}>Halfords-invoice-Mar14.pdf</div>
+                    <div style={{ fontSize:11, color:t.textFaint, marginTop:2 }}>248 KB · uploaded just now</div>
+                  </div>
+                  <Badge t={t} bg={t.successSurface} fg={t.success}>✓ Attached</Badge>
+                </div>
+              </div>
+
+              <div style={{ display:'flex', gap:10, marginTop:24 }}>
+                <Btn t={t} variant="ghost" size="lg" onClick={()=>go('car')}>Cancel</Btn>
+                <div style={{ flex:1 }}/>
+                <Btn t={t} size="lg" onClick={()=>go('car')}>Save service record</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function Reset({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', padding:40 }}>
+        <div style={{ width:380, background:t.canvas, borderRadius:t.radiusLg, boxShadow:t.ring, padding:36 }}>
+          <div onClick={()=>go('auth')} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer' }}>
+            <div style={{ width:24, height:24, borderRadius:6, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:t.fontDisplay, fontWeight:700, fontSize:12 }}>K</div>
+            <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:15 }}>Kinship</div>
+          </div>
+          <div style={{ fontFamily:t.fontDisplay, fontSize:24, fontWeight:600, letterSpacing:-0.5, marginTop:24 }}>Reset your password</div>
+          <div style={{ fontFamily:t.fontBody, fontSize:13, color:t.textMuted, marginTop:6, lineHeight:1.5 }}>Enter the email you use for Kinship and we'll send you a link to set a new password.</div>
+          <div style={{ marginTop:22 }}>
+            <div style={{ fontSize:12, color:t.textMuted, marginBottom:6 }}>Email</div>
+            <div style={{ height:42, borderRadius:10, border:`1px solid ${t.primary}`, boxShadow:`0 0 0 3px ${t.primarySurface}`, padding:'0 14px', display:'flex', alignItems:'center', fontSize:13, background:t.canvas }}>ava@harper.fam</div>
+          </div>
+          <div style={{ marginTop:18 }}><Btn t={t} full size="lg" onClick={()=>go('auth')}>Send reset link</Btn></div>
+          <div style={{ textAlign:'center', marginTop:16, fontSize:12, color:t.textMuted }}>Remembered it? <span onClick={()=>go('auth')} style={{ color:t.primary, fontWeight:600, cursor:'pointer' }}>Back to sign in</span></div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+function Welcome({ t, onNav }) {
+  const go = onNav || (()=>{});
+  return (
+    <Screen t={t} bg={t.surface}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', padding:40 }}>
+        <div style={{ width:560, textAlign:'center' }}>
+          <div style={{ width:80, height:80, borderRadius:20, background:t.primary, color:'#fff', display:'inline-flex', alignItems:'center', justifyContent:'center', margin:'0 auto' }}><Ic.spark s={36}/></div>
+          <div style={{ fontFamily:t.fontDisplay, fontSize:36, fontWeight:600, letterSpacing:-0.8, marginTop:24 }}>You're all set, Ava.</div>
+          <div style={{ fontFamily:t.fontBody, fontSize:15, color:t.textMuted, marginTop:12, lineHeight:1.5, maxWidth:440, margin:'12px auto 0' }}>
+            The Harper household is live. 4 modules are turned on, and Noah has an invite waiting in his inbox.
+          </div>
+          <div style={{ marginTop:32, display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, textAlign:'left' }}>
+            {[
+              {n:'Add your first chore', c:t.chores, to:'chores/new'},
+              {n:'Upload a policy PDF', c:t.ins, to:'insurance/policy'},
+              {n:'Log a car service', c:t.car, to:'car/service'},
+            ].map(step=>(
+              <div key={step.n} onClick={()=>go(step.to)} style={{ padding:14, borderRadius:12, background:step.c.light, color:step.c.dark, cursor:'pointer' }}>
+                <div style={{ fontFamily:t.fontDisplay, fontSize:13, fontWeight:600 }}>{step.n}</div>
+                <div style={{ fontSize:11, marginTop:4, opacity:0.8 }}>Get started →</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop:32 }}><Btn t={t} size="lg" onClick={()=>go('dash')}>Take me to the dashboard</Btn></div>
+        </div>
+      </div>
+    </Screen>
+  );
+}
+
+Object.assign(window, { Notifications, Invite, AddTask, PolicyDetail, CarService, Reset, Welcome });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="screens-mobile.jsx">
+//# sourceURL=screens-mobile.jsx
+// Mobile screens — A-only.
+function Phone({ children, t }) {
+  return (
+    <div style={{ width:'100%', height:'100%', background:'#000', padding:0, position:'relative', overflow:'hidden' }}>
+      <div style={{ position:'absolute', inset:0, background:t.surface, borderRadius:0, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+        <div style={{ height:32, padding:'8px 20px', display:'flex', alignItems:'center', background:t.canvas, fontFamily:t.fontBody, fontSize:11, fontWeight:600, color:t.text }}>
+          <div style={{ flex:1 }}>9:41</div>
+          <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+            <span>●●●</span><span>📶</span><span>🔋</span>
+          </div>
+        </div>
+        <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function MobileTab({ t, icon, label, active, color, onClick }) {
+  return (
+    <div onClick={onClick} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:3, padding:'6px 0', color: active?(color||t.primary):t.textFaint, cursor:'pointer' }}>
+      <span style={{ display:'flex' }}>{icon}</span>
+      <div style={{ fontFamily:t.fontBody, fontSize:9.5, fontWeight: active?600:400 }}>{label}</div>
+    </div>
+  );
+}
+
+function MobileDash({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Phone t={t}>
+      <div style={{ padding:'14px 18px 10px', background:t.canvas }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <Avatar initials="AH" color="#e05252" size={30} t={t}/>
+          <div style={{ flex:1 }}>
+            <div style={{ fontFamily:t.fontBody, fontSize:11, color:t.textFaint }}>The Harpers</div>
+            <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:15 }}>Hi Ava</div>
+          </div>
+          <span onClick={()=>go('notifications')} style={{ color:t.textMuted, cursor:'pointer' }}><Ic.bell s={18}/></span>
+        </div>
+      </div>
+      <div style={{ flex:1, overflow:'auto', padding:'6px 14px 14px', display:'flex', flexDirection:'column', gap:10 }}>
+        <div style={{ background:t.primary, borderRadius:14, padding:14, color:'#fff' }}>
+          <div style={{ fontSize:11, opacity:0.8, fontFamily:t.fontBody, fontWeight:500 }}>Today · Tue 21 Apr</div>
+          <div style={{ fontFamily:t.fontDisplay, fontSize:20, fontWeight:600, marginTop:4 }}>3 things on deck</div>
+          <div style={{ display:'flex', gap:6, marginTop:10, flexWrap:'wrap' }}>
+            <Badge t={t} bg="rgba(255,255,255,.2)" fg="#fff">● Recycling 6pm</Badge>
+            <Badge t={t} bg="rgba(255,255,255,.2)" fg="#fff">● Finn pickup</Badge>
+          </div>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+          {[
+            {n:'Chores', c:t.chores, i:<Ic.check s={15}/>, m:'3 today', k:'chores'},
+            {n:'Kids', c:t.kids, i:<Ic.users s={15}/>, m:'2 today', k:'kids'},
+            {n:'Car', c:t.car, i:<Ic.car s={15}/>, m:'MOT Jun 14', k:'car'},
+            {n:'Insurance', c:t.ins, i:<Ic.shield s={15}/>, m:'4 policies', k:'insurance'},
+          ].map((m,i)=>(
+            <div key={i} onClick={()=>go(m.k)} style={{ background:m.c.light, color:m.c.dark, padding:10, borderRadius:12, cursor:'pointer' }}>
+              {m.i}
+              <div style={{ fontFamily:t.fontDisplay, fontSize:13, fontWeight:600, marginTop:6 }}>{m.n}</div>
+              <div style={{ fontFamily:t.fontBody, fontSize:10, opacity:0.8, marginTop:1 }}>{m.m}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background:t.canvas, borderRadius:12, padding:'10px 12px', boxShadow:t.ring }}>
+          <div style={{ fontFamily:t.fontDisplay, fontSize:12, fontWeight:600, marginBottom:6 }}>Up next</div>
+          {d.chores.slice(0,3).map((c,i)=>(
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderTop: i===0?'none':`1px solid ${t.border}` }}>
+              <div style={{ width:14, height:14, borderRadius:3, border:`1.5px solid ${t.borderStrong}` }}/>
+              <div style={{ flex:1, fontSize:11, fontWeight:500 }}>{c.title}</div>
+              <div style={{ fontSize:10, color:t.textFaint }}>{c.due.split(',')[0]}</div>
+            </div>
+          ))}
+        </div>
+        <div onClick={()=>go('chat')} style={{ background:t.primarySurface, borderRadius:12, padding:'10px 12px', display:'flex', alignItems:'center', gap:8, cursor:'pointer' }}>
+          <div style={{ width:26, height:26, borderRadius:13, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}><Ic.spark s={13}/></div>
+          <div style={{ flex:1, fontSize:11, color:t.text }}><b>Aviva home</b> renews in 73 days. Add 4 tasks?</div>
+        </div>
+      </div>
+      <div style={{ display:'flex', borderTop:`1px solid ${t.border}`, background:t.canvas, paddingBottom:6 }}>
+        <MobileTab t={t} icon={<Ic.home s={17}/>} label="Home" active color={t.primary}/>
+        <MobileTab t={t} icon={<Ic.cal s={17}/>} label="Calendar" onClick={()=>go('calendar')}/>
+        <MobileTab t={t} icon={<Ic.spark s={17}/>} label="Ask" onClick={()=>go('chat')}/>
+        <MobileTab t={t} icon={<Ic.users s={17}/>} label="Family" onClick={()=>go('kids')}/>
+        <MobileTab t={t} icon={<Ic.gear s={17}/>} label="More" onClick={()=>go('settings')}/>
+      </div>
+    </Phone>
+  );
+}
+
+function MobileChores({ t, onNav }) {
+  const go = onNav || (()=>{});
+  const d = DEMO;
+  return (
+    <Phone t={t}>
+      <div style={{ padding:'12px 18px', background:t.canvas, display:'flex', alignItems:'center', gap:10 }}>
+        <span onClick={()=>go('dash')} style={{ color:t.text, cursor:'pointer' }}><Ic.chevL/></span>
+        <div style={{ flex:1 }}>
+          <div style={{ fontFamily:t.fontDisplay, fontWeight:600, fontSize:16 }}>Home Chores</div>
+          <div style={{ fontFamily:t.fontBody, fontSize:10, color:t.textFaint }}>6 this week · 4 recurring</div>
+        </div>
+        <div onClick={()=>go('chores/new')} style={{ width:30, height:30, borderRadius:15, background:t.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}><Ic.plus s={16}/></div>
+      </div>
+      <div style={{ display:'flex', gap:6, padding:'8px 14px', overflowX:'auto' }}>
+        {['All','To do','Doing','Done'].map((s,i)=>(
+          <div key={s} style={{ padding:'4px 10px', borderRadius:999, background: i===1?t.primarySurface:t.surface2, color: i===1?t.primary:t.textMuted, fontSize:11, fontWeight: i===1?600:400, whiteSpace:'nowrap' }}>{s}</div>
+        ))}
+      </div>
+      <div style={{ flex:1, overflow:'auto', padding:'6px 14px 14px', display:'flex', flexDirection:'column', gap:8 }}>
+        {d.chores.map((c,i)=>{
+          const done = c.status==='done';
+          return (
+            <div key={i} style={{ background:t.canvas, borderRadius:12, boxShadow:t.ring, padding:'10px 12px', display:'flex', alignItems:'center', gap:10, opacity: done?0.55:1 }}>
+              <div style={{ width:18, height:18, borderRadius:4, background: done?t.primary:'transparent', border: done?'none':`1.5px solid ${t.borderStrong}`, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}>{done && <Ic.check s={11}/>}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontFamily:t.fontDisplay, fontSize:13, fontWeight:600, textDecoration: done?'line-through':'none' }}>{c.title}</div>
+                <div style={{ fontFamily:t.fontBody, fontSize:10, color:t.textMuted, marginTop:2 }}>{c.due} · {c.area}</div>
+              </div>
+              <Avatar initials={c.assignee==='Ava'?'AH':'NH'} color={c.assignee==='Ava'?'#e05252':'#5b76fe'} size={22} t={t}/>
+            </div>
+          );
+        })}
+      </div>
+    </Phone>
+  );
+}
+
+Object.assign(window, { Phone, MobileTab, MobileDash, MobileChores });
+
+</script>
+
+<script type="text/babel" data-presets="react,env" data-file="app.jsx">
+//# sourceURL=app.jsx
+// Main prototype: hash-routed clickable flow with design-canvas overview.
+
+const T = window.TOK.A;
+
+// Route tree — lays out a canvas overview, then a prototype that fills the viewport.
+const ROUTES = {
+  'marketing':         (p) => <Marketing t={T} {...p}/>,
+  'auth':              (p) => <Auth t={T} {...p}/>,
+  'reset':             (p) => <Reset t={T} {...p}/>,
+  'onboarding':        (p) => <Onboarding t={T} {...p}/>,
+  'welcome':           (p) => <Welcome t={T} {...p}/>,
+  'dash':              (p) => <DashA t={T} {...p}/>,
+  'notifications':     (p) => <Notifications t={T} {...p}/>,
+  'chores':            (p) => <Chores t={T} {...p}/>,
+  'chores/new':        (p) => <AddTask t={T} {...p}/>,
+  'kids':              (p) => <Kids t={T} {...p}/>,
+  'kids/new':          (p) => <AddTask t={T} {...p}/>,
+  'calendar':          (p) => <Calendar t={T} {...p}/>,
+  'car':               (p) => <Car t={T} {...p}/>,
+  'car/service':       (p) => <CarService t={T} {...p}/>,
+  'insurance':         (p) => <Insurance t={T} {...p}/>,
+  'insurance/policy':  (p) => <PolicyDetail t={T} {...p}/>,
+  'electronics':       (p) => <Electronics t={T} {...p}/>,
+  'chat':              (p) => <Chat t={T} {...p}/>,
+  'settings':          (p) => <Settings t={T} {...p}/>,
+  'invite':            (p) => <Invite t={T} {...p}/>,
+  'mobile':            (p) => <MobileDash t={T} {...p}/>,
+  'mobile/chores':     (p) => <MobileChores t={T} {...p}/>,
+};
+
+function useHash() {
+  const [h, setH] = React.useState(() => (location.hash||'').replace(/^#/, '') || '');
+  React.useEffect(()=>{
+    const fn = () => setH((location.hash||'').replace(/^#/, ''));
+    window.addEventListener('hashchange', fn);
+    return ()=>window.removeEventListener('hashchange', fn);
+  },[]);
+  const nav = React.useCallback((r)=>{ location.hash = r; }, []);
+  return [h, nav];
+}
+
+// Canvas overview (index) — thumbnails of every screen
+function Overview({ onNav }) {
+  const items = [
+    { id:'marketing',        label:'Marketing landing', group:'Public' },
+    { id:'auth',             label:'Sign in', group:'Public' },
+    { id:'reset',            label:'Reset password', group:'Public' },
+    { id:'onboarding',       label:'Onboarding', group:'Public' },
+    { id:'welcome',          label:"You're all set", group:'Public' },
+
+    { id:'dash',             label:'Dashboard', group:'Main app' },
+    { id:'notifications',    label:'Notifications', group:'Main app' },
+    { id:'calendar',         label:'Calendar', group:'Main app' },
+    { id:'chat',             label:'Ask Kinship', group:'Main app' },
+
+    { id:'chores',           label:'Home Chores', group:'Modules' },
+    { id:'chores/new',       label:'New task', group:'Modules' },
+    { id:'kids',             label:'Kids Activities', group:'Modules' },
+    { id:'car',              label:'Car Maintenance', group:'Modules' },
+    { id:'car/service',      label:'Log service', group:'Modules' },
+    { id:'insurance',        label:'Insurance', group:'Modules' },
+    { id:'insurance/policy', label:'Policy detail', group:'Modules' },
+    { id:'electronics',      label:'Electronics', group:'Modules' },
+
+    { id:'settings',         label:'Settings', group:'Account' },
+    { id:'invite',           label:'Invite member', group:'Account' },
+
+    { id:'mobile',           label:'Mobile dash', group:'Mobile' },
+    { id:'mobile/chores',    label:'Mobile chores', group:'Mobile' },
+  ];
+  const groups = [...new Set(items.map(i=>i.group))];
+  return (
+    <DesignCanvas>
+      <DCSection id="intro" title="Kinship — clickable prototype" subtitle="Every screen below is live. Click any artboard to focus it; use the Sidebar, top-bar bell, or any link inside a screen to navigate. The hash in the URL reflects where you are — share or bookmark deep links.">
+        <DCPostIt color="#fff0b3" x={0} y={0} rotate={-2}>
+          <b>How to use.</b> Click any thumbnail to open that screen full-viewport. Inside a screen, everything clickable is wired — the sidebar, the AI bubble, "See all", card rows, the bell.
+        </DCPostIt>
+        <DCPostIt color="#d4f5c3" x={0} y={0} rotate={1.5}>
+          <b>Single direction.</b> Moved forward with Direction A (Space Grotesk + Noto, bright pastels, 12px rounded cards). Direction B parked.
+        </DCPostIt>
+        <DCPostIt color="#ffd8f4" x={0} y={0} rotate={-1}>
+          <b>Household.</b> The Harpers of Manchester — Ava + Noah, Iris (9), Finn (6). One Ford, one VW, four policies, five appliances.
+        </DCPostIt>
+        <DCPostIt color="#c3faf5" x={0} y={0} rotate={2}>
+          <b>New screens.</b> Notifications, Invite, New task, Log service, Policy detail, Reset password, Welcome — plus mobile tabs.
+        </DCPostIt>
+      </DCSection>
+
+      {groups.map(g=>(
+        <DCSection key={g} id={g.toLowerCase().replace(/\s+/g,'-')} title={g} subtitle="">
+          {items.filter(i=>i.group===g).map(it=>(
+            <DCArtboard key={it.id} id={it.id} label={it.label}
+                        width={it.group==='Mobile'?390:1440}
+                        height={it.group==='Mobile'?780:900}>
+              <div style={{ position:'relative', width:'100%', height:'100%' }}>
+                {ROUTES[it.id]({ onNav })}
+                <div onClick={()=>onNav(it.id)} style={{ position:'absolute', inset:0, cursor:'pointer' }}/>
+              </div>
+            </DCArtboard>
+          ))}
+        </DCSection>
+      ))}
+    </DesignCanvas>
+  );
+}
+
+// Live prototype frame — single screen at scaled viewport with a back-to-overview chip.
+function Proto({ route, onNav }) {
+  const render = ROUTES[route];
+  const isMobile = route.startsWith('mobile');
+  const W = isMobile ? 390 : 1440;
+  const H = isMobile ? 780 : 900;
+
+  const [scale, setScale] = React.useState(1);
+  React.useEffect(()=>{
+    const fit = ()=>{
+      const w = window.innerWidth;
+      const h = window.innerHeight - 44; // top bar
+      const s = Math.min(w / W, h / H, 1);
+      setScale(s);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return ()=>window.removeEventListener('resize', fit);
+  }, [W, H]);
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'#111', display:'flex', flexDirection:'column' }}>
+      <div style={{ height:44, flexShrink:0, background:T.canvas, borderBottom:`1px solid ${T.border}`, display:'flex', alignItems:'center', padding:'0 16px', gap:12 }}>
+        <div onClick={()=>onNav('')} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer' }}>
+          <div style={{ width:22, height:22, borderRadius:6, background:T.primary, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:T.fontDisplay, fontWeight:700, fontSize:12 }}>K</div>
+          <div style={{ fontFamily:T.fontDisplay, fontWeight:600, fontSize:14 }}>Kinship prototype</div>
+        </div>
+        <div style={{ fontFamily:T.fontMono, fontSize:11, color:T.textFaint, padding:'3px 8px', background:T.surface2, borderRadius:4 }}>/{route}</div>
+        <div style={{ flex:1 }}/>
+        <div onClick={()=>onNav('')} style={{ padding:'5px 12px', borderRadius:999, border:`1px solid ${T.border}`, fontFamily:T.fontBody, fontSize:12, fontWeight:600, color:T.text, cursor:'pointer' }}>← Back to overview</div>
+      </div>
+      <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
+        <div style={{
+          width: W, height: H,
+          transform:`scale(${scale})`, transformOrigin:'center',
+          boxShadow:'0 20px 60px rgba(0,0,0,0.4)',
+          borderRadius: isMobile ? 32 : 0,
+          overflow:'hidden',
+          background: T.surface,
+        }}>
+          {render ? render({ onNav }) : <div style={{ padding:40 }}>Route not found: {route}</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [route, nav] = useHash();
+  if (!route) return <Overview onNav={nav}/>;
+  if (!ROUTES[route]) return <Overview onNav={nav}/>;
+  return <Proto route={route} onNav={nav}/>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>
+
+
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#eef0ff"/>
+  <rect x="60" y="60" width="80" height="80" rx="18" fill="#5b76fe"/>
+  <text x="100" y="120" text-anchor="middle" fill="#fff" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="48">K</text>
+</svg>
+</template>
+</body>
+</html>

@@ -364,6 +364,61 @@ export async function updateTaskStatus(
   return { success: true, data: { id: updatedTask.id, status: updatedTask.status } }
 }
 
+// ---------------------------------------------------------------------------
+// Bulk Actions
+// ---------------------------------------------------------------------------
+
+export async function bulkUpdateTaskStatus(
+  ids: string[],
+  status: 'todo' | 'in_progress' | 'done'
+): Promise<ActionResult> {
+  if (ids.length === 0) return { success: true }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) return { success: false, error: 'Not authenticated' }
+
+  const householdId = await getHouseholdId(user.id)
+  if (!householdId) return { success: false, error: 'No household found' }
+
+  for (const id of ids) {
+    await db
+      .update(tasks)
+      .set({ status })
+      .where(and(eq(tasks.id, id), eq(tasks.householdId, householdId)))
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
+  return { success: true }
+}
+
+export async function bulkDeleteTasks(ids: string[]): Promise<ActionResult> {
+  if (ids.length === 0) return { success: true }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) return { success: false, error: 'Not authenticated' }
+
+  const householdId = await getHouseholdId(user.id)
+  if (!householdId) return { success: false, error: 'No household found' }
+
+  for (const id of ids) {
+    await db.delete(tasks).where(and(eq(tasks.parentTaskId, id), eq(tasks.householdId, householdId)))
+    await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.householdId, householdId)))
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
+  return { success: true }
+}
+
 export async function createChoreArea(
   data: unknown
 ): Promise<ActionResult<{ id: string; name: string }>> {

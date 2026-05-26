@@ -1,5 +1,6 @@
-import { Monitor } from 'lucide-react'
+import { Monitor, Plus } from 'lucide-react'
 import { format, differenceInCalendarDays } from 'date-fns'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 export interface UpcomingElectronic {
@@ -24,15 +25,32 @@ export function ElectronicsDashboardCard({ items }: ElectronicsDashboardCardProp
   return (
     <Card className="bg-kinship-surface-container-lowest p-6 flex flex-col gap-4">
       <div className="absolute left-0 top-0 h-1 w-full rounded-t-2xl bg-[#0d9488]" aria-hidden="true" />
-      <div className="flex items-center gap-2">
-        <Monitor className="h-5 w-5 text-[#0d9488]" aria-hidden="true" />
-        <h3 className="font-display text-base font-semibold text-kinship-on-surface">Electronics</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Monitor className="h-5 w-5 text-[#0d9488]" aria-hidden="true" />
+          <h3 className="font-display text-base font-semibold text-kinship-on-surface">Electronics</h3>
+        </div>
+        <Link
+          href="/electronics?action=new"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-[#0d9488] hover:bg-[#0d9488]/10 transition-colors"
+          aria-label="Add new electronic"
+        >
+          <Plus className="h-4 w-4" />
+        </Link>
       </div>
 
       {items.length === 0 ? (
-        <p className="font-body text-sm text-kinship-on-surface-variant">
-          No electronics tracked. Add an item to get started.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <p className="font-body text-sm text-kinship-on-surface-variant text-center">
+            No electronics tracked.
+          </p>
+          <Link
+            href="/electronics?action=new"
+            className="rounded-full bg-[#0d9488] px-4 py-1.5 font-body text-sm font-medium text-white hover:bg-[#0d9488]/90 transition-colors"
+          >
+            Add your first item
+          </Link>
+        </div>
       ) : upcoming.length === 0 ? (
         <p className="font-body text-sm text-kinship-on-surface-variant">
           No upcoming warranty expiries.

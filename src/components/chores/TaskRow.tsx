@@ -47,9 +47,12 @@ interface TaskRowProps {
   onStatusChange: (id: string, status: 'todo' | 'in_progress' | 'done') => void
   onDelete: (id: string) => void
   onEdit: (task: TaskItem) => void
+  selectMode?: boolean
+  selected?: boolean
+  onToggleSelect?: (id: string) => void
 }
 
-export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: TaskRowProps) {
+export function TaskRow({ task, members, onStatusChange, onDelete, onEdit, selectMode = false, selected = false, onToggleSelect }: TaskRowProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const owner = members.find((m) => m.id === task.ownerId)
@@ -65,37 +68,45 @@ export function TaskRow({ task, members, onStatusChange, onDelete, onEdit }: Tas
 
   return (
     <Card
-      className={`relative overflow-visible bg-white rounded-xl ring-miro border-0 p-4 transition-opacity ${isDone ? 'opacity-60' : ''}`}
+      className={`relative overflow-visible bg-white rounded-xl ring-miro border-0 p-4 transition-all ${isDone ? 'opacity-60' : ''} ${selected ? 'ring-2 ring-kinship-primary' : ''}`}
     >
       <div className="flex items-start gap-3">
-        {/* Checkbox */}
-        <button
-          type="button"
-          onClick={handleCheckbox}
-          aria-label={`Mark ${task.title} complete`}
-          className={`h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
-            isDone
-              ? 'border-kinship-primary bg-kinship-primary'
-              : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
-          }`}
-        >
-          {isDone && (
-            <svg
-              className="h-3 w-3 text-white"
-              viewBox="0 0 12 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2 6l3 3 5-5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
-        </button>
+        {/* Select checkbox or Done checkbox */}
+        {selectMode ? (
+          <button
+            type="button"
+            onClick={() => onToggleSelect?.(task.id)}
+            aria-label={`Select ${task.title}`}
+            className={`h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
+              selected
+                ? 'border-kinship-primary bg-kinship-primary'
+                : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
+            }`}
+          >
+            {selected && (
+              <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleCheckbox}
+            aria-label={`Mark ${task.title} complete`}
+            className={`h-5 w-5 shrink-0 flex items-center justify-center rounded border-2 transition-colors ${
+              isDone
+                ? 'border-kinship-primary bg-kinship-primary'
+                : 'border-kinship-on-surface/30 bg-white hover:border-kinship-primary'
+            }`}
+          >
+            {isDone && (
+              <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+        )}
 
         {/* Content */}
         <div className="min-w-0 flex-1">

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -167,7 +167,16 @@ function isoToDateInput(iso: string | null): string {
 
 export function InsuranceClient({ policies, documents, members, kids, cars }: InsuranceClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Auto-open add dialog from ?action=new
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setDialogOpen(true)
+      router.replace('/insurance', { scroll: false })
+    }
+  }, [searchParams, router])
   const [editingPolicy, setEditingPolicy] = useState<SerializedPolicy | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [localDocs, setLocalDocs] = useState<SerializedDocument[]>(documents)

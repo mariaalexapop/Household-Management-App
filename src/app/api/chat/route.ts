@@ -10,7 +10,7 @@
  *   3. Extract the last user text and run RAG retrieval (top 5 chunks)
  *   4. Persist the user message via `saveUserMessage` BEFORE streaming, so
  *      we keep the turn even if the stream crashes.
- *   5. Call `streamText` with Claude Sonnet 4.6 (via @ai-sdk/anthropic),
+ *   5. Call `streamText` with Llama 3.3 70B (via @ai-sdk/groq),
  *      a household-aware system prompt, six tools (five server + one client),
  *      and `stopWhen: stepCountIs(5)` to cap tool-use loops.
  *   6. In `onFinish`, persist the aggregated assistant text + any tool calls
@@ -18,7 +18,7 @@
  *   7. Return `result.toUIMessageStreamResponse()` — the AI SDK v6 UIMessage
  *      streaming protocol that `useChat` on the client expects.
  */
-import { anthropic } from '@ai-sdk/anthropic'
+import { groq } from '@ai-sdk/groq'
 import {
   convertToModelMessages,
   stepCountIs,
@@ -106,11 +106,11 @@ export async function POST(req: Request) {
   const modelMessages = await convertToModelMessages(history)
 
   const result = streamText({
-    model: anthropic('claude-sonnet-4-6'),
+    model: groq('llama-3.3-70b-versatile'),
     system,
     messages: modelMessages,
     tools,
-    stopWhen: stepCountIs(5),
+    stopWhen: stepCountIs(8),
     onFinish: async (event) => {
       try {
         // Aggregate text across all steps so assistant messages emitted

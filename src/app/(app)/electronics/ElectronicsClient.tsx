@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -161,9 +161,18 @@ export function ElectronicsClient({
   documents: initialDocuments,
 }: ElectronicsClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [items] = useState(initialItems)
   const [documents, setDocuments] = useState(initialDocuments)
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Auto-open add dialog from ?action=new
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setDialogOpen(true)
+      router.replace('/electronics', { scroll: false })
+    }
+  }, [searchParams, router])
   const [editingItem, setEditingItem] = useState<SerializedElectronicsItem | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<SerializedElectronicsItem | null>(null)
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)

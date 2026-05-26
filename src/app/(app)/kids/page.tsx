@@ -5,6 +5,7 @@ import { kidActivities, children, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { KidsClient } from './KidsClient'
 import { AppHeader } from '@/components/nav/AppHeader'
+import { Breadcrumb } from '@/components/nav/Breadcrumb'
 
 export const metadata = { title: 'Kids Activities — Kinship' }
 
@@ -70,9 +71,7 @@ export default async function KidsPage() {
     <div className="min-h-screen bg-kinship-surface">
       <AppHeader subtitle="Kids Activities" />
       <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
+        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Kids Activities' }]} />
         <KidsClient
           initialActivities={allActivities}
           childList={childList}

@@ -5,6 +5,7 @@ import { electronics, documents, householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ElectronicsClient } from './ElectronicsClient'
 import { AppHeader } from '@/components/nav/AppHeader'
+import { Breadcrumb } from '@/components/nav/Breadcrumb'
 
 export const metadata = { title: 'Electronics — Kinship' }
 
@@ -72,9 +73,7 @@ export default async function ElectronicsPage() {
     <div className="min-h-screen bg-kinship-surface">
       <AppHeader subtitle="Electronics" />
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-        <a href="/dashboard" className="mb-4 inline-flex items-center gap-1 font-body text-sm text-kinship-primary hover:underline">
-          ← Go back to main dashboard
-        </a>
+        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Electronics' }]} />
         <ElectronicsClient items={serializedItems} documents={serializedDocuments} />
       </main>
     </div>
