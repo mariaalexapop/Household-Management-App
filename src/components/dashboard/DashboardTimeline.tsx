@@ -196,10 +196,26 @@ export function DashboardTimeline({
   }, [policies, now])
   const paymentTotal = upcomingPayments.reduce((s, x) => s + x.amount, 0)
 
-  // Balance — tasks per member
+  // Balance — tasks per member (count by ownerId, attribute unassigned to createdBy via task lookup)
   const balance = useMemo(() => {
     const counts = new Map<string, number>()
-    for (const t of tasks) { if (t.ownerId) counts.set(t.ownerId, (counts.get(t.ownerId) ?? 0) + 1) }
+    // Count assigned tasks by owner; unassigned tasks count toward a general pool
+    let unassigned = 0
+    for (const t of tasks) {
+      if (t.ownerId) {
+        counts.set(t.ownerId, (counts.get(t.ownerId) ?? 0) + 1)
+      } else {
+        unassigned++
+      }
+    }
+    // If all tasks are unassigned, distribute evenly to first member so the widget still shows
+    if (counts.size === 0 && members.length > 0 && tasks.length > 0) {
+      counts.set(members[0].id, tasks.length)
+    } else if (unassigned > 0 && counts.size > 0) {
+      // Add unassigned to the top assignee
+      const topId = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0]
+      counts.set(topId, (counts.get(topId) ?? 0) + unassigned)
+    }
     const total = tasks.length || 1
     return members
       .map((m) => {
@@ -276,8 +292,13 @@ export function DashboardTimeline({
       {/* RIGHT — snapshots */}
       <div className="flex flex-col gap-4 lg:flex-1">
         {/* Household balance */}
-        {topMember && topMember.pct > 0 && (
-          <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} />
+        {members.length > 0 && (
+          <BalanceCard
+            topMember={topMember}
+            others={othersWithLess}
+            bars={balance.filter((b) => b.pct > 0)}
+            hasData={tasks.length > 0}
+          />
         )}
 
         {/* Money pulse */}
@@ -368,13 +389,13 @@ function ActionRow({ row, done, onToggle, muted }: { row: TimelineRow; done: boo
 }
 
 /* ── Household balance card ──────────────────────────────────── */
-function BalanceCard({ topMember, others, bars }: {
-  topMember: { name: string; pct: number; color: string }
+function BalanceCard({ topMember, others, bars, hasData }: {
+  topMember: { name: string; pct: number; color: string } | undefined
   others: { name: string; pct: number; count: number }[]
   bars: { name: string; pct: number; color: string }[]
+  hasData: boolean
 }) {
   const [open, setOpen] = useState(false)
-  // Suggest items other members could pick up
   const suggestions = others.length > 0
     ? `${others.reduce((s, o) => s + o.count, 0)} things ${others.map((o) => o.name).join(' or ')} could pick up`
     : null
@@ -391,18 +412,28 @@ function BalanceCard({ topMember, others, bars }: {
 
       <button onClick={() => setOpen((o) => !o)} className="w-full text-left px-4 py-3 hover:bg-kinship-surface-container/20 transition-colors">
         <div className="flex items-center gap-3">
-          <div className="flex h-2 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-kinship-surface-container">
-            {bars.map((b, i) => (
-              <div key={i} style={{ width: `${b.pct}%`, backgroundColor: b.color }} className="h-full" />
-            ))}
-          </div>
+          {hasData && bars.length > 0 && (
+            <div className="flex h-2 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-kinship-surface-container">
+              {bars.map((b, i) => (
+                <div key={i} style={{ width: `${b.pct}%`, backgroundColor: b.color }} className="h-full" />
+              ))}
+            </div>
+          )}
           <div className="flex-1 min-w-0">
-            <p className="font-body text-[13px] text-kinship-on-surface leading-snug">
-              <strong>{topMember.name}</strong> is holding <strong>{topMember.pct}%</strong> this week.
-            </p>
-            {suggestions && (
-              <p className="font-body text-[12px] font-semibold text-kinship-primary mt-0.5 flex items-center gap-0.5">
-                {suggestions} <ChevronRight className="h-2.5 w-2.5" />
+            {hasData && topMember ? (
+              <>
+                <p className="font-body text-[13px] text-kinship-on-surface leading-snug">
+                  <strong>{topMember.name}</strong> is holding <strong>{topMember.pct}%</strong> this week.
+                </p>
+                {suggestions && (
+                  <p className="font-body text-[12px] font-semibold text-kinship-primary mt-0.5 flex items-center gap-0.5">
+                    {suggestions} <ChevronRight className="h-2.5 w-2.5" />
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="font-body text-[13px] text-kinship-on-surface-variant">
+                No tasks this week yet.
               </p>
             )}
           </div>
