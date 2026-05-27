@@ -88,7 +88,7 @@ export function HamburgerMenu() {
             className="flex items-center gap-2 px-3 py-2 text-sm text-kinship-on-surface hover:bg-kinship-surface-container"
           >
             <CheckSquare className="h-4 w-4" />
-            Home Chores
+            Tasks
           </Link>
           <Link
             href="/kids"

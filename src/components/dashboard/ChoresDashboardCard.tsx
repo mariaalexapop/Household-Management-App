@@ -19,7 +19,7 @@ export function ChoresDashboardCard({ tasks }: ChoresDashboardCardProps) {
       {/* Colored header */}
       <div className="bg-[#c3faf5] px-3.5 py-2.5 flex items-center gap-2 text-[#187574]">
         <CheckSquare className="h-4 w-4" />
-        <span className="font-display font-semibold text-[13px]">Home Chores</span>
+        <span className="font-display font-semibold text-[13px]">Tasks</span>
         <span className="flex-1" />
         <span className="font-body text-[11px] font-medium opacity-80">
           {tasks.length} upcoming

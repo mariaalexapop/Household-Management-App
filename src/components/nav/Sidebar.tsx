@@ -33,7 +33,7 @@ const NAV_SECTIONS: { title?: string; items: NavItem[] }[] = [
     title: 'Modules',
     items: [
       { key: 'calendar', label: 'Calendar', href: '/calendar', icon: CalendarDays },
-      { key: 'chores', label: 'Home Chores', href: '/chores', icon: CheckSquare, moduleKey: 'chores' },
+      { key: 'chores', label: 'Tasks', href: '/chores', icon: CheckSquare, moduleKey: 'chores' },
       { key: 'kids', label: 'Kids Activities', href: '/kids', icon: Users, moduleKey: 'kids' },
       { key: 'cars', label: 'Car Maintenance', href: '/cars', icon: Car, moduleKey: 'car' },
       { key: 'insurance', label: 'Insurance', href: '/insurance', icon: Shield, moduleKey: 'insurance' },

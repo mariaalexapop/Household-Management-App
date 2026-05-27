@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 ]
 
 const ADD_OPTIONS = [
-  { label: 'Home Chores', href: '/chores?action=new', icon: CheckSquare, color: '#187574', bg: '#c3faf5' },
+  { label: 'Tasks', href: '/chores?action=new', icon: CheckSquare, color: '#187574', bg: '#c3faf5' },
   { label: 'Kids Activities', href: '/kids?action=new', icon: CalendarHeart, color: '#600000', bg: '#ffc6c6' },
   { label: 'Car', href: '/cars?action=new', icon: Car, color: '#7a4000', bg: '#ffe6cd' },
   { label: 'Insurance', href: '/insurance?action=new', icon: Shield, color: '#3d2a8a', bg: '#d9d4ff' },

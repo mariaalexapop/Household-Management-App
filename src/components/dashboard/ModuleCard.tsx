@@ -11,7 +11,7 @@ interface ModuleMeta {
 
 const MODULE_META: Record<ModuleKey, ModuleMeta> = {
   chores: {
-    label: 'Home Chores',
+    label: 'Tasks',
     description: 'Tasks, recurring chores, assignments',
     Icon: CheckSquare,
   },

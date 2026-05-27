@@ -16,7 +16,7 @@ const TYPE_LABELS: Record<string, string> = {
 }
 
 const MODULE_META: Record<ModuleKey, { label: string; icon: typeof CheckSquare; light: string; dark: string }> = {
-  chores: { label: 'Home Chores', icon: CheckSquare, light: 'bg-module-chores-light', dark: 'text-module-chores-dark' },
+  chores: { label: 'Tasks', icon: CheckSquare, light: 'bg-module-chores-light', dark: 'text-module-chores-dark' },
   kids: { label: 'Kids Activities', icon: CalendarHeart, light: 'bg-module-kids-light', dark: 'text-module-kids-dark' },
   car: { label: 'Car Maintenance', icon: Car, light: 'bg-module-car-light', dark: 'text-module-car-dark' },
   insurance: { label: 'Insurance', icon: Shield, light: 'bg-module-ins-light', dark: 'text-module-ins-dark' },

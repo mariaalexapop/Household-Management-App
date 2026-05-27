@@ -7,7 +7,7 @@ import { ChoresClient } from './ChoresClient'
 import { seedDefaultAreas } from '@/app/actions/tasks'
 import { TopBar } from '@/components/nav/TopBar'
 
-export const metadata = { title: 'Home Chores — Kinship' }
+export const metadata = { title: 'Tasks — Kinship' }
 
 export default async function ChoresPage({
   searchParams,
@@ -101,7 +101,7 @@ export default async function ChoresPage({
   return (
     <>
       <TopBar
-        title="Home Chores"
+        title="Tasks"
         subtitle={`${dueThisWeek} ${dueThisWeek === 1 ? 'task' : 'tasks'} due this week`}
         backHref="/dashboard"
         backLabel="Dashboard"

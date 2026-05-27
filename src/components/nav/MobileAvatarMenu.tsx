@@ -11,7 +11,7 @@ import {
 import { useUserInfo } from './UserContext'
 
 const MODULE_ITEMS = [
-  { key: 'chores', label: 'Home Chores', href: '/chores', icon: CheckSquare },
+  { key: 'chores', label: 'Tasks', href: '/chores', icon: CheckSquare },
   { key: 'kids', label: 'Kids Activities', href: '/kids', icon: CalendarHeart },
   { key: 'car', label: 'Car Maintenance', href: '/cars', icon: Car },
   { key: 'insurance', label: 'Insurance', href: '/insurance', icon: Shield },

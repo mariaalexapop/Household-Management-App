@@ -6,7 +6,7 @@ import { Sparkles } from 'lucide-react'
 const MODULE_CARDS = [
   {
     letter: 'H',
-    name: 'Home Chores',
+    name: 'Tasks',
     lightClass: 'bg-module-chores-light',
     darkClass: 'text-module-chores-dark',
     problem: 'Whose turn is it to take out the bins?',

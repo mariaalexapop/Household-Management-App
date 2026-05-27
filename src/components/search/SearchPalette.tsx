@@ -43,7 +43,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: 'nav-dashboard', label: 'Go to Dashboard', keywords: ['dashboard', 'home', 'overview'], icon: LayoutDashboard, color: '#5b76fe', href: '/dashboard', group: 'navigate' },
   { id: 'nav-calendar', label: 'Go to Calendar', keywords: ['calendar', 'schedule', 'dates', 'events'], icon: CalendarDays, color: '#5b76fe', href: '/calendar', group: 'navigate' },
   { id: 'nav-costs', label: 'Go to Cost Summary', keywords: ['costs', 'money', 'expenses', 'spending', 'budget'], icon: Coins, color: '#5b76fe', href: '/costs', group: 'navigate' },
-  { id: 'nav-chores', label: 'Go to Home Chores', keywords: ['chores', 'tasks', 'todo'], icon: CheckSquare, color: '#5b76fe', href: '/chores', group: 'navigate' },
+  { id: 'nav-chores', label: 'Go to Tasks', keywords: ['chores', 'tasks', 'todo'], icon: CheckSquare, color: '#5b76fe', href: '/chores', group: 'navigate' },
   { id: 'nav-kids', label: 'Go to Kids Activities', keywords: ['kids', 'children', 'activities'], icon: CalendarHeart, color: '#16a34a', href: '/kids', group: 'navigate' },
   { id: 'nav-cars', label: 'Go to Cars', keywords: ['cars', 'vehicles', 'mot', 'service', 'tax'], icon: Car, color: '#ea580c', href: '/cars', group: 'navigate' },
   { id: 'nav-insurance', label: 'Go to Insurance', keywords: ['insurance', 'policies', 'cover'], icon: Shield, color: '#9333ea', href: '/insurance', group: 'navigate' },
