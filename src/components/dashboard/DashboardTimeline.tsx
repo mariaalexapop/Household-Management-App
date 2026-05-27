@@ -377,7 +377,7 @@ function MoneyPulseCard({ payments, total }: { payments: { date: string; title: 
       </div>
       <div className="px-3.5 py-2">
         <div className="flex items-baseline justify-between mb-1">
-          <span className="font-body text-[10.5px] font-bold uppercase tracking-wider text-kinship-placeholder">Coming out</span>
+          <span className="text-[10.5px] uppercase tracking-wider text-kinship-placeholder" style={{ fontWeight: 700 }}>Coming out</span>
           <span className="font-mono text-[11px] text-kinship-placeholder">{payments.length} charges</span>
         </div>
         {payments.map((p, i) => (
