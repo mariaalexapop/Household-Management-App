@@ -67,7 +67,7 @@ function memberInitials(members: SerializedMember[], memberId: string | null): {
 function dayLabel(dateStr: string): string {
   const d = parseISO(dateStr)
   if (isToday(d)) return 'Today'
-  return format(d, 'EEE')
+  return format(d, 'EEE d')
 }
 
 function timeLabel(dateStr: string): string {
@@ -138,8 +138,8 @@ export function DashboardTimeline({
 
     for (const p of policies) {
       const dates = [
-        { date: p.expiryDate, label: `${p.insurer} — ${p.policyType} expiry` },
-        { date: p.nextPaymentDate, label: `${p.insurer} — payment due` },
+        { date: p.expiryDate, label: `${p.insurer} — ${p.policyType} expiry`, amount: undefined as string | undefined },
+        { date: p.nextPaymentDate, label: `${p.insurer} — payment due`, amount: p.premiumCents ? `€${(p.premiumCents / 100).toFixed(2)}` : undefined },
       ]
       for (const dl of dates) {
         if (!dl.date) continue
@@ -147,7 +147,7 @@ export function DashboardTimeline({
         if (d < weekStart || d >= parseISO(nextWeekEndIso)) continue
         rows.push({
           id: `ins-${p.id}-${dl.label}`, day: dayLabel(dl.date), when: '',
-          title: dl.label, module: 'insurance', sortKey: d.getTime(),
+          title: dl.label, module: 'insurance', amount: dl.amount, sortKey: d.getTime(),
         })
       }
     }
@@ -304,48 +304,60 @@ function SectionHead({ title, dateRange, muted }: { title: string; dateRange: st
 function ActionRow({ row, done, onToggle, muted }: { row: TimelineRow; done: boolean; onToggle: () => void; muted?: boolean }) {
   return (
     <div
-      className="grid items-center gap-x-3 border-t border-kinship-surface-container py-2.5"
+      className="grid items-center gap-x-3.5 border-t border-kinship-surface-container"
       style={{
-        gridTemplateColumns: '22px 56px 50px 1fr auto',
-        opacity: done ? 0.5 : muted ? 0.85 : 1,
+        gridTemplateColumns: '24px 72px 62px 1fr auto',
+        padding: '12px 0',
+        opacity: done ? 0.55 : muted ? 0.92 : 1,
       }}
     >
+      {/* Checkbox */}
       <button
         onClick={onToggle}
         aria-label={done ? 'Mark not done' : 'Mark done'}
-        className={`flex h-[18px] w-[18px] items-center justify-center rounded-full transition-colors ${
-          done ? 'bg-kinship-success text-white' : 'ring-[1.5px] ring-inset ring-kinship-on-surface-variant/30 hover:ring-kinship-primary'
-        }`}
+        style={{
+          width: 20, height: 20, padding: 0, border: 'none', borderRadius: 10, cursor: 'pointer',
+          background: done ? '#00b473' : 'transparent',
+          boxShadow: done ? 'none' : 'inset 0 0 0 1.5px #b0b3c0',
+          color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'background .12s, box-shadow .12s',
+        }}
       >
-        {done && <Check className="h-2.5 w-2.5" />}
+        {done && <Check className="h-3 w-3" />}
       </button>
 
-      <span className={`font-display text-[13px] font-semibold leading-none ${
+      {/* Day + date */}
+      <span className={`font-display text-[13.5px] font-semibold ${
         row.isOverdue ? 'text-amber-600' : row.day === 'Today' ? 'text-kinship-primary' : 'text-kinship-on-surface'
       } ${done ? 'line-through' : ''}`}>
         {row.day}
       </span>
 
-      <span className="font-mono text-[11px] text-kinship-placeholder leading-none">{row.when || ''}</span>
+      {/* Time */}
+      <span className="font-mono text-[11.5px] text-kinship-placeholder">{row.when || ''}</span>
 
-      <div className="flex items-center gap-2 min-w-0">
-        <span className="h-[6px] w-[6px] shrink-0 rounded-full" style={{ backgroundColor: MOD[row.module]?.dot ?? '#999' }} />
-        <span className={`truncate font-body font-medium text-kinship-on-surface ${done ? 'line-through' : ''} ${muted ? 'text-[13px]' : 'text-[14px]'}`}>
+      {/* Module dot + title + badges */}
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span className="h-[7px] w-[7px] shrink-0 rounded-full" style={{ backgroundColor: MOD[row.module]?.dot ?? '#999' }} />
+        <span className={`truncate text-kinship-on-surface ${done ? 'line-through' : ''} ${muted ? 'text-[13.5px]' : 'text-[14.5px]'}`}
+          style={{ fontWeight: 500 }}>
           {row.title}
         </span>
-        {done && <span className="shrink-0 text-[10px] font-semibold text-kinship-success tracking-wide">done</span>}
+        {done && <span className="shrink-0 text-[10.5px] font-semibold tracking-wide" style={{ color: '#00b473' }}>done</span>}
         {row.isOverdue && row.lateDays && (
-          <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-amber-600">
+          <span className="shrink-0 rounded-full px-[7px] py-[2px] text-[10px] font-bold uppercase tracking-wider"
+            style={{ background: '#fff3e0', color: '#d97706', letterSpacing: '0.4px' }}>
             {row.lateDays}
           </span>
         )}
       </div>
 
-      <div className="flex items-center gap-2 justify-end">
-        {row.amount && <span className="font-mono text-[13px] font-medium text-kinship-on-surface">{row.amount}</span>}
+      {/* Amount + avatar */}
+      <div className="flex items-center gap-2.5 justify-end">
+        {row.amount && <span className="font-mono text-[13.5px] text-kinship-on-surface" style={{ fontWeight: 500 }}>{row.amount}</span>}
         {row.whoInitials && (
-          <div className="flex h-[20px] w-[20px] items-center justify-center rounded-full text-[8px] font-bold text-white"
-            style={{ backgroundColor: row.whoColor ?? '#999' }}>
+          <div className="flex items-center justify-center rounded-full text-white"
+            style={{ width: 26, height: 26, fontSize: 10, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>
             {row.whoInitials}
           </div>
         )}
