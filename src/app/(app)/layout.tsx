@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { householdMembers } from '@/lib/db/schema'
+import { householdMembers, householdSettings } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { ConnectionIndicator } from '@/components/realtime/ConnectionIndicator'
@@ -39,6 +39,15 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     return <>{children}</>
   }
 
+  // Fetch active modules
+  const [settingsRow] = await db
+    .select({ activeModules: householdSettings.activeModules })
+    .from(householdSettings)
+    .where(eq(householdSettings.householdId, householdId))
+    .limit(1)
+
+  const activeModules = (settingsRow?.activeModules ?? []) as string[]
+
   const displayName = memberRow?.displayName ?? user.email?.split('@')[0] ?? 'User'
   const initials = displayName
     .split(' ')
@@ -56,6 +65,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             userName={displayName}
             userInitials={initials}
             userEmail={user.email}
+            activeModules={activeModules}
           />
           <main className="flex-1 min-w-0 flex flex-col overflow-hidden mobile-only-pb">
             {children}

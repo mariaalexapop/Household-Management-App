@@ -12,9 +12,18 @@ interface SidebarProps {
   userInitials?: string | null
   userEmail?: string | null
   userAvatarUrl?: string | null
+  activeModules?: string[]
 }
 
-const NAV_SECTIONS = [
+interface NavItem {
+  key: string
+  label: string
+  href: string
+  icon: typeof LayoutDashboard
+  moduleKey?: string
+}
+
+const NAV_SECTIONS: { title?: string; items: NavItem[] }[] = [
   {
     items: [
       { key: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -24,11 +33,11 @@ const NAV_SECTIONS = [
     title: 'Modules',
     items: [
       { key: 'calendar', label: 'Calendar', href: '/calendar', icon: CalendarDays },
-      { key: 'chores', label: 'Home Chores', href: '/chores', icon: CheckSquare },
-      { key: 'kids', label: 'Kids Activities', href: '/kids', icon: Users },
-      { key: 'cars', label: 'Car Maintenance', href: '/cars', icon: Car },
-      { key: 'insurance', label: 'Insurance', href: '/insurance', icon: Shield },
-      { key: 'electronics', label: 'Electronics', href: '/electronics', icon: Plug },
+      { key: 'chores', label: 'Home Chores', href: '/chores', icon: CheckSquare, moduleKey: 'chores' },
+      { key: 'kids', label: 'Kids Activities', href: '/kids', icon: Users, moduleKey: 'kids' },
+      { key: 'cars', label: 'Car Maintenance', href: '/cars', icon: Car, moduleKey: 'car' },
+      { key: 'insurance', label: 'Insurance', href: '/insurance', icon: Shield, moduleKey: 'insurance' },
+      { key: 'electronics', label: 'Electronics', href: '/electronics', icon: Plug, moduleKey: 'electronics' },
     ],
   },
   {
@@ -45,7 +54,7 @@ const NAV_SECTIONS = [
   },
 ]
 
-export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
+export function Sidebar({ userName, userInitials, userEmail, activeModules }: SidebarProps) {
   const pathname = usePathname()
 
   const isActive = (href: string) =>
@@ -65,7 +74,13 @@ export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3.5 pb-3">
-        {NAV_SECTIONS.map((section, si) => (
+        {NAV_SECTIONS.map((section, si) => {
+          const visibleItems = section.items.filter((item) => {
+            if (!item.moduleKey) return true
+            return activeModules?.includes(item.moduleKey)
+          })
+          if (visibleItems.length === 0) return null
+          return (
           <div key={si}>
             {section.title && (
               <div className="px-2 pt-3.5 pb-1.5 font-body text-[10px] font-semibold uppercase tracking-widest text-kinship-placeholder">
@@ -73,7 +88,7 @@ export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
               </div>
             )}
             <div className="flex flex-col gap-0.5">
-              {section.items.map((item) => {
+              {visibleItems.map((item) => {
                 const active = isActive(item.href)
                 const Icon = item.icon
                 return (
@@ -93,7 +108,8 @@ export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
               })}
             </div>
           </div>
-        ))}
+          )
+        })}
       </nav>
 
       {/* Footer — user */}
