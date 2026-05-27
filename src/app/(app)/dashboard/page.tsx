@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { eq, ne, asc, desc, and, or, isNotNull, gte, lt } from 'drizzle-orm'
-import { startOfWeek, addDays, addMonths } from 'date-fns'
+import { startOfWeek, addDays, addMonths, differenceInCalendarDays } from 'date-fns'
 import { db } from '@/lib/db'
 import {
   householdMembers,
@@ -13,6 +13,7 @@ import {
   cars,
   insurancePolicies,
   electronics,
+  suggestions,
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardTimeline } from '@/components/dashboard/DashboardTimeline'
@@ -188,6 +189,41 @@ export default async function DashboardPage() {
       .where(eq(electronics.householdId, row.householdId))
   }
 
+  // Fetch pending suggestions from DB
+  const allSuggestions = await db
+    .select()
+    .from(suggestions)
+    .where(and(eq(suggestions.householdId, row.householdId), eq(suggestions.status, 'pending')))
+
+  const serializedSuggestions = allSuggestions.map((s) => ({
+    id: s.id,
+    sourceModule: s.sourceModule,
+    sourceEntityId: s.sourceEntityId,
+    sourceField: s.sourceField,
+    deadlineDate: s.deadlineDate,
+    suggestedTitle: s.suggestedTitle,
+    suggestedNotes: s.suggestedNotes,
+    suggestedOwnerId: s.suggestedOwnerId,
+    status: s.status,
+    createdAt: s.createdAt?.toISOString() ?? null,
+  }))
+
+  // Split overdue tasks: >14 days overdue = stale, <=14 days = regular overdue
+  const staleOverdue: DashTask[] = []
+  const regularTasks: DashTask[] = []
+  for (const t of allTasks) {
+    if (!t.startsAt || t.status === 'done') {
+      regularTasks.push(t)
+      continue
+    }
+    const daysBefore = differenceInCalendarDays(now, t.startsAt)
+    if (t.startsAt < weekStart && daysBefore > 14) {
+      staleOverdue.push(t)
+    } else {
+      regularTasks.push(t)
+    }
+  }
+
   // Serialize dates for client
   const serialize = <T extends Record<string, unknown>>(rows: T[]) =>
     rows.map((r) => {
@@ -205,12 +241,12 @@ export default async function DashboardPage() {
       <main className="flex-1 overflow-auto px-4 py-2 sm:px-6">
         <DashboardTimeline
           activeModules={activeModules}
-          tasks={serialize(allTasks)}
+          tasks={serialize(regularTasks)}
           activities={serialize(allActivities)}
-          cars={serialize(allCars)}
           policies={serialize(allPolicies)}
-          electronics={serialize(allElectronics)}
           members={serialize(members)}
+          suggestions={serializedSuggestions}
+          staleOverdue={serialize(staleOverdue)}
           weekStartIso={weekStart.toISOString()}
           weekEndIso={weekEnd.toISOString()}
           nextWeekEndIso={nextWeekEnd.toISOString()}

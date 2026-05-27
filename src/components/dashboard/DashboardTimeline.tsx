@@ -6,7 +6,8 @@ import { Check, TrendingUp, ChevronRight, Upload, Users, Lightbulb, AlertTriangl
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { updateTaskStatus, createTask } from '@/app/actions/tasks'
+import { updateTaskStatus } from '@/app/actions/tasks'
+import { acceptSuggestion, dismissSuggestion } from '@/app/actions/suggestions'
 import type { ModuleKey } from '@/stores/onboarding'
 
 const MOD: Record<ModuleKey, { dot: string }> = {
@@ -21,14 +22,28 @@ interface TimelineRow {
 }
 interface SerializedMember { id: string; displayName: string | null; avatarUrl: string | null; userId: string }
 
+interface SerializedSuggestion {
+  id: string
+  sourceModule: string
+  sourceEntityId: string
+  sourceField: string
+  deadlineDate: string
+  suggestedTitle: string
+  suggestedNotes: string | null
+  suggestedOwnerId: string | null
+  status: string
+  createdAt: string | null
+}
+
 interface Props {
   activeModules: ModuleKey[]
   tasks: { id: string; title: string; areaName: string | null; startsAt: string | null; ownerId: string | null; status: string }[]
   activities: { id: string; title: string; childName: string | null; childId: string | null; startsAt: string | null; assigneeId: string | null }[]
-  cars: { id: string; make: string; model: string; motDueDate: string | null; taxDueDate: string | null; nextServiceDate: string | null }[]
   policies: { id: string; insurer: string; policyType: string; expiryDate: string | null; nextPaymentDate: string | null; premiumCents: number | null; paymentSchedule: string | null }[]
-  electronics: { id: string; name: string; warrantyExpiryDate: string | null }[]
-  members: SerializedMember[]; weekStartIso: string; weekEndIso: string; nextWeekEndIso: string
+  members: SerializedMember[]
+  suggestions: SerializedSuggestion[]
+  staleOverdue: { id: string; title: string; areaName: string | null; startsAt: string | null; ownerId: string | null; status: string }[]
+  weekStartIso: string; weekEndIso: string; nextWeekEndIso: string
 }
 
 function memberInfo(members: SerializedMember[], id: string | null) {
@@ -55,7 +70,7 @@ function timeLabel(dateStr: string): string {
 }
 
 export function DashboardTimeline({
-  activeModules, tasks, activities, cars, policies, electronics, members,
+  activeModules, tasks, activities, policies, members, suggestions, staleOverdue,
   weekStartIso, weekEndIso, nextWeekEndIso,
 }: Props) {
   const weekStart = parseISO(weekStartIso)
@@ -83,26 +98,12 @@ export function DashboardTimeline({
         title: a.childName ? `${a.childName} — ${a.title}` : a.title, module: 'kids',
         whoInitials: who?.initials, whoColor: who?.color, sortKey: d.getTime() })
     }
-    for (const c of cars) {
-      for (const [date, label] of [[c.motDueDate, `MOT — ${c.make} ${c.model}`], [c.taxDueDate, `Tax — ${c.make} ${c.model}`], [c.nextServiceDate, `Service — ${c.make} ${c.model}`]] as [string|null, string][]) {
-        if (!date) continue; const d = parseISO(date)
-        if (d < weekStart || d >= parseISO(nextWeekEndIso)) continue
-        rows.push({ id: `car-${c.id}-${label}`, day: dayLabel(date), title: label, module: 'car', sortKey: d.getTime() })
-      }
-    }
-    for (const p of policies) {
-      for (const [date, label, amt] of [[p.expiryDate, `${p.insurer} — ${p.policyType} expiry`, undefined], [p.nextPaymentDate, `${p.insurer} — payment due`, p.premiumCents ? `€${(p.premiumCents/100).toFixed(2)}` : undefined]] as [string|null, string, string|undefined][]) {
-        if (!date) continue; const d = parseISO(date)
-        if (d < weekStart || d >= parseISO(nextWeekEndIso)) continue
-        rows.push({ id: `ins-${p.id}-${label}`, day: dayLabel(date), title: label, module: 'insurance', amount: amt, sortKey: d.getTime() })
-      }
-    }
     return {
       overdue: rows.filter((r) => r.isOverdue).sort((a, b) => a.sortKey - b.sortKey),
       thisWeek: rows.filter((r) => !r.isOverdue && r.sortKey >= weekStart.getTime() && r.sortKey < weekEnd.getTime()).sort((a, b) => a.sortKey - b.sortKey),
       nextWeek: rows.filter((r) => !r.isOverdue && r.sortKey >= weekEnd.getTime()).sort((a, b) => a.sortKey - b.sortKey),
     }
-  }, [tasks, activities, cars, policies, weekStart, weekEnd, nextWeekEndIso, members, now])
+  }, [tasks, activities, weekStart, weekEnd, members, now])
 
   /* ── Done toggle ─────────────────────────────────────────────── */
   const [doneSet, setDoneSet] = useState<Set<string>>(() => {
@@ -138,41 +139,6 @@ export function DashboardTimeline({
     return members.map((m) => { const count = counts.get(m.id) ?? 0; return { id: m.id, name: m.displayName?.split(' ')[0] ?? '?', pct: Math.round((count / total) * 100), color: memberInfo([m], m.id)?.color ?? '#999', count } }).sort((a, b) => b.pct - a.pct)
   }, [tasks, members])
   const topMember = balance[0]; const othersWithLess = balance.filter((b) => b.pct > 0 && b.id !== topMember?.id)
-
-  /* ── Suggestions (only this/next week, max 30d overdue) ─────── */
-  interface Suggestion { id: string; title: string; reason: string; dueDate: string; module: ModuleKey; urgency: 'soon'|'upcoming'; suggestedMemberId?: string; suggestedMemberName?: string }
-  const suggestions = useMemo(() => {
-    const items: Suggestion[] = []
-    const cutoff = parseISO(nextWeekEndIso).getTime()
-    const maxOverdue = 30 // ignore items >30 days overdue
-
-    for (const c of cars) {
-      const label = `${c.make} ${c.model}`
-      for (const [date, type] of [[c.motDueDate, 'MOT'], [c.taxDueDate, 'Tax'], [c.nextServiceDate, 'Service']] as [string|null, string][]) {
-        if (!date) continue; const d = parseISO(date); const days = differenceInCalendarDays(d, now)
-        if (d.getTime() > cutoff || days < -maxOverdue) continue
-        items.push({ id: `sug-car-${c.id}-${type}`, title: `${type} — ${label}`,
-          reason: days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Due today' : days === 1 ? 'Due tomorrow' : `Due in ${days} days`,
-          dueDate: date, module: 'car', urgency: days <= 7 ? 'soon' : 'upcoming' })
-      }
-    }
-    for (const p of policies) {
-      if (!p.expiryDate) continue; const d = parseISO(p.expiryDate); const days = differenceInCalendarDays(d, now)
-      if (d.getTime() > cutoff || days < -maxOverdue) continue
-      items.push({ id: `sug-ins-${p.id}`, title: `${p.insurer} — ${p.policyType} renewal`,
-        reason: days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Expires today' : days === 1 ? 'Expires tomorrow' : `Expires in ${days} days`,
-        dueDate: p.expiryDate, module: 'insurance', urgency: days <= 7 ? 'soon' : 'upcoming' })
-    }
-    for (const e of electronics) {
-      if (!e.warrantyExpiryDate) continue; const d = parseISO(e.warrantyExpiryDate); const days = differenceInCalendarDays(d, now)
-      if (d.getTime() > cutoff || days < -maxOverdue) continue
-      items.push({ id: `sug-elec-${e.id}`, title: `${e.name} — warranty expiring`,
-        reason: days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Expires today' : days === 1 ? 'Expires tomorrow' : `Expires in ${days} days`,
-        dueDate: e.warrantyExpiryDate, module: 'electronics', urgency: days <= 7 ? 'soon' : 'upcoming' })
-    }
-    const leastLoaded = balance.length > 1 ? balance.reduce((min, b) => b.pct < min.pct ? b : min, balance[balance.length - 1]) : balance[0]
-    return items.sort((a, b) => parseISO(a.dueDate).getTime() - parseISO(b.dueDate).getTime()).slice(0, 5).map((s) => ({ ...s, suggestedMemberId: leastLoaded?.id, suggestedMemberName: leastLoaded?.name }))
-  }, [cars, policies, electronics, balance, now, nextWeekEndIso])
 
   const weekRange = `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'd')}`
   const nextWeekRange = `${format(weekEnd, 'MMM d')} – ${format(addDays(weekEnd, 6), 'MMM d')}`
@@ -217,7 +183,8 @@ export function DashboardTimeline({
       {/* RIGHT — sidebar */}
       <div className="flex flex-col gap-4 lg:flex-1">
         {members.length > 0 && <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} hasData={tasks.length > 0} />}
-        {suggestions.length > 0 && <SuggestionsCard suggestions={suggestions} members={members} />}
+        {suggestions.length > 0 && <SuggestionsCard suggestions={suggestions} />}
+        {staleOverdue.length > 0 && <ReviewCard staleOverdue={staleOverdue} members={members} />}
         {upcomingPayments.length > 0 && <MoneyPulseCard payments={upcomingPayments} total={paymentTotal} />}
       </div>
     </div>
@@ -294,73 +261,141 @@ function BalanceCard({ topMember, others, bars, hasData }: { topMember: { name: 
   )
 }
 
-/* ── Suggestions ─────────────────────────────────────────────── */
-function SuggestionsCard({ suggestions, members }: {
-  suggestions: { id: string; title: string; reason: string; dueDate: string; module: ModuleKey; urgency: 'soon'|'upcoming'; suggestedMemberId?: string; suggestedMemberName?: string }[]
-  members: SerializedMember[]
-}) {
+/* ── Suggestions (DB-backed) ──────────────────────────────────── */
+function SuggestionsCard({ suggestions }: { suggestions: SerializedSuggestion[] }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set())
-  const [created, setCreated] = useState<Set<string>>(new Set())
 
-  const handleCreate = (sug: typeof suggestions[0]) => {
+  const handleAccept = (sug: SerializedSuggestion) => {
     startTransition(async () => {
-      const result = await createTask({ title: sug.title, notes: `Auto-suggested: ${sug.reason}`, ownerId: sug.suggestedMemberId ?? null, startsAt: sug.dueDate })
-      if (result.success) { setCreated((s) => new Set(s).add(sug.id)); toast.success(`Task created: ${sug.title}`, { description: sug.suggestedMemberName ? `Assigned to ${sug.suggestedMemberName}` : undefined }); router.refresh() }
-      else toast.error(result.error ?? 'Failed to create task')
+      const result = await acceptSuggestion({ suggestionId: sug.id })
+      if (result.success) {
+        toast.success(`Task created: ${result.data?.taskTitle ?? sug.suggestedTitle}`)
+        router.refresh()
+      } else {
+        toast.error(result.error ?? 'Failed to accept suggestion')
+      }
     })
   }
 
-  const handleEdit = (sug: typeof suggestions[0]) => {
-    // Navigate to chores with pre-filled data via query params
-    const params = new URLSearchParams({ action: 'new', title: sug.title, startsAt: sug.dueDate })
-    if (sug.suggestedMemberId) params.set('ownerId', sug.suggestedMemberId)
+  const handleEdit = (sug: SerializedSuggestion) => {
+    const params = new URLSearchParams({ action: 'new', title: sug.suggestedTitle, startsAt: sug.deadlineDate })
+    if (sug.suggestedOwnerId) params.set('ownerId', sug.suggestedOwnerId)
     router.push(`/chores?${params.toString()}`)
   }
 
-  const visible = suggestions.filter((s) => !dismissed.has(s.id) && !created.has(s.id))
-  if (visible.length === 0) return null
+  const handleDismiss = (sug: SerializedSuggestion) => {
+    startTransition(async () => {
+      const result = await dismissSuggestion({ suggestionId: sug.id })
+      if (result.success) {
+        router.refresh()
+      } else {
+        toast.error(result.error ?? 'Failed to dismiss suggestion')
+      }
+    })
+  }
+
+  if (suggestions.length === 0) return null
 
   return (
     <div className="rounded-2xl bg-white ring-miro overflow-hidden">
       <div className="flex items-baseline gap-2 border-b border-kinship-surface-container px-3.5 py-2">
         <Lightbulb className="h-[13px] w-[13px] text-amber-500" />
         <span className="font-display text-[13px] font-semibold text-kinship-on-surface">Suggested</span>
-        <div className="flex-1" /><span className="font-body text-[10px] text-kinship-placeholder">this &amp; next week</span>
+        <div className="flex-1" /><span className="font-body text-[10px] text-kinship-placeholder">{suggestions.length} pending</span>
       </div>
       <div className="px-3.5 py-1.5">
-        {visible.map((sug, i) => (
-          <div key={sug.id} className={`py-2 ${i > 0 ? 'border-t border-kinship-surface-container' : ''}`}>
-            <div className="flex items-start gap-2">
-              <div className={`mt-0.5 flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full ${sug.urgency === 'soon' ? 'bg-amber-100 text-amber-600' : 'bg-kinship-surface-container text-kinship-on-surface-variant'}`}>
-                <AlertTriangle className="h-[9px] w-[9px]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-[4px] w-[4px] shrink-0 rounded-full" style={{ backgroundColor: MOD[sug.module]?.dot ?? '#999' }} />
-                  <span className="font-body text-[11.5px] font-semibold text-kinship-on-surface truncate">{sug.title}</span>
+        {suggestions.map((sug, i) => {
+          const mod = (sug.sourceModule ?? 'chores') as ModuleKey
+          const d = parseISO(sug.deadlineDate)
+          const days = differenceInCalendarDays(d, new Date())
+          const reason = days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Due today' : days === 1 ? 'Due tomorrow' : `Due in ${days} days`
+          const urgent = days <= 7
+
+          return (
+            <div key={sug.id} className={`py-2 ${i > 0 ? 'border-t border-kinship-surface-container' : ''}`}>
+              <div className="flex items-start gap-2">
+                <div className={`mt-0.5 flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full ${urgent ? 'bg-amber-100 text-amber-600' : 'bg-kinship-surface-container text-kinship-on-surface-variant'}`}>
+                  <AlertTriangle className="h-[9px] w-[9px]" />
                 </div>
-                <p className="font-body text-[10px] text-kinship-on-surface-variant mt-0.5">{sug.reason}</p>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <button onClick={() => handleCreate(sug)} disabled={isPending}
-                    className="flex items-center gap-1 rounded-full bg-kinship-primary px-2.5 py-[3px] font-body text-[10px] font-semibold text-white hover:bg-kinship-primary-pressed transition-colors disabled:opacity-50">
-                    <UserPlus className="h-[9px] w-[9px]" />
-                    {sug.suggestedMemberName ? `Assign to ${sug.suggestedMemberName}` : 'Create task'}
-                  </button>
-                  <button onClick={() => handleEdit(sug)}
-                    className="flex items-center gap-1 rounded-full border border-kinship-outline-variant px-2 py-[3px] font-body text-[10px] font-medium text-kinship-on-surface-variant hover:bg-kinship-surface-container transition-colors">
-                    <Pencil className="h-[8px] w-[8px]" /> Edit
-                  </button>
-                  <button onClick={() => setDismissed((s) => new Set(s).add(sug.id))}
-                    className="rounded-full px-2 py-[3px] font-body text-[10px] text-kinship-placeholder hover:bg-kinship-surface-container transition-colors">
-                    Dismiss
-                  </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-[4px] w-[4px] shrink-0 rounded-full" style={{ backgroundColor: MOD[mod]?.dot ?? '#999' }} />
+                    <span className="font-body text-[11.5px] font-semibold text-kinship-on-surface truncate">{sug.suggestedTitle}</span>
+                  </div>
+                  <p className="font-body text-[10px] text-kinship-on-surface-variant mt-0.5">{reason}</p>
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <button onClick={() => handleAccept(sug)} disabled={isPending}
+                      className="flex items-center gap-1 rounded-full bg-kinship-primary px-2.5 py-[3px] font-body text-[10px] font-semibold text-white hover:bg-kinship-primary-pressed transition-colors disabled:opacity-50">
+                      <UserPlus className="h-[9px] w-[9px]" /> Accept
+                    </button>
+                    <button onClick={() => handleEdit(sug)}
+                      className="flex items-center gap-1 rounded-full border border-kinship-outline-variant px-2 py-[3px] font-body text-[10px] font-medium text-kinship-on-surface-variant hover:bg-kinship-surface-container transition-colors">
+                      <Pencil className="h-[8px] w-[8px]" /> Edit
+                    </button>
+                    <button onClick={() => handleDismiss(sug)} disabled={isPending}
+                      className="rounded-full px-2 py-[3px] font-body text-[10px] text-kinship-placeholder hover:bg-kinship-surface-container transition-colors disabled:opacity-50">
+                      Dismiss
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ── Things to review (stale overdue >14 days) ───────────────── */
+function ReviewCard({ staleOverdue, members }: {
+  staleOverdue: { id: string; title: string; areaName: string | null; startsAt: string | null; ownerId: string | null; status: string }[]
+  members: SerializedMember[]
+}) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const handleMarkDone = (taskId: string) => {
+    startTransition(async () => {
+      await updateTaskStatus({ id: taskId, status: 'done' })
+      router.refresh()
+    })
+  }
+
+  if (staleOverdue.length === 0) return null
+
+  return (
+    <div className="rounded-2xl bg-white ring-miro overflow-hidden">
+      <div className="flex items-baseline gap-2 border-b border-kinship-surface-container px-3.5 py-2">
+        <AlertTriangle className="h-[13px] w-[13px] text-amber-500" />
+        <span className="font-display text-[13px] font-semibold text-kinship-on-surface">Things to review</span>
+        <div className="flex-1" /><span className="font-body text-[10px] text-kinship-placeholder">{staleOverdue.length} stale</span>
+      </div>
+      <div className="px-3.5 py-1.5">
+        {staleOverdue.map((task, i) => {
+          const days = task.startsAt ? differenceInCalendarDays(new Date(), parseISO(task.startsAt)) : 0
+          return (
+            <div key={task.id} className={`flex items-center gap-2 py-2 ${i > 0 ? 'border-t border-kinship-surface-container' : ''}`}>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-[4px] w-[4px] shrink-0 rounded-full" style={{ backgroundColor: MOD.chores.dot }} />
+                  <span className="font-body text-[11.5px] font-medium text-kinship-on-surface truncate">{task.title}</span>
+                </div>
+                <span className="font-body text-[10px] font-semibold text-amber-600">{days}d overdue</span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <Link href="/chores" className="rounded-full border border-kinship-outline-variant px-2 py-[3px] font-body text-[10px] font-medium text-kinship-on-surface-variant hover:bg-kinship-surface-container transition-colors">
+                  Reschedule
+                </Link>
+                <button onClick={() => handleMarkDone(task.id)} disabled={isPending}
+                  className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-[3px] font-body text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50">
+                  <Check className="h-[8px] w-[8px]" /> Done
+                </button>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
