@@ -14,6 +14,7 @@
  */
 import {
   boolean,
+  date,
   index,
   integer,
   jsonb,
@@ -683,6 +684,53 @@ export const messages = pgTable(
   },
   () => [
     pgPolicy('messages_all_member', {
+      for: 'all',
+      to: authenticatedRole,
+      using: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+      withCheck: sql`household_id IN (
+        SELECT household_id FROM household_members WHERE user_id = ${authUid}
+      )`,
+    }),
+  ]
+)
+
+// ---------------------------------------------------------------------------
+// suggestions (Phase 7 — deadline-to-task intelligence)
+// ---------------------------------------------------------------------------
+export const suggestions = pgTable(
+  'suggestions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    householdId: uuid('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    sourceModule: text('source_module').notNull(), // 'car' | 'insurance' | 'electronics'
+    sourceEntityId: text('source_entity_id').notNull(), // the car/policy/electronic item ID
+    sourceField: text('source_field').notNull(), // which deadline field: 'motDueDate', 'expiryDate', etc.
+    deadlineDate: date('deadline_date').notNull(),
+    suggestedTitle: text('suggested_title').notNull(), // smart-rewritten task title
+    suggestedNotes: text('suggested_notes'),
+    // suggestedOwnerId references household_members.id — plain uuid, FK added in migration
+    suggestedOwnerId: text('suggested_owner_id'),
+    status: text('status').notNull().default('pending'), // 'pending' | 'accepted' | 'dismissed'
+    // acceptedTaskId references tasks.id — set when suggestion is accepted
+    acceptedTaskId: text('accepted_task_id'),
+    dismissedAt: timestamp('dismissed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  },
+  (t) => [
+    index('suggestions_household_status_idx').on(t.householdId, t.status),
+    unique('suggestions_unique_deadline').on(
+      t.householdId,
+      t.sourceModule,
+      t.sourceEntityId,
+      t.sourceField,
+      t.deadlineDate
+    ),
+    pgPolicy('suggestions_all_member', {
       for: 'all',
       to: authenticatedRole,
       using: sql`household_id IN (
