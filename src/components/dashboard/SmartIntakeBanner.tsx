@@ -130,16 +130,16 @@ export function SmartIntakeBanner() {
       <button
         type="button"
         onClick={() => setStage('open')}
-        className="group flex w-full items-center gap-3.5 rounded-2xl bg-gradient-to-r from-kinship-primary to-kinship-primary/80 px-4 py-3.5 text-white text-left shadow-sm hover:shadow-md transition-all"
+        className="group flex w-full items-center gap-3 rounded-xl bg-kinship-primary-surface px-3.5 py-3 text-left hover:bg-kinship-primary/10 transition-colors"
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-          <Sparkles className="h-4 w-4" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-kinship-primary text-white">
+          <Sparkles className="h-3.5 w-3.5" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="font-display text-[13px] font-semibold">Smart intake</div>
-          <div className="font-body text-[11px] text-white/75">Drop a receipt, photo or PDF — describe it and Kinship files it for you.</div>
+          <div className="font-display text-[13px] font-semibold text-kinship-primary">Smart intake</div>
+          <div className="font-body text-[11px] text-kinship-on-surface-variant">Drop a receipt, photo or PDF — describe it and Kinship files it for you.</div>
         </div>
-        <span className="shrink-0 rounded-full bg-white/20 px-3 py-1 font-body text-[11px] font-semibold group-hover:bg-white/30 transition-colors">
+        <span className="shrink-0 rounded-full bg-white/70 px-2.5 py-0.5 font-body text-[10.5px] font-semibold text-kinship-primary group-hover:bg-white transition-colors">
           + Add
         </span>
       </button>
