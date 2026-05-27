@@ -204,10 +204,12 @@ Plans:
 4. Dismissed suggestions don't reappear for that deadline cycle.
 5. Suggestions are scoped to this week + next week (not ancient overdue items).
 
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (use /gsd-plan-phase 7 to create plans)
+- [ ] 07-01-PLAN.md — Suggestions schema + migration (new `suggestions` table) — Wave 1
+- [ ] 07-02-PLAN.md — Suggestion server actions + Inngest daily job (templates, CRUD, cron) — Wave 2
+- [ ] 07-03-PLAN.md — Dashboard refactor (tasks-only timeline, DB suggestions, review card) — Wave 3
 
 ---
 
