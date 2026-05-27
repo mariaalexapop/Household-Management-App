@@ -2,10 +2,11 @@
 
 import { useState, useMemo, useTransition } from 'react'
 import { format, isToday, isTomorrow, isBefore, parseISO, startOfDay, differenceInCalendarDays, addDays } from 'date-fns'
-import { Check, TrendingUp, ChevronRight, Upload, Users } from 'lucide-react'
+import { Check, TrendingUp, ChevronRight, Upload, Users, Lightbulb, AlertTriangle, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { updateTaskStatus } from '@/app/actions/tasks'
+import { toast } from 'sonner'
+import { updateTaskStatus, createTask } from '@/app/actions/tasks'
 import type { ModuleKey } from '@/stores/onboarding'
 
 /* ── Module colors ───────────────────────────────────────────── */
@@ -231,6 +232,75 @@ export function DashboardTimeline({
   const topMember = balance[0]
   const othersWithLess = balance.filter((b) => b.pct > 0 && b.id !== topMember?.id)
 
+  /* ── Smart suggestions — upcoming deadlines → task proposals ── */
+  interface Suggestion {
+    id: string; title: string; reason: string; dueDate: string
+    module: ModuleKey; urgency: 'soon' | 'upcoming'
+    suggestedMemberId?: string; suggestedMemberName?: string
+  }
+  const suggestions = useMemo(() => {
+    const items: Suggestion[] = []
+    const thirtyDays = now.getTime() + 30 * 86400000
+
+    // Car deadlines
+    for (const c of cars) {
+      const label = `${c.make} ${c.model}`
+      for (const [date, type] of [
+        [c.motDueDate, 'MOT'], [c.taxDueDate, 'Tax'], [c.nextServiceDate, 'Service'],
+      ] as [string | null, string][]) {
+        if (!date) continue
+        const d = parseISO(date)
+        if (d.getTime() < now.getTime() || d.getTime() > thirtyDays) continue
+        const days = differenceInCalendarDays(d, now)
+        items.push({
+          id: `sug-car-${c.id}-${type}`, title: `${type} — ${label}`,
+          reason: days <= 0 ? 'Due today' : days <= 7 ? `Due in ${days} days` : `Due ${format(d, 'MMM d')}`,
+          dueDate: date, module: 'car', urgency: days <= 7 ? 'soon' : 'upcoming',
+        })
+      }
+    }
+
+    // Insurance expiry
+    for (const p of policies) {
+      if (!p.expiryDate) continue
+      const d = parseISO(p.expiryDate)
+      if (d.getTime() < now.getTime() || d.getTime() > thirtyDays) continue
+      const days = differenceInCalendarDays(d, now)
+      items.push({
+        id: `sug-ins-${p.id}`, title: `${p.insurer} — ${p.policyType} renewal`,
+        reason: days <= 0 ? 'Expires today' : days <= 7 ? `Expires in ${days} days` : `Expires ${format(d, 'MMM d')}`,
+        dueDate: p.expiryDate, module: 'insurance', urgency: days <= 14 ? 'soon' : 'upcoming',
+      })
+    }
+
+    // Electronics warranty expiry
+    for (const e of electronics) {
+      if (!e.warrantyExpiryDate) continue
+      const d = parseISO(e.warrantyExpiryDate)
+      if (d.getTime() < now.getTime() || d.getTime() > thirtyDays) continue
+      const days = differenceInCalendarDays(d, now)
+      items.push({
+        id: `sug-elec-${e.id}`, title: `${e.name} — warranty expiring`,
+        reason: days <= 7 ? `Expires in ${days} days` : `Expires ${format(d, 'MMM d')}`,
+        dueDate: e.warrantyExpiryDate, module: 'electronics', urgency: days <= 14 ? 'soon' : 'upcoming',
+      })
+    }
+
+    // Suggest the least-loaded member for each
+    const leastLoaded = balance.length > 1
+      ? balance.reduce((min, b) => b.pct < min.pct ? b : min, balance[balance.length - 1])
+      : balance[0]
+
+    return items
+      .sort((a, b) => parseISO(a.dueDate).getTime() - parseISO(b.dueDate).getTime())
+      .slice(0, 5)
+      .map((s) => ({
+        ...s,
+        suggestedMemberId: leastLoaded?.id,
+        suggestedMemberName: leastLoaded?.name,
+      }))
+  }, [cars, policies, electronics, balance, now])
+
   const weekRange = `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'd')}`
   const nextWeekRange = `${format(weekEnd, 'MMM d')} – ${format(addDays(weekEnd, 6), 'MMM d')}`
 
@@ -299,6 +369,11 @@ export function DashboardTimeline({
             bars={balance.filter((b) => b.pct > 0)}
             hasData={tasks.length > 0}
           />
+        )}
+
+        {/* Smart suggestions */}
+        {suggestions.length > 0 && (
+          <SuggestionsCard suggestions={suggestions} members={members} />
         )}
 
         {/* Money pulse */}
@@ -452,6 +527,90 @@ function BalanceCard({ topMember, others, bars, hasData }: {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+/* ── Smart suggestions ────────────────────────────────────────── */
+function SuggestionsCard({ suggestions, members }: {
+  suggestions: { id: string; title: string; reason: string; dueDate: string; module: ModuleKey; urgency: 'soon' | 'upcoming'; suggestedMemberId?: string; suggestedMemberName?: string }[]
+  members: SerializedMember[]
+}) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set())
+  const [created, setCreated] = useState<Set<string>>(new Set())
+
+  const handleCreateTask = (sug: typeof suggestions[0]) => {
+    startTransition(async () => {
+      const result = await createTask({
+        title: sug.title,
+        notes: `Auto-suggested: ${sug.reason}`,
+        ownerId: sug.suggestedMemberId ?? null,
+        startsAt: sug.dueDate,
+      })
+      if (result.success) {
+        setCreated((s) => new Set(s).add(sug.id))
+        toast.success(`Task created: ${sug.title}`, {
+          description: sug.suggestedMemberName ? `Assigned to ${sug.suggestedMemberName}` : undefined,
+        })
+        router.refresh()
+      } else {
+        toast.error(result.error ?? 'Failed to create task')
+      }
+    })
+  }
+
+  const visible = suggestions.filter((s) => !dismissed.has(s.id) && !created.has(s.id))
+  if (visible.length === 0) return null
+
+  return (
+    <div className="rounded-2xl bg-white ring-miro overflow-hidden">
+      <div className="flex items-baseline gap-2 border-b border-kinship-surface-container px-4 py-2.5">
+        <Lightbulb className="h-[14px] w-[14px] text-amber-500" />
+        <span className="font-display text-[14px] font-semibold text-kinship-on-surface">Suggested</span>
+        <div className="flex-1" />
+        <span className="font-body text-[11px] text-kinship-placeholder">next 30 days</span>
+      </div>
+
+      <div className="px-4 py-2">
+        {visible.map((sug, i) => (
+          <div key={sug.id} className={`py-2.5 ${i > 0 ? 'border-t border-kinship-surface-container' : ''}`}>
+            <div className="flex items-start gap-2.5">
+              <div className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full ${
+                sug.urgency === 'soon' ? 'bg-amber-100 text-amber-600' : 'bg-kinship-surface-container text-kinship-on-surface-variant'
+              }`}>
+                <AlertTriangle className="h-[10px] w-[10px]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-[5px] w-[5px] shrink-0 rounded-full" style={{ backgroundColor: MOD[sug.module]?.dot ?? '#999' }} />
+                  <span className="font-body text-[12.5px] font-semibold text-kinship-on-surface truncate">{sug.title}</span>
+                </div>
+                <p className="font-body text-[11px] text-kinship-on-surface-variant mt-0.5">{sug.reason}</p>
+
+                {/* Action buttons */}
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    onClick={() => handleCreateTask(sug)}
+                    disabled={isPending}
+                    className="flex items-center gap-1 rounded-full bg-kinship-primary px-3 py-1 font-body text-[11px] font-semibold text-white hover:bg-kinship-primary-pressed transition-colors disabled:opacity-50"
+                  >
+                    <UserPlus className="h-[10px] w-[10px]" />
+                    {sug.suggestedMemberName ? `Assign to ${sug.suggestedMemberName}` : 'Create task'}
+                  </button>
+                  <button
+                    onClick={() => setDismissed((s) => new Set(s).add(sug.id))}
+                    className="rounded-full px-2.5 py-1 font-body text-[11px] font-medium text-kinship-on-surface-variant hover:bg-kinship-surface-container transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
