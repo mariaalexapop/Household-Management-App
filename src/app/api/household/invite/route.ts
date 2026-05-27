@@ -3,7 +3,7 @@ import { eq, and } from 'drizzle-orm'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { activityFeed, householdMembers, households, householdInvites } from '@/lib/db/schema'
-import { inngest } from '@/lib/inngest/client'
+import { sendInviteEmail } from '@/lib/email/send-invite'
 
 /**
  * POST /api/household/invite
@@ -105,19 +105,11 @@ export async function POST(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const inviteUrl = `${appUrl}/auth/signup?invite=${invite.token}`
 
-  // Enqueue Inngest event to send the branded invite email via Resend
-  // Non-blocking: if Inngest is unavailable the invite record still exists
+  // Send invite email directly via Resend
   try {
-    await inngest.send({
-      name: 'household/invite.created',
-      data: {
-        email,
-        householdName,
-        inviteUrl,
-      },
-    })
+    await sendInviteEmail({ email, householdName, inviteUrl })
   } catch (err) {
-    console.warn('[invite] Failed to enqueue invite email — Inngest may not be running:', err)
+    console.warn('[invite] Failed to send invite email:', err)
   }
 
   return NextResponse.json({ success: true })

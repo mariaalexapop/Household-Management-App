@@ -11,7 +11,7 @@ import {
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { createHouseholdSchema } from '@/lib/validations/onboarding'
-import { inngest } from '@/lib/inngest/client'
+import { sendInviteEmail } from '@/lib/email/send-invite'
 import type { HouseholdType, ModuleKey } from '@/stores/onboarding'
 
 interface CreateHouseholdInput {
@@ -125,25 +125,17 @@ export async function createHousehold(
       return { householdId: household.id, inviteTokens: tokens }
     })
 
-    // Send invite emails via Inngest (outside transaction)
-    // Non-blocking: if Inngest is unavailable the invite records still exist
-    try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-      await Promise.all(
-        inviteTokens.map((inv) =>
-          inngest.send({
-            name: 'household/invite.created',
-            data: {
-              email: inv.email,
-              householdName,
-              inviteUrl: `${appUrl}/auth/signup?invite=${inv.token}`,
-            },
-          })
-        )
+    // Send invite emails directly via Resend (outside transaction)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    await Promise.allSettled(
+      inviteTokens.map((inv) =>
+        sendInviteEmail({
+          email: inv.email,
+          householdName,
+          inviteUrl: `${appUrl}/auth/signup?invite=${inv.token}`,
+        })
       )
-    } catch (err) {
-      console.warn('[createHousehold] Failed to enqueue invite emails — Inngest may not be running:', err)
-    }
+    )
 
     return { success: true, householdId }
   } catch (err) {
