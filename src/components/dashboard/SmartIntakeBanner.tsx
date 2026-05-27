@@ -130,12 +130,18 @@ export function SmartIntakeBanner() {
       <button
         type="button"
         onClick={() => setStage('open')}
-        className="flex w-full items-center gap-2.5 rounded-xl bg-kinship-primary-surface px-3.5 py-2 text-kinship-primary hover:bg-kinship-primary/10 transition-colors text-left"
+        className="group flex w-full items-center gap-3.5 rounded-2xl bg-gradient-to-r from-kinship-primary to-kinship-primary/80 px-4 py-3.5 text-white text-left shadow-sm hover:shadow-md transition-all"
       >
-        <Upload className="h-[13px] w-[13px] shrink-0" />
-        <span className="font-body text-[12px] font-medium">Drop a receipt, photo or PDF — Kinship files it for you.</span>
-        <span className="flex-1" />
-        <span className="rounded-full bg-white/70 px-2.5 py-0.5 font-body text-[10.5px] font-semibold text-kinship-primary">+ Add</span>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+          <Sparkles className="h-4 w-4" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-display text-[13px] font-semibold">Smart intake</div>
+          <div className="font-body text-[11px] text-white/75">Drop a receipt, photo or PDF — describe it and Kinship files it for you.</div>
+        </div>
+        <span className="shrink-0 rounded-full bg-white/20 px-3 py-1 font-body text-[11px] font-semibold group-hover:bg-white/30 transition-colors">
+          + Add
+        </span>
       </button>
     )
   }
