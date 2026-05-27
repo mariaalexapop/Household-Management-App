@@ -614,7 +614,7 @@ function MoneyPulseChart({ monthlyCosts }: { monthlyCosts: { monthIndex: number;
               activeLines.has(line.key) ? (
                 <Line
                   key={line.key}
-                  type="monotone"
+                  type="linear"
                   dataKey={line.key}
                   stroke={line.color}
                   strokeWidth={line.key === 'total' ? 2 : 1.5}
