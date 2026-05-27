@@ -42,9 +42,20 @@ export default async function SettingsPage() {
 
   const member = memberRows[0]
 
+  const displayName = member?.displayName ?? user.email?.split('@')[0] ?? 'User'
+  const initials = displayName
+    .split(' ')
+    .map((w: string) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+
   return (
     <>
-      <TopBar title="Settings" subtitle="Household, members & modules" />
+      <TopBar
+        title="Settings"
+        subtitle="Household, members & modules"
+      />
 
       <div className="flex-1 overflow-auto px-6 py-2">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr]">

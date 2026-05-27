@@ -72,6 +72,14 @@ export default async function HouseholdSettingsPage() {
   const { householdId } = currentMember
   const isAdmin = currentMember.memberRole === 'admin'
 
+  const displayName = currentMember.memberDisplayName ?? user.email?.split('@')[0] ?? 'User'
+  const settingsInitials = displayName
+    .split(' ')
+    .map((w: string) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+
   // Fetch all members of this household
   const allMembers = await db
     .select({
@@ -148,7 +156,10 @@ export default async function HouseholdSettingsPage() {
 
   return (
     <>
-      <TopBar title="Settings" subtitle="Household, members & modules" />
+      <TopBar
+        title="Settings"
+        subtitle="Household, members & modules"
+      />
 
       <div className="flex-1 overflow-auto px-6 py-2">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr]">

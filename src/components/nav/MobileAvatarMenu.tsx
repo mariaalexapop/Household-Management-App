@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
-  LayoutDashboard, CalendarDays, Coins, Settings, LogOut,
+  LayoutDashboard, CalendarDays, Coins, Settings, LogOut, Users,
   CheckSquare, CalendarHeart, Car, Shield, Monitor,
 } from 'lucide-react'
 import { useUserInfo } from './UserContext'
@@ -126,9 +126,19 @@ export function MobileAvatarMenu() {
             <Coins className="h-4 w-4" />
             Cost Summary
           </Link>
+
+          <hr className="my-1 border-kinship-surface-container" />
+
+          <div className="px-3 pt-3 pb-1 font-body text-[10px] font-semibold uppercase tracking-widest text-kinship-placeholder">
+            Settings
+          </div>
           <Link href="/settings" onClick={() => setOpen(false)} className={linkClass('/settings')}>
             <Settings className="h-4 w-4" />
-            Settings
+            Profile
+          </Link>
+          <Link href="/settings/household" onClick={() => setOpen(false)} className={linkClass('/settings/household')}>
+            <Users className="h-4 w-4" />
+            Household
           </Link>
 
           <hr className="my-1 border-kinship-surface-container" />
