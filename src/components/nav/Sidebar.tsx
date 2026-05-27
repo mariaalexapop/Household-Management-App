@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, CalendarDays, CheckSquare, Users, Car, Shield, Plug,
-  Sparkles, Settings,
+  Sparkles, Settings, Coins,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -38,6 +38,12 @@ const NAV_SECTIONS: { title?: string; items: NavItem[] }[] = [
       { key: 'cars', label: 'Car Maintenance', href: '/cars', icon: Car, moduleKey: 'car' },
       { key: 'insurance', label: 'Insurance', href: '/insurance', icon: Shield, moduleKey: 'insurance' },
       { key: 'electronics', label: 'Electronics', href: '/electronics', icon: Plug, moduleKey: 'electronics' },
+    ],
+  },
+  {
+    title: 'Cost',
+    items: [
+      { key: 'costs', label: 'Cost Summary', href: '/costs', icon: Coins },
     ],
   },
   {
