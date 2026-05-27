@@ -13,7 +13,6 @@ import {
 import { ActivityList } from '@/components/kids/ActivityList'
 import { ActivityForm } from '@/components/kids/ActivityForm'
 import { UnifiedCalendar } from '@/components/calendar/UnifiedCalendar'
-import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import { MODULE_COLOURS, type CalendarEvent } from '@/lib/calendar/types'
 import { createChild, deleteChild, deleteActivity } from '@/app/actions/kids'
 import { registerChildren } from '@/lib/kids/child-colours'
@@ -209,11 +208,6 @@ export function KidsClient({
         </DialogContent>
       </Dialog>
 
-      <FloatingAddButton
-        onClick={handleAdd}
-        label="Add Activity"
-        className="bg-module-kids-dot"
-      />
     </div>
   )
 }

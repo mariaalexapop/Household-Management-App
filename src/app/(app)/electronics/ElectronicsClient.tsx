@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import {
   Monitor,
   Plus,
@@ -526,11 +525,6 @@ export function ElectronicsClient({
         </DialogContent>
       </Dialog>
 
-      <FloatingAddButton
-        onClick={openAdd}
-        label="Add Item"
-        className="bg-module-elec-dot"
-      />
     </div>
   )
 }

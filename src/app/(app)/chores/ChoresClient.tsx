@@ -13,7 +13,6 @@ import { TaskList } from '@/components/chores/TaskList'
 import { TaskForm } from '@/components/chores/TaskForm'
 import { TaskFilters } from '@/components/chores/TaskFilters'
 import { updateTaskStatus, deleteTask, bulkUpdateTaskStatus, bulkDeleteTasks } from '@/app/actions/tasks'
-import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -392,13 +391,6 @@ export function ChoresClient({
         </DialogContent>
       </Dialog>
 
-      <FloatingAddButton
-        onClick={() => {
-          setEditingTask(null)
-          setIsAddDialogOpen(true)
-        }}
-        label="Add Task"
-      />
     </div>
   )
 }

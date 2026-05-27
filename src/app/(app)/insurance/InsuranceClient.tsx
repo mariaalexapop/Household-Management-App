@@ -8,7 +8,6 @@ import { z } from 'zod'
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { Pencil, Trash2, ChevronDown, ChevronUp, Plus, Shield, FileText } from 'lucide-react'
-import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -443,11 +442,6 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
         </DialogContent>
       </Dialog>
 
-      <FloatingAddButton
-        onClick={handleAdd}
-        label="Add Policy"
-        style={{ backgroundColor: '#6a55d9' }}
-      />
     </div>
   )
 }
