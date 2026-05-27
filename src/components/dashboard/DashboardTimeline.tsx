@@ -143,15 +143,21 @@ export function DashboardTimeline({
   const paymentTotal = upcomingPayments.reduce((s, x) => s + x.amount, 0)
 
   /* ── Balance ─────────────────────────────────────────────────── */
+  const doneTasks = tasks.filter((t) => t.status === 'done')
+  const pendingTasks = tasks.filter((t) => t.status !== 'done')
+  const doneCount = doneTasks.length
+  const totalCount = tasks.length
+
   const balance = useMemo(() => {
     const counts = new Map<string, number>(); let unassigned = 0
-    for (const t of tasks) { t.ownerId ? counts.set(t.ownerId, (counts.get(t.ownerId) ?? 0) + 1) : unassigned++ }
-    if (counts.size === 0 && members.length > 0 && tasks.length > 0) counts.set(members[0].id, tasks.length)
+    for (const t of pendingTasks) { t.ownerId ? counts.set(t.ownerId, (counts.get(t.ownerId) ?? 0) + 1) : unassigned++ }
+    if (counts.size === 0 && members.length > 0 && pendingTasks.length > 0) counts.set(members[0].id, pendingTasks.length)
     else if (unassigned > 0 && counts.size > 0) { const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0]; counts.set(top, (counts.get(top) ?? 0) + unassigned) }
-    const total = tasks.length || 1
+    const total = pendingTasks.length || 1
     return members.map((m) => { const count = counts.get(m.id) ?? 0; return { id: m.id, name: m.displayName?.split(' ')[0] ?? '?', pct: Math.round((count / total) * 100), color: memberInfo([m], m.id)?.color ?? '#999', count } }).sort((a, b) => b.pct - a.pct)
-  }, [tasks, members])
+  }, [pendingTasks, members])
   const topMember = balance[0]; const othersWithLess = balance.filter((b) => b.pct > 0 && b.id !== topMember?.id)
+  const donePct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
 
   const weekRange = `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'd')}`
   const nextWeekRange = `${format(weekEnd, 'MMM d')} – ${format(addDays(weekEnd, 6), 'MMM d')}`
@@ -210,7 +216,7 @@ export function DashboardTimeline({
       {/* RIGHT — sidebar (draggable cards) */}
       <div className="lg:flex-1">
         <SortableCardGrid cards={[
-          { id: 'balance', visible: members.length > 0, node: <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} hasData={tasks.length > 0} /> },
+          { id: 'balance', visible: members.length > 0, node: <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} hasData={tasks.length > 0} donePct={donePct} doneCount={doneCount} totalCount={totalCount} /> },
           { id: 'suggestions', visible: suggestions.length > 0, node: <SuggestionsCard suggestions={suggestions} /> },
           { id: 'review', visible: staleOverdue.length > 0, node: <ReviewCard staleOverdue={staleOverdue} members={members} /> },
           { id: 'cost-chart', visible: !!(monthlyCosts && monthlyCosts.some((m) => m.total > 0)), node: <MoneyPulseChart monthlyCosts={monthlyCosts ?? []} /> },
@@ -363,9 +369,17 @@ function ActionRow({ row, done, onToggle, muted, members }: {
 }
 
 /* ── Household balance ───────────────────────────────────────── */
-function BalanceCard({ topMember, others, bars, hasData }: { topMember: { name: string; pct: number; color: string } | undefined; others: { name: string; pct: number; count: number }[]; bars: { name: string; pct: number; color: string }[]; hasData: boolean }) {
+function BalanceCard({ topMember, others, bars, hasData, donePct, doneCount, totalCount }: { topMember: { name: string; pct: number; color: string } | undefined; others: { name: string; pct: number; count: number }[]; bars: { name: string; pct: number; color: string }[]; hasData: boolean; donePct: number; doneCount: number; totalCount: number }) {
   const [open, setOpen] = useState(false)
   const sug = others.length > 0 ? `${others.reduce((s, o) => s + o.count, 0)} things ${others.map((o) => o.name).join(' or ')} could pick up` : null
+
+  const completionMsg = totalCount > 0 && doneCount > 0
+    ? donePct >= 100 ? 'All done this week — great job!'
+    : donePct >= 75 ? `Almost there! ${doneCount}/${totalCount} tasks completed.`
+    : donePct >= 50 ? `Nice progress — ${doneCount}/${totalCount} tasks done.`
+    : `${doneCount}/${totalCount} tasks completed so far.`
+    : null
+
   return (
     <div className="rounded-2xl bg-white ring-miro overflow-hidden">
       <div className="flex items-baseline gap-2 border-b border-kinship-surface-container px-3.5 py-2">
@@ -373,12 +387,31 @@ function BalanceCard({ topMember, others, bars, hasData }: { topMember: { name: 
         <span className="font-display text-[13px] font-semibold text-kinship-on-surface">Household balance</span>
         <div className="flex-1" /><span className="font-body text-[10px] text-kinship-placeholder">this week</span>
       </div>
+
+      {/* Completion progress */}
+      {completionMsg && (
+        <div className="px-3.5 pt-2.5 pb-1">
+          <div className="flex items-center gap-2.5">
+            <div className="flex-1 h-1.5 rounded-full bg-kinship-surface-container overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${donePct >= 100 ? 'bg-green-500' : donePct >= 50 ? 'bg-kinship-primary' : 'bg-kinship-primary/60'}`}
+                style={{ width: `${Math.min(donePct, 100)}%` }}
+              />
+            </div>
+            <span className="font-mono text-[10px] text-kinship-placeholder shrink-0">{donePct}%</span>
+          </div>
+          <p className={`font-body text-[11px] mt-1 ${donePct >= 75 ? 'text-green-600 font-medium' : 'text-kinship-on-surface-variant'}`}>
+            {completionMsg}
+          </p>
+        </div>
+      )}
+
       <button onClick={() => setOpen((o) => !o)} className="w-full text-left px-3.5 py-2.5 hover:bg-kinship-surface-container/20 transition-colors">
         <div className="flex items-center gap-3">
           {hasData && bars.length > 0 && <div className="flex h-2 w-20 shrink-0 overflow-hidden rounded-full ring-1 ring-kinship-surface-container">{bars.map((b, i) => <div key={i} style={{ width: `${b.pct}%`, backgroundColor: b.color }} className="h-full" />)}</div>}
           <div className="flex-1 min-w-0">
             {hasData && topMember ? (<>
-              <p className="font-body text-[12px] text-kinship-on-surface leading-snug"><strong>{topMember.name}</strong> is holding <strong>{topMember.pct}%</strong> this week.</p>
+              <p className="font-body text-[12px] text-kinship-on-surface leading-snug"><strong>{topMember.name}</strong> is holding <strong>{topMember.pct}%</strong> of remaining tasks.</p>
               {sug && <p className="font-body text-[11px] font-semibold text-kinship-primary mt-0.5 flex items-center gap-0.5">{sug} <ChevronRight className="h-2.5 w-2.5" /></p>}
             </>) : <p className="font-body text-[12px] text-kinship-on-surface-variant">No tasks this week yet.</p>}
           </div>
