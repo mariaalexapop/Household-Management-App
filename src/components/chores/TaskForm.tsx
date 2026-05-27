@@ -58,6 +58,7 @@ interface TaskPrefill {
   notes?: string
   startDate?: string
   ownerId?: string
+  areaId?: string
 }
 
 interface TaskFormProps {
@@ -110,7 +111,7 @@ export function TaskForm({
     : {
         title: prefill?.title ?? '',
         notes: prefill?.notes ?? '',
-        areaId: '',
+        areaId: prefill?.areaId ?? '',
         ownerId: prefill?.ownerId ?? currentUserId,
         startDate: prefill?.startDate ?? format(new Date(), 'yyyy-MM-dd'),
         startTime: '',

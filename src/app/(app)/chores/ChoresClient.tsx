@@ -82,18 +82,34 @@ export function ChoresClient({
 
   // Auto-open add dialog from ?action=new with optional prefill
   const searchParams = useSearchParams()
-  const [prefill, setPrefill] = useState<{ title?: string; notes?: string; startDate?: string; ownerId?: string } | null>(null)
+  const [prefill, setPrefill] = useState<{ title?: string; notes?: string; startDate?: string; ownerId?: string; areaId?: string } | null>(null)
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
       const title = searchParams.get('title') ?? undefined
       const startsAt = searchParams.get('startsAt') ?? undefined
       const ownerId = searchParams.get('ownerId') ?? undefined
       const notes = searchParams.get('notes') ?? undefined
+      const areaHint = searchParams.get('areaHint') ?? undefined
+
+      // Resolve areaHint (module name) to an area ID by fuzzy matching area names
+      const AREA_HINTS: Record<string, string[]> = {
+        car: ['car', 'vehicle', 'auto', 'mot'],
+        insurance: ['insurance', 'policy', 'renewal'],
+        electronics: ['electronics', 'warranty', 'appliance'],
+      }
+      let resolvedAreaId: string | undefined
+      if (areaHint && AREA_HINTS[areaHint]) {
+        const keywords = AREA_HINTS[areaHint]
+        const match = areas.find((a) => keywords.some((kw) => a.name.toLowerCase().includes(kw)))
+        if (match) resolvedAreaId = match.id
+      }
+
       setPrefill({
         title,
         notes,
         startDate: startsAt ? startsAt.slice(0, 10) : undefined,
         ownerId,
+        areaId: resolvedAreaId,
       })
       setEditingTask(null)
       setIsAddDialogOpen(true)
