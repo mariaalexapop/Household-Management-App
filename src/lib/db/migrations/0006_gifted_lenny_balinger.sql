@@ -1,0 +1,1 @@
+ALTER TABLE "insurance_policies" ADD COLUMN "is_auto_payment" boolean DEFAULT false NOT NULL;

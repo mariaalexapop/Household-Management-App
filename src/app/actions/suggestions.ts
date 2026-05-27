@@ -88,17 +88,17 @@ export async function seedSuggestions(householdId: string): Promise<void> {
 
   // Insurance
   const householdPolicies = await db
-    .select({ id: insurancePolicies.id, insurer: insurancePolicies.insurer, policyType: insurancePolicies.policyType, expiryDate: insurancePolicies.expiryDate, nextPaymentDate: insurancePolicies.nextPaymentDate })
+    .select({ id: insurancePolicies.id, insurer: insurancePolicies.insurer, policyType: insurancePolicies.policyType, expiryDate: insurancePolicies.expiryDate, nextPaymentDate: insurancePolicies.nextPaymentDate, isAutoPayment: insurancePolicies.isAutoPayment })
     .from(insurancePolicies).where(eq(insurancePolicies.householdId, householdId))
 
   for (const p of householdPolicies) {
-    for (const [field, date, key] of [
-      ['expiryDate', p.expiryDate, 'insurance.expiryDate'],
-      ['nextPaymentDate', p.nextPaymentDate, 'insurance.nextPaymentDate'],
-    ] as [string, Date | null, TemplateKey][]) {
-      if (date && date <= windowEnd) {
-        candidates.push({ sourceModule: 'insurance', sourceEntityId: p.id, sourceField: field, deadlineDate: date, templateKey: key, context: { insurer: p.insurer, type: p.policyType, date: format(date, 'dd MMM yyyy') } })
-      }
+    // Expiry suggestions always show (even for auto-payment — you still need to renew)
+    if (p.expiryDate && p.expiryDate <= windowEnd) {
+      candidates.push({ sourceModule: 'insurance', sourceEntityId: p.id, sourceField: 'expiryDate', deadlineDate: p.expiryDate, templateKey: 'insurance.expiryDate', context: { insurer: p.insurer, type: p.policyType, date: format(p.expiryDate, 'dd MMM yyyy') } })
+    }
+    // Payment suggestions only if NOT auto-payment (no action needed for direct debits)
+    if (!p.isAutoPayment && p.nextPaymentDate && p.nextPaymentDate <= windowEnd) {
+      candidates.push({ sourceModule: 'insurance', sourceEntityId: p.id, sourceField: 'nextPaymentDate', deadlineDate: p.nextPaymentDate, templateKey: 'insurance.nextPaymentDate', context: { insurer: p.insurer, type: p.policyType, date: format(p.nextPaymentDate, 'dd MMM yyyy') } })
     }
   }
 

@@ -26,6 +26,7 @@ const createPolicySchema = z.object({
   nextPaymentDate: z.string().datetime({ offset: true }).optional().nullable(),
   expiryReminderDays: z.number().int().min(1).default(30).optional(),
   paymentReminderDays: z.number().int().min(1).default(7).optional(),
+  isAutoPayment: z.boolean().optional().default(false),
   coveredName: z.string().max(200).optional().nullable(),
   linkedCarId: z.string().uuid().optional().nullable(),
 })
@@ -101,6 +102,7 @@ export async function createPolicy(data: unknown): Promise<ActionResult<{ id: st
       nextPaymentDate: parsed.data.nextPaymentDate ? new Date(parsed.data.nextPaymentDate) : null,
       expiryReminderDays,
       paymentReminderDays,
+      isAutoPayment: parsed.data.isAutoPayment ?? false,
       coveredName: parsed.data.coveredName ?? null,
       linkedCarId: parsed.data.linkedCarId ?? null,
       createdBy: user.id,
@@ -196,6 +198,7 @@ export async function updatePolicy(data: unknown): Promise<ActionResult<{ id: st
       nextPaymentDate: parsed.data.nextPaymentDate ? new Date(parsed.data.nextPaymentDate) : null,
       expiryReminderDays,
       paymentReminderDays,
+      isAutoPayment: parsed.data.isAutoPayment ?? false,
       coveredName: parsed.data.coveredName ?? null,
       linkedCarId: parsed.data.linkedCarId ?? null,
     })

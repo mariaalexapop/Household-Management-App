@@ -43,6 +43,7 @@ export interface SerializedPolicy {
   paymentSchedule: PaymentSchedule | null
   premiumCents: number | null
   nextPaymentDate: string | null
+  isAutoPayment: boolean
   expiryReminderDays: number
   paymentReminderDays: number
   coveredName: string | null
@@ -124,6 +125,7 @@ const formSchema = z.object({
   paymentSchedule: z.string().optional().default(''),
   premiumPounds: z.string().optional().default(''),
   nextPaymentDate: z.string().optional().default(''),
+  isAutoPayment: z.boolean().optional().default(false),
   paymentReminderDays: z.number().int().min(1),
   coveredName: z.string().max(200).optional().default(''),
   linkedCarId: z.string().optional().default(''),
@@ -483,6 +485,7 @@ function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: Policy
       premiumPounds:
         policy?.premiumCents != null ? String(centsToPounds(policy.premiumCents)) : '',
       nextPaymentDate: isoToDateInput(policy?.nextPaymentDate ?? null),
+      isAutoPayment: policy?.isAutoPayment ?? false,
       paymentReminderDays: policy?.paymentReminderDays ?? 7,
       coveredName: policy?.coveredName ?? '',
       linkedCarId: policy?.linkedCarId ?? '',
@@ -524,6 +527,7 @@ function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: Policy
         nextPaymentDate: values.nextPaymentDate ? dateToISOWithOffset(values.nextPaymentDate) : null,
         expiryReminderDays: Number(values.expiryReminderDays) || 30,
         paymentReminderDays: Number(values.paymentReminderDays) || 7,
+        isAutoPayment: values.isAutoPayment ?? false,
         coveredName: values.coveredName?.trim() || null,
         linkedCarId: values.linkedCarId || null,
       }
@@ -790,6 +794,17 @@ function PolicyForm({ policy, onSuccess, onCancel, members, kids, cars }: Policy
             />
           </div>
         </div>
+
+        {watchedSchedule && watchedSchedule !== '' && (
+          <label className="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" {...register('isAutoPayment')}
+              className="h-4 w-4 rounded border-gray-300 text-kinship-primary focus:ring-kinship-primary" />
+            <div>
+              <span className="font-body text-sm text-kinship-on-surface">Automatic payment</span>
+              <p className="font-body text-xs text-kinship-on-surface-variant">Direct debit or standing order — no action needed on payment dates</p>
+            </div>
+          </label>
+        )}
 
         {watchedSchedule && watchedSchedule !== '' && (
           <Controller

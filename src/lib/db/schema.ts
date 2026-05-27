@@ -505,6 +505,7 @@ export const insurancePolicies = pgTable(
     nextPaymentDate: timestamp('next_payment_date', { withTimezone: true }),
     expiryReminderDays: integer('expiry_reminder_days').default(30),
     paymentReminderDays: integer('payment_reminder_days').default(7),
+    isAutoPayment: boolean('is_auto_payment').default(false).notNull(), // direct debit / standing order
     coveredName: text('covered_name'), // person or asset this policy covers
     linkedCarId: uuid('linked_car_id').references(() => cars.id, { onDelete: 'set null' }),
     // createdBy references auth.users(id) — cross-schema, FK added in migration

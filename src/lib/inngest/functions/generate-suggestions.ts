@@ -115,36 +115,27 @@ export const generateSuggestions = inngest.createFunction(
               policyType: insurancePolicies.policyType,
               expiryDate: insurancePolicies.expiryDate,
               nextPaymentDate: insurancePolicies.nextPaymentDate,
+              isAutoPayment: insurancePolicies.isAutoPayment,
             })
             .from(insurancePolicies)
             .where(eq(insurancePolicies.householdId, household.id))
 
           for (const policy of householdPolicies) {
-            const policyDeadlines: Array<{
-              field: string
-              date: Date | null
-              key: TemplateKey
-            }> = [
-              { field: 'expiryDate', date: policy.expiryDate, key: 'insurance.expiryDate' },
-              { field: 'nextPaymentDate', date: policy.nextPaymentDate, key: 'insurance.nextPaymentDate' },
-            ]
-
-            for (const dl of policyDeadlines) {
-              if (dl.date && dl.date >= startOfDay(now) && dl.date <= endOfDay(windowEnd)) {
-                candidates.push({
-                  householdId: household.id,
-                  sourceModule: 'insurance',
-                  sourceEntityId: policy.id,
-                  sourceField: dl.field,
-                  deadlineDate: dl.date,
-                  templateKey: dl.key,
-                  context: {
-                    insurer: policy.insurer,
-                    type: policy.policyType,
-                    date: format(dl.date, 'dd MMM yyyy'),
-                  },
-                })
-              }
+            // Expiry suggestions always show (even for auto-payment — renewal still needs action)
+            if (policy.expiryDate && policy.expiryDate >= startOfDay(now) && policy.expiryDate <= endOfDay(windowEnd)) {
+              candidates.push({
+                householdId: household.id, sourceModule: 'insurance', sourceEntityId: policy.id,
+                sourceField: 'expiryDate', deadlineDate: policy.expiryDate, templateKey: 'insurance.expiryDate',
+                context: { insurer: policy.insurer, type: policy.policyType, date: format(policy.expiryDate, 'dd MMM yyyy') },
+              })
+            }
+            // Payment suggestions only if NOT auto-payment
+            if (!policy.isAutoPayment && policy.nextPaymentDate && policy.nextPaymentDate >= startOfDay(now) && policy.nextPaymentDate <= endOfDay(windowEnd)) {
+              candidates.push({
+                householdId: household.id, sourceModule: 'insurance', sourceEntityId: policy.id,
+                sourceField: 'nextPaymentDate', deadlineDate: policy.nextPaymentDate, templateKey: 'insurance.nextPaymentDate',
+                context: { insurer: policy.insurer, type: policy.policyType, date: format(policy.nextPaymentDate, 'dd MMM yyyy') },
+              })
             }
           }
 
