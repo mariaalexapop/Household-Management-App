@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
-import { eq, ne, asc, and, or, isNotNull, gte, lt } from 'drizzle-orm'
-import { startOfWeek, addDays } from 'date-fns'
+import { eq, ne, asc, desc, and, or, isNotNull, gte, lt } from 'drizzle-orm'
+import { startOfWeek, addDays, addMonths } from 'date-fns'
 import { db } from '@/lib/db'
 import {
   householdMembers,
@@ -15,14 +15,9 @@ import {
   electronics,
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
-import { DashboardGrid } from '@/components/dashboard/DashboardGrid'
+import { DashboardTimeline } from '@/components/dashboard/DashboardTimeline'
 import { registerChildren } from '@/lib/kids/child-colours'
 import type { ModuleKey } from '@/stores/onboarding'
-import type { UpcomingTask } from '@/components/dashboard/ChoresDashboardCard'
-import type { UpcomingActivity } from '@/components/dashboard/KidsDashboardCard'
-import type { UpcomingCar } from '@/components/dashboard/CarDashboardCard'
-import type { UpcomingPolicy } from '@/components/dashboard/InsuranceDashboardCard'
-import type { UpcomingElectronic } from '@/components/dashboard/ElectronicsDashboardCard'
 import { TopBar } from '@/components/nav/TopBar'
 
 export const metadata = {
@@ -30,22 +25,19 @@ export const metadata = {
 }
 
 export default async function DashboardPage() {
-  // Authenticate
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/auth/login')
-  }
+  if (!user) redirect('/auth/login')
 
-  // Fetch household settings for the current user
   const [row] = await db
     .select({
       householdId: householdMembers.householdId,
       householdName: households.name,
       activeModules: householdSettings.activeModules,
+      displayName: householdMembers.displayName,
     })
     .from(householdMembers)
     .innerJoin(households, eq(householdMembers.householdId, households.id))
@@ -53,77 +45,99 @@ export default async function DashboardPage() {
     .where(eq(householdMembers.userId, user.id))
     .limit(1)
 
-  if (!row) {
-    redirect('/onboarding')
-  }
+  if (!row) redirect('/onboarding')
 
   const activeModules = (row.activeModules ?? []) as ModuleKey[]
+  const firstName = row.displayName?.split(' ')[0] ?? user.email?.split('@')[0] ?? 'there'
 
-  // Week boundaries for filtering
+  // Time boundaries
   const now = new Date()
   const weekStart = startOfWeek(now, { weekStartsOn: 1 })
   const weekEnd = addDays(weekStart, 7)
+  const nextWeekEnd = addDays(weekStart, 14)
+  const thirtyDaysOut = addMonths(now, 1)
 
-  // Fetch tasks for the current week
-  let upcomingTasks: UpcomingTask[] = []
+  // Greeting
+  const hour = now.getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+
+  // Fetch members for avatar display
+  const members = await db
+    .select({
+      id: householdMembers.id,
+      displayName: householdMembers.displayName,
+      avatarUrl: householdMembers.avatarUrl,
+      userId: householdMembers.userId,
+    })
+    .from(householdMembers)
+    .where(eq(householdMembers.householdId, row.householdId))
+
+  // Fetch tasks: this week + next week + overdue
+  type DashTask = {
+    id: string; title: string; areaName: string | null; startsAt: Date | null;
+    ownerId: string | null; status: string;
+  }
+  let allTasks: DashTask[] = []
 
   if (activeModules.includes('chores')) {
-    const taskRows = await db
+    allTasks = await db
       .select({
         id: tasksTable.id,
         title: tasksTable.title,
         areaName: choreAreas.name,
         startsAt: tasksTable.startsAt,
+        ownerId: tasksTable.ownerId,
+        status: tasksTable.status,
       })
       .from(tasksTable)
       .leftJoin(choreAreas, eq(tasksTable.areaId, choreAreas.id))
       .where(
         and(
           eq(tasksTable.householdId, row.householdId),
-          ne(tasksTable.status, 'done'),
+          or(eq(tasksTable.isRecurring, false), isNotNull(tasksTable.parentTaskId)),
+          // Fetch: overdue (before this week, not done) + this week + next week
           or(
-            eq(tasksTable.isRecurring, false),
-            isNotNull(tasksTable.parentTaskId),
+            // Overdue: before week start and not done
+            and(lt(tasksTable.startsAt, weekStart), ne(tasksTable.status, 'done')),
+            // This week (any status to show done items)
+            and(gte(tasksTable.startsAt, weekStart), lt(tasksTable.startsAt, weekEnd)),
+            // Next week (not done)
+            and(gte(tasksTable.startsAt, weekEnd), lt(tasksTable.startsAt, nextWeekEnd), ne(tasksTable.status, 'done')),
           ),
-          gte(tasksTable.startsAt, weekStart),
-          lt(tasksTable.startsAt, weekEnd),
         )
       )
       .orderBy(asc(tasksTable.startsAt))
-
-    upcomingTasks = taskRows
   }
 
-  // Fetch activities for the current week
-  let upcomingActivities: UpcomingActivity[] = []
+  // Fetch activities: this week + next week
+  type DashActivity = {
+    id: string; title: string; childName: string | null; childId: string | null;
+    startsAt: Date | null; assigneeId: string | null;
+  }
+  let allActivities: DashActivity[] = []
 
   if (activeModules.includes('kids')) {
-    const activityRows = await db
+    allActivities = await db
       .select({
         id: kidActivities.id,
         title: kidActivities.title,
         childName: children.name,
         childId: kidActivities.childId,
         startsAt: kidActivities.startsAt,
+        assigneeId: kidActivities.assigneeId,
       })
       .from(kidActivities)
       .leftJoin(children, eq(kidActivities.childId, children.id))
       .where(
         and(
           eq(kidActivities.householdId, row.householdId),
-          or(
-            eq(kidActivities.isRecurring, false),
-            isNotNull(kidActivities.parentActivityId),
-          ),
+          or(eq(kidActivities.isRecurring, false), isNotNull(kidActivities.parentActivityId)),
           gte(kidActivities.startsAt, weekStart),
-          lt(kidActivities.startsAt, weekEnd),
+          lt(kidActivities.startsAt, nextWeekEnd),
         )
       )
       .orderBy(asc(kidActivities.startsAt))
 
-    upcomingActivities = activityRows
-
-    // Register all children so colours match the kids page
     const allChildren = await db
       .select({ id: children.id })
       .from(children)
@@ -132,63 +146,74 @@ export default async function DashboardPage() {
     registerChildren(allChildren.map((c) => c.id))
   }
 
-  // Fetch cars for CarDashboardCard
-  let upcomingCars: UpcomingCar[] = []
+  // Fetch cars
+  type DashCar = { id: string; make: string; model: string; motDueDate: Date | null; taxDueDate: Date | null; nextServiceDate: Date | null }
+  let allCars: DashCar[] = []
   if (activeModules.includes('car')) {
-    upcomingCars = await db
-      .select({
-        id: cars.id,
-        make: cars.make,
-        model: cars.model,
-        motDueDate: cars.motDueDate,
-        taxDueDate: cars.taxDueDate,
-        nextServiceDate: cars.nextServiceDate,
-      })
+    allCars = await db
+      .select({ id: cars.id, make: cars.make, model: cars.model, motDueDate: cars.motDueDate, taxDueDate: cars.taxDueDate, nextServiceDate: cars.nextServiceDate })
       .from(cars)
       .where(eq(cars.householdId, row.householdId))
   }
 
-  // Fetch insurance policies for InsuranceDashboardCard
-  let upcomingPolicies: UpcomingPolicy[] = []
+  // Fetch policies with premium data for money pulse
+  type DashPolicy = {
+    id: string; insurer: string; policyType: string; expiryDate: Date | null;
+    nextPaymentDate: Date | null; premiumCents: number | null; paymentSchedule: string | null;
+  }
+  let allPolicies: DashPolicy[] = []
   if (activeModules.includes('insurance')) {
-    upcomingPolicies = await db
+    allPolicies = await db
       .select({
         id: insurancePolicies.id,
         insurer: insurancePolicies.insurer,
         policyType: insurancePolicies.policyType,
         expiryDate: insurancePolicies.expiryDate,
         nextPaymentDate: insurancePolicies.nextPaymentDate,
+        premiumCents: insurancePolicies.premiumCents,
+        paymentSchedule: insurancePolicies.paymentSchedule,
       })
       .from(insurancePolicies)
       .where(eq(insurancePolicies.householdId, row.householdId))
       .orderBy(asc(insurancePolicies.expiryDate))
   }
 
-  // Fetch electronics for ElectronicsDashboardCard
-  let upcomingElectronics: UpcomingElectronic[] = []
+  // Fetch electronics
+  type DashElectronic = { id: string; name: string; warrantyExpiryDate: Date | null }
+  let allElectronics: DashElectronic[] = []
   if (activeModules.includes('electronics')) {
-    upcomingElectronics = await db
-      .select({
-        id: electronics.id,
-        name: electronics.name,
-        warrantyExpiryDate: electronics.warrantyExpiryDate,
-      })
+    allElectronics = await db
+      .select({ id: electronics.id, name: electronics.name, warrantyExpiryDate: electronics.warrantyExpiryDate })
       .from(electronics)
       .where(eq(electronics.householdId, row.householdId))
   }
 
+  // Serialize dates for client
+  const serialize = <T extends Record<string, unknown>>(rows: T[]) =>
+    rows.map((r) => {
+      const out: Record<string, unknown> = {}
+      for (const [k, v] of Object.entries(r)) {
+        out[k] = v instanceof Date ? v.toISOString() : v
+      }
+      return out as { [K in keyof T]: T[K] extends Date | null ? string | null : T[K] }
+    })
+
   return (
     <>
-      <TopBar title={row.householdName ?? 'Good afternoon'} subtitle="Your household at a glance" />
+      <TopBar title={`${greeting}, ${firstName}`} subtitle="Your household at a glance" />
 
-      <main className="flex-1 overflow-auto px-6 py-2">
-        <DashboardGrid
+      <main className="flex-1 overflow-auto px-4 py-2 sm:px-6">
+        <DashboardTimeline
           activeModules={activeModules}
-          upcomingTasks={upcomingTasks}
-          upcomingActivities={upcomingActivities}
-          upcomingCars={upcomingCars}
-          upcomingPolicies={upcomingPolicies}
-          upcomingElectronics={upcomingElectronics}
+          tasks={serialize(allTasks)}
+          activities={serialize(allActivities)}
+          cars={serialize(allCars)}
+          policies={serialize(allPolicies)}
+          electronics={serialize(allElectronics)}
+          members={serialize(members)}
+          weekStartIso={weekStart.toISOString()}
+          weekEndIso={weekEnd.toISOString()}
+          nextWeekEndIso={nextWeekEnd.toISOString()}
         />
       </main>
     </>
