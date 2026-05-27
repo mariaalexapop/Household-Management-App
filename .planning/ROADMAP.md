@@ -188,6 +188,28 @@ Plans:
 
 ---
 
+## Backlog
+
+### Phase 999.1: Deadline-to-task intelligence — smart task generation from module deadlines (BACKLOG)
+
+**Goal:** Deadlines from car (MOT, tax, service), insurance (expiry, payment), and electronics (warranty expiry) should automatically generate actionable task suggestions — not clutter the dashboard timeline directly. The dashboard should show only tasks; deadlines live in a separate "upcoming" or sidebar context. When a deadline is approaching, the system suggests creating a task (e.g. "RCA expires Jun 2 → Create task: Renew RCA") with pre-filled title, due date, and suggested assignee. Users can accept, edit, or dismiss. Accepted suggestions become real tasks that appear in the timeline.
+
+**Requirements:** TBD
+**Plans:** 0 plans
+
+**Context captured:**
+- Dashboard timeline currently mixes tasks and deadlines — user wants tasks only in the main timeline
+- Deadlines should surface as suggestions (current "Suggested" card is a starting point but needs refinement)
+- Each deadline type needs a smart task template (e.g. insurance expiry → "Renew [insurer] [type] policy", car MOT → "Book MOT for [car]")
+- Suggestions should include: one-click create, edit before create, assign to member, dismiss
+- Consider: should dismissed suggestions reappear? Snooze period? Persistent dismissal?
+- Consider: Inngest background job that checks deadlines daily and creates suggestion records in DB (not just computed client-side)
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+---
+
 ## v2 Roadmap (post-MVP)
 
 | Phase | Focus |
