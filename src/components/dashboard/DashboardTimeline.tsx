@@ -229,7 +229,7 @@ function SectionHead({ title, dateRange, muted }: { title: string; dateRange: st
   return (
     <div className="flex items-baseline gap-3 border-b border-kinship-surface-container pb-1">
       <h2 className={`font-display font-semibold tracking-tight ${muted ? 'text-[14px] text-kinship-on-surface-variant' : 'text-[16px] text-kinship-on-surface'}`}>{title}</h2>
-      <span className="font-mono text-[10.5px] tracking-wide text-kinship-placeholder">{dateRange}</span>
+      <span className="font-mono text-[9px] tracking-wide text-kinship-placeholder">{dateRange}</span>
     </div>
   )
 }
