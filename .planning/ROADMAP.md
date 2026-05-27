@@ -16,7 +16,7 @@
 - [x] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
 - [x] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
 - [x] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA installability, performance audit
-- [ ] **Phase 7: Deadline-to-Task Intelligence** - Smart task generation from module deadlines, dashboard shows tasks only
+- [x] **Phase 7: Deadline-to-Task Intelligence** - Smart task generation from module deadlines, dashboard shows tasks only
 
 ---
 
@@ -30,6 +30,7 @@
 | 4. Tracker Modules | 9/9 | Complete | 2026-04-11 |
 | 5. AI Chatbot & RAG | 6/6 | Complete | 2026-04-14 |
 | 6. Platform & Polish | 3/3 | Complete | 2026-04-20 |
+| 7. Deadline-to-Task Intelligence | 3/3 | Complete | 2026-05-27 |
 
 ---
 
@@ -204,12 +205,12 @@ Plans:
 4. Dismissed suggestions don't reappear for that deadline cycle.
 5. Suggestions are scoped to this week + next week (not ancient overdue items).
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans executed
 
 Plans:
-- [ ] 07-01-PLAN.md — Suggestions schema + migration (new `suggestions` table) — Wave 1
-- [ ] 07-02-PLAN.md — Suggestion server actions + Inngest daily job (templates, CRUD, cron) — Wave 2
-- [ ] 07-03-PLAN.md — Dashboard refactor (tasks-only timeline, DB suggestions, review card) — Wave 3
+- [x] 07-01-PLAN.md — Suggestions schema + migration (new `suggestions` table) — Wave 1
+- [x] 07-02-PLAN.md — Suggestion server actions + Inngest daily job (templates, CRUD, cron) — Wave 2
+- [x] 07-03-PLAN.md — Dashboard refactor (tasks-only timeline, DB suggestions, review card) — Wave 3
 
 ---
 
