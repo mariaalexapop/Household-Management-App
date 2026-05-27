@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { updateTaskStatus, assignTask } from '@/app/actions/tasks'
+import { SortableCardGrid } from './SortableCardGrid'
 import { acceptSuggestion, dismissSuggestion } from '@/app/actions/suggestions'
 import type { ModuleKey } from '@/stores/onboarding'
 
@@ -189,13 +190,15 @@ export function DashboardTimeline({
         </section>
       </div>
 
-      {/* RIGHT — sidebar */}
-      <div className="flex flex-col gap-4 lg:flex-1">
-        {members.length > 0 && <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} hasData={tasks.length > 0} />}
-        {suggestions.length > 0 && <SuggestionsCard suggestions={suggestions} />}
-        {staleOverdue.length > 0 && <ReviewCard staleOverdue={staleOverdue} members={members} />}
-        {monthlyCosts && monthlyCosts.some((m) => m.total > 0) && <MoneyPulseChart monthlyCosts={monthlyCosts} />}
-        {upcomingPayments.length > 0 && <MoneyPulseCard payments={upcomingPayments} total={paymentTotal} />}
+      {/* RIGHT — sidebar (draggable cards) */}
+      <div className="lg:flex-1">
+        <SortableCardGrid cards={[
+          { id: 'balance', visible: members.length > 0, node: <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} hasData={tasks.length > 0} /> },
+          { id: 'suggestions', visible: suggestions.length > 0, node: <SuggestionsCard suggestions={suggestions} /> },
+          { id: 'review', visible: staleOverdue.length > 0, node: <ReviewCard staleOverdue={staleOverdue} members={members} /> },
+          { id: 'cost-chart', visible: !!(monthlyCosts && monthlyCosts.some((m) => m.total > 0)), node: <MoneyPulseChart monthlyCosts={monthlyCosts ?? []} /> },
+          { id: 'money-pulse', visible: upcomingPayments.length > 0, node: <MoneyPulseCard payments={upcomingPayments} total={paymentTotal} /> },
+        ]} />
       </div>
     </div>
   )
