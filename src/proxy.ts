@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
   // Allow auth routes, public routes, and static assets to pass through
   const isAuthRoute = pathname.startsWith('/auth')
   const isApiRoute = pathname.startsWith('/api')
-  const isPublicRoute = pathname === '/marketing' || pathname.startsWith('/join') || pathname.startsWith('/onboarding')
+  const isPublicRoute = pathname === '/' || pathname === '/marketing' || pathname.startsWith('/join') || pathname.startsWith('/onboarding')
 
   if (!user && !isAuthRoute && !isApiRoute && !isPublicRoute) {
     const url = request.nextUrl.clone()
