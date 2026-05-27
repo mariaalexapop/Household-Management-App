@@ -115,7 +115,7 @@ export default async function DashboardPage() {
 
   // Fetch activities: this week + next week
   type DashActivity = {
-    id: string; title: string; notes: string | null; location: string | null;
+    id: string; title: string; notes: string | null; location: string | null; category: string | null;
     childName: string | null; childId: string | null;
     startsAt: Date | null; endsAt: Date | null; assigneeId: string | null;
   }
@@ -128,6 +128,7 @@ export default async function DashboardPage() {
         title: kidActivities.title,
         notes: kidActivities.notes,
         location: kidActivities.location,
+        category: kidActivities.category,
         childName: children.name,
         childId: kidActivities.childId,
         startsAt: kidActivities.startsAt,

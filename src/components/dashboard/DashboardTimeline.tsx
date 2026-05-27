@@ -20,8 +20,8 @@ interface TimelineRow {
   module: ModuleKey; whoInitials?: string; whoColor?: string; amount?: string
   isOverdue?: boolean; lateDays?: string; isDone?: boolean; isTask?: boolean; sortKey: number
   // Detail fields for expand
-  notes?: string | null; areaName?: string | null; endsAt?: string | null
-  location?: string | null; childName?: string | null; ownerName?: string | null
+  notes?: string | null; areaName?: string | null; endsAt?: string | null; startsAtFull?: string | null
+  location?: string | null; childName?: string | null; ownerName?: string | null; category?: string | null
 }
 interface SerializedMember { id: string; displayName: string | null; avatarUrl: string | null; userId: string }
 
@@ -41,7 +41,7 @@ interface SerializedSuggestion {
 interface Props {
   activeModules: ModuleKey[]
   tasks: { id: string; title: string; notes: string | null; areaName: string | null; startsAt: string | null; endsAt: string | null; ownerId: string | null; status: string }[]
-  activities: { id: string; title: string; notes: string | null; location: string | null; childName: string | null; childId: string | null; startsAt: string | null; endsAt: string | null; assigneeId: string | null }[]
+  activities: { id: string; title: string; notes: string | null; location: string | null; category: string | null; childName: string | null; childId: string | null; startsAt: string | null; endsAt: string | null; assigneeId: string | null }[]
   policies: { id: string; insurer: string; policyType: string; expiryDate: string | null; nextPaymentDate: string | null; premiumCents: number | null; paymentSchedule: string | null }[]
   members: SerializedMember[]
   suggestions: SerializedSuggestion[]
@@ -94,7 +94,7 @@ export function DashboardTimeline({
         when: timeLabel(t.startsAt), title: t.title, module: 'chores', whoInitials: who?.initials, whoColor: who?.color,
         isOverdue: isOv, lateDays: isOv ? `${differenceInCalendarDays(now, d)}d late` : undefined,
         isDone: t.status === 'done', isTask: true, sortKey: d.getTime(),
-        notes: t.notes, areaName: t.areaName, endsAt: t.endsAt, ownerName: ownerMember?.displayName })
+        notes: t.notes, areaName: t.areaName, endsAt: t.endsAt, startsAtFull: t.startsAt, ownerName: ownerMember?.displayName })
     }
     for (const a of activities) {
       if (!a.startsAt) continue; const d = parseISO(a.startsAt)
@@ -103,8 +103,8 @@ export function DashboardTimeline({
       rows.push({ id: `act-${a.id}`, day: dayLabel(a.startsAt), when: timeLabel(a.startsAt),
         title: a.childName ? `${a.childName} — ${a.title}` : a.title, module: 'kids',
         whoInitials: who?.initials, whoColor: who?.color, sortKey: d.getTime(),
-        notes: a.notes, location: a.location, childName: a.childName, endsAt: a.endsAt,
-        ownerName: assigneeMember?.displayName })
+        notes: a.notes, location: a.location, childName: a.childName, endsAt: a.endsAt, startsAtFull: a.startsAt,
+        ownerName: assigneeMember?.displayName, category: a.category })
     }
     return {
       overdue: rows.filter((r) => r.isOverdue).sort((a, b) => a.sortKey - b.sortKey),
@@ -237,7 +237,7 @@ function ActionRow({ row, done, onToggle, muted, members }: {
     })
   }
 
-  const hasDetails = row.notes || row.areaName || row.endsAt || row.location || row.ownerName
+  const hasDetails = row.notes || row.areaName || row.endsAt || row.location || row.ownerName || row.category || row.startsAtFull || row.childName
   const moduleLabel = row.module === 'chores' ? 'Task' : row.module === 'kids' ? 'Activity' : row.module === 'car' ? 'Car' : row.module === 'insurance' ? 'Insurance' : 'Electronics'
 
   return (
@@ -305,24 +305,53 @@ function ActionRow({ row, done, onToggle, muted, members }: {
 
       {/* Expanded detail panel */}
       {expanded && (
-        <div className="ml-[23px] mb-2 rounded-lg bg-kinship-surface/60 px-3 py-2.5 flex flex-col gap-1.5">
-          <div className="flex items-center gap-3 flex-wrap">
+        <div className="ml-[23px] mb-2 rounded-lg bg-kinship-surface/60 px-3 py-2.5 flex flex-col gap-2">
+          {/* Tags row */}
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="rounded-full px-2 py-px text-[9px] font-semibold uppercase tracking-wider" style={{ backgroundColor: MOD[row.module]?.dot ?? '#999', color: '#fff' }}>{moduleLabel}</span>
-            {row.areaName && <span className="font-body text-[10px] text-kinship-on-surface-variant">Area: {row.areaName}</span>}
-            {row.ownerName && <span className="font-body text-[10px] text-kinship-on-surface-variant">Assigned: {row.ownerName}</span>}
-            {row.location && <span className="font-body text-[10px] text-kinship-on-surface-variant">📍 {row.location}</span>}
+            {row.category && <span className="rounded-full bg-kinship-surface-container px-2 py-px text-[9px] font-medium text-kinship-on-surface-variant capitalize">{row.category}</span>}
+            {row.areaName && <span className="rounded-full bg-kinship-surface-container px-2 py-px text-[9px] font-medium text-kinship-on-surface-variant">{row.areaName}</span>}
           </div>
-          {row.endsAt && (
-            <p className="font-body text-[10px] text-kinship-on-surface-variant">Ends: {format(parseISO(row.endsAt), 'EEE d MMM, h:mma')}</p>
-          )}
+
+          {/* Info grid */}
+          <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            {row.startsAtFull && (
+              <><span className="font-body text-[10px] text-kinship-placeholder">When</span>
+              <span className="font-body text-[10px] text-kinship-on-surface">{format(parseISO(row.startsAtFull), 'EEEE d MMM yyyy, h:mm a')}</span></>
+            )}
+            {row.endsAt && (
+              <><span className="font-body text-[10px] text-kinship-placeholder">Until</span>
+              <span className="font-body text-[10px] text-kinship-on-surface">{format(parseISO(row.endsAt), 'EEEE d MMM yyyy, h:mm a')}</span></>
+            )}
+            {row.location && (
+              <><span className="font-body text-[10px] text-kinship-placeholder">Location</span>
+              <span className="font-body text-[10px] text-kinship-on-surface">{row.location}</span></>
+            )}
+            {row.ownerName && (
+              <><span className="font-body text-[10px] text-kinship-placeholder">Assigned</span>
+              <span className="font-body text-[10px] text-kinship-on-surface">{row.ownerName}</span></>
+            )}
+            {row.childName && (
+              <><span className="font-body text-[10px] text-kinship-placeholder">Child</span>
+              <span className="font-body text-[10px] text-kinship-on-surface">{row.childName}</span></>
+            )}
+          </div>
+
+          {/* Notes */}
           {row.notes && (
-            <p className="font-body text-[11px] text-kinship-on-surface leading-relaxed whitespace-pre-wrap">{row.notes}</p>
+            <div className="mt-0.5">
+              <span className="font-body text-[9px] text-kinship-placeholder uppercase tracking-wider">Notes</span>
+              <p className="font-body text-[11px] text-kinship-on-surface leading-relaxed whitespace-pre-wrap mt-0.5">{row.notes}</p>
+            </div>
           )}
+
           {!hasDetails && (
             <p className="font-body text-[10px] text-kinship-placeholder italic">No additional details.</p>
           )}
+
+          {/* Edit link */}
           {row.isTask && row.realId && (
-            <Link href={`/chores`} className="self-start mt-1 rounded-full border border-kinship-outline-variant px-2.5 py-[3px] font-body text-[10px] font-medium text-kinship-primary hover:bg-kinship-primary-surface transition-colors flex items-center gap-1">
+            <Link href="/chores" className="self-start mt-0.5 rounded-full border border-kinship-outline-variant px-2.5 py-[3px] font-body text-[10px] font-medium text-kinship-primary hover:bg-kinship-primary-surface transition-colors flex items-center gap-1">
               <Pencil className="h-[8px] w-[8px]" /> Edit task
             </Link>
           )}
