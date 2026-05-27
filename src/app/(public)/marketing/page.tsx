@@ -120,7 +120,6 @@ const NAV_LINKS = [
   { label: 'How it works', href: '#how' },
   { label: 'AI assistant', href: '#ai' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Privacy', href: '#footer' },
 ]
 
 /* ------------------------------------------------------------------ */
