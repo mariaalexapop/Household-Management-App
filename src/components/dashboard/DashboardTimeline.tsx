@@ -530,31 +530,20 @@ function MoneyPulseChart({ monthlyCosts }: { monthlyCosts: { monthIndex: number;
   const now = new Date()
   const currentMonthIdx = now.getMonth() // 0-indexed
 
-  // Build chart data: past months use real data, future months use prediction
-  // Prediction = average of months with data
-  const monthsWithData = monthlyCosts.filter((m) => m.monthIndex <= currentMonthIdx && m.total > 0)
-  const avg = (key: 'car' | 'health' | 'home' | 'total') => {
-    if (monthsWithData.length === 0) return 0
-    return Math.round(monthsWithData.reduce((s, m) => s + m[key], 0) / monthsWithData.length)
-  }
-  const avgCar = avg('car')
-  const avgHealth = avg('health')
-  const avgHome = avg('home')
-  const avgTotal = avg('total')
-
+  // Build chart data: all months use the server-projected data (insurance
+  // premiums and car costs are already projected using actual payment schedules)
   // Show from Jan through 6 months after current month (max Dec)
   const lastMonth = Math.min(currentMonthIdx + 6, 11)
 
   const chartData = Array.from({ length: lastMonth + 1 }, (_, i) => {
     const m = monthlyCosts[i]
-    const isPast = i <= currentMonthIdx
     return {
       name: MONTH_LABELS[i],
-      total: isPast ? m.total / 100 : avgTotal / 100,
-      health: isPast ? m.health / 100 : avgHealth / 100,
-      car: isPast ? m.car / 100 : avgCar / 100,
-      home: isPast ? m.home / 100 : avgHome / 100,
-      predicted: !isPast,
+      total: m.total / 100,
+      health: m.health / 100,
+      car: m.car / 100,
+      home: m.home / 100,
+      predicted: i > currentMonthIdx,
     }
   })
 
