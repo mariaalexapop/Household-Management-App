@@ -13,6 +13,7 @@ import {
 import { ActivityList } from '@/components/kids/ActivityList'
 import { ActivityForm } from '@/components/kids/ActivityForm'
 import { UnifiedCalendar } from '@/components/calendar/UnifiedCalendar'
+import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import { MODULE_COLOURS, type CalendarEvent } from '@/lib/calendar/types'
 import { createChild, deleteChild, deleteActivity } from '@/app/actions/kids'
 import { registerChildren } from '@/lib/kids/child-colours'
@@ -123,8 +124,7 @@ export function KidsClient({
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">Kids Activities</h2>
+      <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
         <div className="flex items-center gap-2">
           {/* List / Calendar pill switcher */}
           <div className="flex rounded-full border border-kinship-outline-variant bg-white p-0.5">
@@ -149,7 +149,7 @@ export function KidsClient({
           </div>
           <Button
             onClick={handleAdd}
-            className="ml-1 min-h-11 rounded-full bg-module-kids-dot text-white hover:bg-module-kids-dark"
+            className="ml-1 hidden md:inline-flex min-h-11 rounded-full bg-module-kids-dot text-white hover:bg-module-kids-dark"
           >
             + Add Activity
           </Button>
@@ -208,6 +208,12 @@ export function KidsClient({
           />
         </DialogContent>
       </Dialog>
+
+      <FloatingAddButton
+        onClick={handleAdd}
+        label="Add Activity"
+        className="bg-module-kids-dot"
+      />
     </div>
   )
 }

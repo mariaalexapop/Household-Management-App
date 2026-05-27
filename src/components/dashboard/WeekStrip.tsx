@@ -19,9 +19,11 @@ export interface WeekEvent {
 
 interface WeekStripProps {
   events: WeekEvent[]
+  selectedDate: string | null
+  onSelectDate: (date: string | null) => void
 }
 
-export function WeekStrip({ events }: WeekStripProps) {
+export function WeekStrip({ events, selectedDate, onSelectDate }: WeekStripProps) {
   const today = new Date()
   const weekStart = startOfWeek(today, { weekStartsOn: 1 }) // Monday
 
@@ -37,25 +39,44 @@ export function WeekStrip({ events }: WeekStripProps) {
 
   return (
     <div className="bg-white rounded-2xl ring-miro overflow-hidden">
-      <div className="px-3.5 py-2.5">
+      <div className="px-3.5 py-2.5 flex items-center justify-between">
         <h2 className="font-display text-[13px] font-semibold text-kinship-on-surface">This week</h2>
+        {selectedDate && (
+          <button
+            onClick={() => onSelectDate(null)}
+            className="rounded-full bg-kinship-primary-surface px-2.5 py-0.5 font-body text-[11px] font-medium text-kinship-primary hover:bg-kinship-primary/20 transition-colors"
+          >
+            Show all week
+          </button>
+        )}
       </div>
       <div className="grid grid-cols-7 gap-1 px-3 pb-3">
         {days.map((day) => {
           const dateStr = format(day, 'yyyy-MM-dd')
           const current = isToday(day)
+          const isSelected = selectedDate === dateStr
           const modules = eventsByDate.get(dateStr)
+          const hasEvents = !!modules && modules.size > 0
 
           return (
-            <div key={dateStr} className="flex flex-col items-center gap-1">
+            <button
+              key={dateStr}
+              type="button"
+              onClick={() => onSelectDate(isSelected ? null : dateStr)}
+              className="flex flex-col items-center gap-1 rounded-lg py-1 transition-colors hover:bg-kinship-surface-container"
+            >
               <span className="font-body text-[10px] uppercase tracking-wide text-kinship-on-surface-variant">
                 {format(day, 'EEE')}
               </span>
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full font-body text-sm font-semibold ${
-                  current
-                    ? 'bg-kinship-primary text-white'
-                    : 'text-kinship-on-surface'
+                className={`flex h-8 w-8 items-center justify-center rounded-full font-body text-sm font-semibold transition-colors ${
+                  isSelected
+                    ? 'bg-kinship-on-surface text-white'
+                    : current
+                      ? 'bg-kinship-primary text-white'
+                      : hasEvents
+                        ? 'text-kinship-on-surface'
+                        : 'text-kinship-on-surface-variant'
                 }`}
               >
                 {format(day, 'd')}
@@ -71,7 +92,7 @@ export function WeekStrip({ events }: WeekStripProps) {
                     ))
                   : null}
               </div>
-            </div>
+            </button>
           )
         })}
       </div>

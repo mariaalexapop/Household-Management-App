@@ -27,9 +27,9 @@ export function WizardLayout({
   children,
 }: WizardLayoutProps) {
   return (
-    <div className="grid h-screen gap-6 bg-kinship-surface p-6" style={{ gridTemplateColumns: '260px 1fr' }}>
-      {/* Left sidebar — step nav */}
-      <div className="flex flex-col rounded-2xl bg-white p-5 ring-miro">
+    <div className="flex h-screen flex-col bg-kinship-surface md:grid md:grid-cols-[260px_1fr] md:gap-6 md:p-6">
+      {/* Left sidebar — desktop only */}
+      <div className="hidden md:flex flex-col rounded-2xl bg-white p-5 ring-miro">
         {/* Brand */}
         <Link href="/marketing" className="mb-5 flex items-center gap-2.5">
           <div className="flex h-[22px] w-[22px] items-center justify-center rounded-md bg-kinship-primary font-display text-xs font-bold text-white">
@@ -46,7 +46,6 @@ export function WizardLayout({
             const stepNum = i + 1
             const isDone = stepNum < step
             const isActive = stepNum === step
-            const isPending = stepNum > step
 
             return (
               <div
@@ -83,8 +82,43 @@ export function WizardLayout({
         </p>
       </div>
 
+      {/* Mobile top bar with progress */}
+      <div className="flex items-center gap-3 border-b border-kinship-surface-container bg-white px-4 py-3 md:hidden">
+        <Link href="/marketing" className="flex items-center gap-2">
+          <div className="flex h-[22px] w-[22px] items-center justify-center rounded-md bg-kinship-primary font-display text-xs font-bold text-white">
+            K
+          </div>
+          <span className="font-display font-semibold text-[16px] text-kinship-on-surface">
+            Kinship
+          </span>
+        </Link>
+        <div className="flex-1" />
+        <div className="flex items-center gap-1.5">
+          {STEP_LABELS.slice(0, totalSteps).map((label, i) => {
+            const stepNum = i + 1
+            const isDone = stepNum < step
+            const isActive = stepNum === step
+            return (
+              <div
+                key={label}
+                className={`h-1.5 w-8 rounded-full transition-colors ${
+                  isDone
+                    ? 'bg-kinship-success'
+                    : isActive
+                      ? 'bg-kinship-primary'
+                      : 'bg-kinship-surface-container'
+                }`}
+              />
+            )
+          })}
+        </div>
+        <p className="ml-1 font-body text-xs text-kinship-placeholder">
+          {step}/{totalSteps}
+        </p>
+      </div>
+
       {/* Right content */}
-      <div className="flex flex-col overflow-hidden rounded-[40px] bg-white p-12 ring-miro">
+      <div className="flex flex-1 flex-col overflow-hidden bg-white px-5 py-6 md:rounded-[40px] md:p-12 md:ring-miro">
         {/* Step label */}
         <p className="font-body text-xs font-semibold uppercase tracking-wider text-kinship-placeholder">
           Step {step} of {totalSteps}
@@ -114,7 +148,7 @@ export function WizardLayout({
           {onNext && (
             <>
               {step === totalSteps ? null : (
-                <span className="font-body text-xs text-kinship-placeholder">
+                <span className="hidden font-body text-xs text-kinship-placeholder sm:inline">
                   {nextDisabled ? 'Select to continue' : ''}
                 </span>
               )}

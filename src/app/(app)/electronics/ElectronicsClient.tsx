@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
+import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import {
   Monitor,
   Plus,
@@ -283,13 +284,10 @@ export function ElectronicsClient({
   return (
     <div>
       {/* Page header */}
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
-          Electronics
-        </h2>
+      <div className="mb-6 flex flex-wrap items-start justify-end gap-3">
         <Button
           onClick={openAdd}
-          className="bg-module-elec-dot text-white hover:bg-module-elec-dark h-11 px-4 gap-2 rounded-full"
+          className="hidden md:inline-flex bg-module-elec-dot text-white hover:bg-module-elec-dark h-11 px-4 gap-2 rounded-full"
         >
           <Plus className="h-4 w-4" />
           Add Item
@@ -527,6 +525,12 @@ export function ElectronicsClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <FloatingAddButton
+        onClick={openAdd}
+        label="Add Item"
+        className="bg-module-elec-dot"
+      />
     </div>
   )
 }

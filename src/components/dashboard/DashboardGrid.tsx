@@ -1,3 +1,7 @@
+'use client'
+
+import { useState } from 'react'
+import { format } from 'date-fns'
 import { EmptyModuleState } from './EmptyModuleState'
 import { ChoresDashboardCard } from './ChoresDashboardCard'
 import type { UpcomingTask } from './ChoresDashboardCard'
@@ -23,6 +27,13 @@ interface DashboardGridProps {
   upcomingCars: UpcomingCar[]
   upcomingPolicies: UpcomingPolicy[]
   upcomingElectronics: UpcomingElectronic[]
+}
+
+/** Check if a Date falls on a given YYYY-MM-DD string */
+function matchesDate(d: Date | string | null | undefined, dateStr: string): boolean {
+  if (!d) return false
+  const iso = typeof d === 'string' ? d : d.toISOString()
+  return iso.slice(0, 10) === dateStr
 }
 
 /** Build week-strip dot events from all data sources */
@@ -125,6 +136,8 @@ export function DashboardGrid({
   upcomingPolicies,
   upcomingElectronics,
 }: DashboardGridProps) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
   if (activeModules.length === 0) {
     return <EmptyModuleState />
   }
@@ -132,32 +145,73 @@ export function DashboardGrid({
   const weekEvents = buildWeekEvents(activeModules, upcomingTasks, upcomingActivities, upcomingCars, upcomingPolicies)
   const timelineItems = buildTimeline(activeModules, upcomingTasks, upcomingActivities, upcomingCars, upcomingPolicies, upcomingElectronics)
 
-  /* Collect the module cards that are active */
+  // Filter data when a date is selected
+  const filteredTasks = selectedDate
+    ? upcomingTasks.filter((t) => matchesDate(t.startsAt, selectedDate))
+    : upcomingTasks
+
+  const filteredActivities = selectedDate
+    ? upcomingActivities.filter((a) => matchesDate(a.startsAt, selectedDate))
+    : upcomingActivities
+
+  const filteredCars = selectedDate
+    ? upcomingCars.filter((c) =>
+        matchesDate(c.motDueDate, selectedDate) ||
+        matchesDate(c.taxDueDate, selectedDate) ||
+        matchesDate(c.nextServiceDate, selectedDate)
+      )
+    : upcomingCars
+
+  const filteredPolicies = selectedDate
+    ? upcomingPolicies.filter((p) =>
+        matchesDate(p.expiryDate, selectedDate) ||
+        matchesDate(p.nextPaymentDate, selectedDate)
+      )
+    : upcomingPolicies
+
+  const filteredElectronics = selectedDate
+    ? upcomingElectronics.filter((e) => matchesDate(e.warrantyExpiryDate, selectedDate))
+    : upcomingElectronics
+
+  const filteredTimeline = selectedDate
+    ? timelineItems.filter((item) => format(item.date, 'yyyy-MM-dd') === selectedDate)
+    : timelineItems
+
+  /* Collect the module cards that are active AND have data (when filtered) */
   const moduleCards: React.ReactNode[] = []
-  if (activeModules.includes('chores')) {
-    moduleCards.push(<ChoresDashboardCard key="chores" tasks={upcomingTasks} />)
+  if (activeModules.includes('chores') && (!selectedDate || filteredTasks.length > 0)) {
+    moduleCards.push(<ChoresDashboardCard key="chores" tasks={filteredTasks} />)
   }
-  if (activeModules.includes('kids')) {
-    moduleCards.push(<KidsDashboardCard key="kids" activities={upcomingActivities} />)
+  if (activeModules.includes('kids') && (!selectedDate || filteredActivities.length > 0)) {
+    moduleCards.push(<KidsDashboardCard key="kids" activities={filteredActivities} />)
   }
-  if (activeModules.includes('car')) {
-    moduleCards.push(<CarDashboardCard key="car" cars={upcomingCars} />)
+  if (activeModules.includes('car') && (!selectedDate || filteredCars.length > 0)) {
+    moduleCards.push(<CarDashboardCard key="car" cars={filteredCars} />)
   }
-  if (activeModules.includes('insurance')) {
-    moduleCards.push(<InsuranceDashboardCard key="insurance" policies={upcomingPolicies} />)
+  if (activeModules.includes('insurance') && (!selectedDate || filteredPolicies.length > 0)) {
+    moduleCards.push(<InsuranceDashboardCard key="insurance" policies={filteredPolicies} />)
   }
-  if (activeModules.includes('electronics')) {
-    moduleCards.push(<ElectronicsDashboardCard key="electronics" items={upcomingElectronics} />)
+  if (activeModules.includes('electronics') && (!selectedDate || filteredElectronics.length > 0)) {
+    moduleCards.push(<ElectronicsDashboardCard key="electronics" items={filteredElectronics} />)
   }
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
       {/* Left column (~60%) */}
       <div className="flex flex-col gap-4 lg:w-[60%]">
-        <WeekStrip events={weekEvents} />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {moduleCards}
-        </div>
+        <WeekStrip events={weekEvents} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+
+        {selectedDate && moduleCards.length === 0 ? (
+          <div className="rounded-2xl bg-white ring-miro p-6 text-center">
+            <p className="font-body text-sm text-kinship-on-surface-variant">
+              Nothing scheduled for {format(new Date(selectedDate + 'T12:00:00'), 'EEEE, d MMMM')}.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {moduleCards}
+          </div>
+        )}
       </div>
 
       {/* Right column (~40%) */}
@@ -165,7 +219,7 @@ export function DashboardGrid({
         <AiPinnedCard />
 
         {/* Electronics warranty watch — show in right column if active */}
-        {activeModules.includes('electronics') && upcomingElectronics.length > 0 && (
+        {!selectedDate && activeModules.includes('electronics') && upcomingElectronics.length > 0 && (
           <div className="bg-white rounded-2xl ring-miro overflow-hidden">
             <div className="bg-[#d4f5c3] px-3.5 py-2.5 flex items-center gap-2 text-[#1f5c1f]">
               <span className="font-display font-semibold text-[13px]">Warranty watch</span>
@@ -204,7 +258,7 @@ export function DashboardGrid({
           </div>
         )}
 
-        <ComingUpTimeline items={timelineItems} />
+        <ComingUpTimeline items={filteredTimeline} />
       </div>
     </div>
   )

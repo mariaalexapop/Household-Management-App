@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { format, formatDistanceToNow, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { Pencil, Trash2, ChevronDown, ChevronUp, Plus, Shield, FileText } from 'lucide-react'
+import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -240,13 +241,10 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
   return (
     <div>
       {/* Page header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
-          Insurance
-        </h2>
+      <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
         <Button
           onClick={handleAdd}
-          className="min-h-11 rounded-full text-white hover:opacity-90"
+          className="hidden md:inline-flex min-h-11 rounded-full text-white hover:opacity-90"
           style={{ backgroundColor: INS_DOT }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add Policy
@@ -444,6 +442,12 @@ export function InsuranceClient({ policies, documents, members, kids, cars }: In
           />
         </DialogContent>
       </Dialog>
+
+      <FloatingAddButton
+        onClick={handleAdd}
+        label="Add Policy"
+        style={{ backgroundColor: '#6a55d9' }}
+      />
     </div>
   )
 }

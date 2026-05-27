@@ -13,6 +13,7 @@ import { TaskList } from '@/components/chores/TaskList'
 import { TaskForm } from '@/components/chores/TaskForm'
 import { TaskFilters } from '@/components/chores/TaskFilters'
 import { updateTaskStatus, deleteTask, bulkUpdateTaskStatus, bulkDeleteTasks } from '@/app/actions/tasks'
+import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -321,7 +322,7 @@ export function ChoresClient({
               setEditingTask(null)
               setIsAddDialogOpen(true)
             }}
-            className="min-h-[44px] shrink-0 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
+            className="hidden md:inline-flex min-h-[44px] shrink-0 rounded-full bg-kinship-primary text-white hover:bg-kinship-primary/90"
           >
             Add Task
           </Button>
@@ -390,6 +391,14 @@ export function ChoresClient({
           </div>
         </DialogContent>
       </Dialog>
+
+      <FloatingAddButton
+        onClick={() => {
+          setEditingTask(null)
+          setIsAddDialogOpen(true)
+        }}
+        label="Add Task"
+      />
     </div>
   )
 }

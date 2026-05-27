@@ -2,13 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, CalendarDays, Search, Settings } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, MessageCircle } from 'lucide-react'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/calendar', label: 'Calendar', icon: CalendarDays },
-  { href: '/search', label: 'Search', icon: Search, isSearch: true },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/chat', label: 'Ask Kinship', icon: MessageCircle },
 ]
 
 export function BottomNav() {
@@ -22,24 +21,6 @@ export function BottomNav() {
           const isActive = item.href === '/'
             ? pathname === '/'
             : pathname.startsWith(item.href)
-
-          if (item.isSearch) {
-            return (
-              <button
-                key={item.href}
-                type="button"
-                onClick={() => {
-                  document.dispatchEvent(
-                    new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
-                  )
-                }}
-                className="flex flex-col items-center gap-0.5 px-3 py-1 text-kinship-on-surface-variant"
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">{item.label}</span>
-              </button>
-            )
-          }
 
           return (
             <Link

@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export function AiPinnedCard() {
   return (
-    <div className="rounded-2xl bg-kinship-primary/10 ring-miro overflow-hidden p-4 flex flex-col gap-3">
+    <div className="hidden md:flex rounded-2xl bg-kinship-primary/10 ring-miro overflow-hidden p-4 flex-col gap-3">
       <div className="flex items-center gap-2 text-kinship-primary">
         <Sparkles className="h-4 w-4" />
         <span className="font-display text-[13px] font-semibold">Ask Kinship</span>

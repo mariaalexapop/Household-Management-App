@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Car, Plus, Pencil, Trash2, History, X } from 'lucide-react'
+import { FloatingAddButton } from '@/components/ui/FloatingAddButton'
 import { format, parseISO, isValid } from 'date-fns'
 
 import { Button } from '@/components/ui/button'
@@ -248,13 +249,10 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
   return (
     <div>
       {/* Page header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.02em] text-kinship-on-surface sm:text-[32px]">
-          Cars
-        </h2>
+      <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
         <Button
           onClick={handleOpenAddCar}
-          className="min-h-11 rounded-full text-white hover:opacity-90"
+          className="hidden md:inline-flex min-h-11 rounded-full text-white hover:opacity-90"
           style={{ backgroundColor: CAR_DOT }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add Car
@@ -525,6 +523,12 @@ export function CarsClient({ cars, serviceRecords }: CarsClientProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      <FloatingAddButton
+        onClick={handleOpenAddCar}
+        label="Add Car"
+        style={{ backgroundColor: '#c67d2a' }}
+      />
     </div>
   )
 }

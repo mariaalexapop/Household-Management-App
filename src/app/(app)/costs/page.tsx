@@ -214,7 +214,7 @@ export default async function CostsPage({ searchParams }: CostsPageProps) {
 
   return (
     <>
-      <TopBar title="Cost Summary" />
+      <TopBar title="Cost Summary" subtitle={`Household spending for ${selectedYear}`} />
 
       <main className="flex-1 overflow-auto px-6 py-2">
         <CostsClient

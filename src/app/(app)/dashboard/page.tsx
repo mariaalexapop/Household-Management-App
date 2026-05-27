@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
-import { eq, ne, asc, and, or, isNotNull } from 'drizzle-orm'
+import { eq, ne, asc, and, or, isNotNull, gte, lt } from 'drizzle-orm'
+import { startOfWeek, addDays } from 'date-fns'
 import { db } from '@/lib/db'
 import {
   householdMembers,
@@ -58,7 +59,12 @@ export default async function DashboardPage() {
 
   const activeModules = (row.activeModules ?? []) as ModuleKey[]
 
-  // Fetch upcoming tasks for the Home Chores dashboard card
+  // Week boundaries for filtering
+  const now = new Date()
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 })
+  const weekEnd = addDays(weekStart, 7)
+
+  // Fetch tasks for the current week
   let upcomingTasks: UpcomingTask[] = []
 
   if (activeModules.includes('chores')) {
@@ -75,20 +81,20 @@ export default async function DashboardPage() {
         and(
           eq(tasksTable.householdId, row.householdId),
           ne(tasksTable.status, 'done'),
-          // Exclude parent template rows (recurring tasks with no parentTaskId)
           or(
             eq(tasksTable.isRecurring, false),
             isNotNull(tasksTable.parentTaskId),
           ),
+          gte(tasksTable.startsAt, weekStart),
+          lt(tasksTable.startsAt, weekEnd),
         )
       )
       .orderBy(asc(tasksTable.startsAt))
-      .limit(3)
 
     upcomingTasks = taskRows
   }
 
-  // Fetch upcoming activities for the Kids dashboard card
+  // Fetch activities for the current week
   let upcomingActivities: UpcomingActivity[] = []
 
   if (activeModules.includes('kids')) {
@@ -109,10 +115,11 @@ export default async function DashboardPage() {
             eq(kidActivities.isRecurring, false),
             isNotNull(kidActivities.parentActivityId),
           ),
+          gte(kidActivities.startsAt, weekStart),
+          lt(kidActivities.startsAt, weekEnd),
         )
       )
       .orderBy(asc(kidActivities.startsAt))
-      .limit(3)
 
     upcomingActivities = activityRows
 
