@@ -11,6 +11,7 @@ import { ChatbotDock } from '@/components/chatbot/ChatbotDock'
 import { BottomNav } from '@/components/nav/BottomNav'
 import { Sidebar } from '@/components/nav/Sidebar'
 import { SearchPalette } from '@/components/search/SearchPalette'
+import { UserProvider } from '@/components/nav/UserContext'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
@@ -56,25 +57,35 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     .toUpperCase()
     .slice(0, 2)
 
+  const userInfo = {
+    displayName,
+    initials,
+    email: user.email ?? '',
+    avatarUrl: memberRow?.avatarUrl ?? null,
+    activeModules,
+  }
+
   return (
     <RealtimeProvider householdId={householdId} userId={user.id}>
       <ChatbotProvider>
-        <ConnectionIndicator />
-        <div className="flex h-screen overflow-hidden bg-kinship-surface">
-          <Sidebar
-            userName={displayName}
-            userInitials={initials}
-            userEmail={user.email}
-            activeModules={activeModules}
-          />
-          <main className="flex-1 min-w-0 flex flex-col overflow-hidden mobile-only-pb">
-            {children}
-          </main>
-        </div>
-        <ChatbotFab />
-        <ChatbotDock />
-        <BottomNav />
-        <SearchPalette />
+        <UserProvider value={userInfo}>
+          <ConnectionIndicator />
+          <div className="flex h-screen overflow-hidden bg-kinship-surface">
+            <Sidebar
+              userName={displayName}
+              userInitials={initials}
+              userEmail={user.email}
+              activeModules={activeModules}
+            />
+            <main className="flex-1 min-w-0 flex flex-col overflow-hidden mobile-only-pb">
+              {children}
+            </main>
+          </div>
+          <ChatbotFab />
+          <ChatbotDock />
+          <BottomNav />
+          <SearchPalette />
+        </UserProvider>
       </ChatbotProvider>
     </RealtimeProvider>
   )

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Bell, ChevronLeft, Search } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { MobileAvatarMenu } from './MobileAvatarMenu'
 
 interface TopBarProps {
   title: string
@@ -37,14 +38,24 @@ export function TopBar({ title, subtitle, cta, backHref, backLabel }: TopBarProp
         )}
       </div>
 
-      {/* Search pill */}
+      {/* Search — icon on mobile, pill on sm+ */}
       <button
         onClick={() => {
           document.dispatchEvent(
             new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
           )
         }}
-        className="hidden sm:flex items-center gap-2 rounded-full bg-kinship-surface-container px-3 py-1.5 text-kinship-placeholder font-body text-xs min-w-[180px] hover:bg-kinship-surface-container-low transition-colors"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-kinship-on-surface-variant hover:bg-kinship-surface-container transition-colors md:hidden"
+      >
+        <Search className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => {
+          document.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+          )
+        }}
+        className="hidden md:flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-kinship-surface-container px-3 py-1.5 text-kinship-placeholder font-body text-xs min-w-[180px] hover:bg-kinship-surface-container-low transition-colors"
       >
         <Search className="h-3.5 w-3.5" />
         <span>Ask Kinship or search...</span>
@@ -63,6 +74,9 @@ export function TopBar({ title, subtitle, cta, backHref, backLabel }: TopBarProp
 
       {/* Page CTA */}
       {cta}
+
+      {/* Mobile avatar menu — visible only on mobile */}
+      <MobileAvatarMenu />
     </div>
   )
 }
