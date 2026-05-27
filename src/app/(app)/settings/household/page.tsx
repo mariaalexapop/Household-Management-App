@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
-import { desc, eq, sql } from 'drizzle-orm'
+import { and, desc, eq, isNull, gt, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { activityFeed, householdMembers, householdSettings, households } from '@/lib/db/schema'
+import { activityFeed, householdInvites, householdMembers, householdSettings, households } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { MembersList } from '@/components/household/MembersList'
 import { InviteModal } from '@/components/household/InviteModal'
@@ -110,6 +110,29 @@ export default async function HouseholdSettingsPage() {
     .orderBy(desc(activityFeed.createdAt))
     .limit(20)
 
+  // Fetch pending (unclaimed, not expired) invites for this household
+  const pendingInviteRows = await db
+    .select({
+      id: householdInvites.id,
+      email: householdInvites.email,
+      expiresAt: householdInvites.expiresAt,
+    })
+    .from(householdInvites)
+    .where(
+      and(
+        eq(householdInvites.householdId, householdId),
+        isNull(householdInvites.claimedAt),
+        gt(householdInvites.expiresAt, new Date())
+      )
+    )
+    .orderBy(desc(householdInvites.expiresAt))
+
+  const pendingInvites = pendingInviteRows.map((row) => ({
+    id: row.id,
+    email: row.email,
+    expiresAt: row.expiresAt.toISOString(),
+  }))
+
   const initialFeedItems: ActivityFeedItem[] = feedRows.map((row) => ({
     id: row.id,
     householdId: row.householdId,
@@ -147,6 +170,7 @@ export default async function HouseholdSettingsPage() {
                 members={allMembers}
                 currentUserId={user.id}
                 isAdmin={isAdmin}
+                pendingInvites={pendingInvites}
               />
             </section>
 

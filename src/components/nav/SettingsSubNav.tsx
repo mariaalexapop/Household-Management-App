@@ -1,14 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 const sections = [
   { label: 'Profile', href: '/settings' },
   { label: 'Household', href: '/settings/household' },
-  { label: 'Members', href: '/settings/household', anchor: 'members' },
-  { label: 'Modules', href: '/settings/modules' },
-  { label: 'Notifications', href: '/settings#notifications' },
   { label: 'Integrations', href: '#' },
   { label: 'Data & Privacy', href: '#' },
   { label: 'Billing', href: '#' },
@@ -16,17 +14,18 @@ const sections = [
 
 export function SettingsSubNav() {
   const pathname = usePathname()
+  const router = useRouter()
 
   function isActive(section: (typeof sections)[number]) {
-    // Profile is active only on exact /settings
     if (section.label === 'Profile') return pathname === '/settings'
-    // Household and Members both point to /settings/household
     if (section.href === '/settings/household') return pathname === '/settings/household'
-    // Modules
-    if (section.href === '/settings/modules') return pathname === '/settings/modules'
-    // Notifications section on profile page
-    if (section.label === 'Notifications') return false
     return false
+  }
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/auth/login')
   }
 
   return (
@@ -48,6 +47,15 @@ export function SettingsSubNav() {
             </Link>
           )
         })}
+
+        <hr className="my-1 border-kinship-surface-container" />
+
+        <button
+          onClick={handleLogout}
+          className="block w-full text-left rounded-lg px-3 py-2 font-body text-[13px] text-red-600 transition-colors hover:bg-red-50"
+        >
+          Log out
+        </button>
       </div>
     </nav>
   )

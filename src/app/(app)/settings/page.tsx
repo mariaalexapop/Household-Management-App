@@ -4,10 +4,8 @@ import { db } from '@/lib/db'
 import { householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/household/ProfileForm'
-import { Label } from '@/components/ui/label'
 import { DeleteAccountSection } from './DeleteAccountSection'
 import { TopBar } from '@/components/nav/TopBar'
-import { NotificationToggle } from './NotificationToggle'
 import { SettingsSubNav } from '@/components/nav/SettingsSubNav'
 
 export const metadata = {
@@ -65,35 +63,8 @@ export default async function SettingsPage() {
               <ProfileForm
                 initialDisplayName={member?.displayName ?? null}
                 initialAvatarUrl={member?.avatarUrl ?? null}
+                email={user.email ?? null}
               />
-            </section>
-
-            <hr className="border-kinship-surface-container" />
-
-            {/* Notifications */}
-            <section id="notifications" className="space-y-4">
-              <div>
-                <h2 className="font-display text-lg font-semibold text-kinship-on-surface">
-                  Notifications
-                </h2>
-                <p className="font-body text-sm text-kinship-on-surface-variant">
-                  Manage how you receive notifications
-                </p>
-              </div>
-              <div className="rounded-lg bg-kinship-surface-container-lowest p-4 flex items-center justify-between gap-4">
-                <div>
-                  <Label
-                    htmlFor="email-assign-toggle"
-                    className="font-body text-sm font-medium text-kinship-on-surface"
-                  >
-                    Email me when I&apos;m assigned a task
-                  </Label>
-                  <p className="font-body text-xs text-kinship-on-surface-variant mt-0.5">
-                    Receive an email notification when a household member assigns a task to you.
-                  </p>
-                </div>
-                <NotificationToggle defaultEnabled={true} />
-              </div>
             </section>
 
             <hr className="border-kinship-surface-container" />

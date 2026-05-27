@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { RemoveMemberButton } from './RemoveMemberButton'
+import { RoleSelector } from './RoleSelector'
 
 export interface HouseholdMember {
   id: string
@@ -13,10 +14,17 @@ export interface HouseholdMember {
   joinedAt: Date | string | null
 }
 
+export interface PendingInvite {
+  id: string
+  email: string | null
+  expiresAt: Date | string
+}
+
 interface MembersListProps {
   members: HouseholdMember[]
   currentUserId: string
   isAdmin: boolean
+  pendingInvites?: PendingInvite[]
 }
 
 function getInitials(name: string | null): string {
@@ -28,14 +36,16 @@ function getInitials(name: string | null): string {
     .join('')
 }
 
-/**
- * MembersList — Server Component
- *
- * Renders all household members with avatar, display name, role badge,
- * and joined date. Admins see a "Remove" button on each member row
- * (except their own row).
- */
-export function MembersList({ members, currentUserId, isAdmin }: MembersListProps) {
+function getRoleLabel(role: string): string {
+  switch (role) {
+    case 'admin': return 'Admin'
+    case 'contributor': return 'Contributor'
+    case 'view-only': return 'View-only'
+    default: return 'Member'
+  }
+}
+
+export function MembersList({ members, currentUserId, isAdmin, pendingInvites = [] }: MembersListProps) {
   return (
     <div className="space-y-2">
       {members.map((member) => {
@@ -44,6 +54,7 @@ export function MembersList({ members, currentUserId, isAdmin }: MembersListProp
           ? format(new Date(member.joinedAt), 'MMM yyyy')
           : null
         const isSelf = member.userId === currentUserId
+        const isOwnerAdmin = member.role === 'admin'
 
         return (
           <div
@@ -74,11 +85,15 @@ export function MembersList({ members, currentUserId, isAdmin }: MembersListProp
             </div>
 
             <div className="flex items-center gap-2">
-              <Badge variant={member.role === 'admin' ? 'default' : 'secondary'}>
-                {member.role === 'admin' ? 'Admin' : 'Member'}
-              </Badge>
+              {isAdmin && !isSelf ? (
+                <RoleSelector memberId={member.id} currentRole={member.role} />
+              ) : (
+                <Badge variant={isOwnerAdmin ? 'default' : 'secondary'}>
+                  {getRoleLabel(member.role)}
+                </Badge>
+              )}
 
-              {isAdmin && !(isSelf && member.role === 'admin') && (
+              {isAdmin && !(isSelf && isOwnerAdmin) && (
                 <RemoveMemberButton memberId={member.id} memberName={member.displayName} />
               )}
             </div>
@@ -86,7 +101,40 @@ export function MembersList({ members, currentUserId, isAdmin }: MembersListProp
         )
       })}
 
-      {members.length === 0 && (
+      {/* Pending invites */}
+      {pendingInvites.length > 0 && (
+        <>
+          {pendingInvites.map((invite) => (
+            <div
+              key={invite.id}
+              className="flex items-center justify-between rounded-lg border border-dashed border-border bg-kinship-surface-container-lowest px-4 py-3"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar size="default">
+                  <AvatarFallback className="bg-kinship-surface-container text-kinship-on-surface-variant">
+                    ?
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex flex-col">
+                  <span className="font-body text-sm font-medium text-kinship-on-surface-variant">
+                    {invite.email ?? 'Invite link'}
+                  </span>
+                  <span className="font-body text-xs text-kinship-on-surface-variant">
+                    Expires {format(new Date(invite.expiresAt), 'MMM d, yyyy')}
+                  </span>
+                </div>
+              </div>
+
+              <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
+                Pending
+              </Badge>
+            </div>
+          ))}
+        </>
+      )}
+
+      {members.length === 0 && pendingInvites.length === 0 && (
         <p className="font-body text-sm text-kinship-on-surface-variant py-4 text-center">
           No members found.
         </p>

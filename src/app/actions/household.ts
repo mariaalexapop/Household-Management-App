@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { householdMembers } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
@@ -132,4 +132,73 @@ export async function uploadAvatar(formData: FormData): Promise<{ url?: string; 
     .where(eq(householdMembers.userId, user.id))
 
   return { url: avatarUrl }
+}
+
+// ---------------------------------------------------------------------------
+// updateMemberRole
+// ---------------------------------------------------------------------------
+
+const validRoles = ['admin', 'contributor', 'view-only'] as const
+type MemberRole = (typeof validRoles)[number]
+
+export async function updateMemberRole(
+  memberId: string,
+  newRole: MemberRole
+): Promise<{ success: boolean; error?: string }> {
+  if (!validRoles.includes(newRole)) {
+    return { success: false, error: 'Invalid role' }
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  // Verify the caller is an admin of the same household
+  const callerRows = await db
+    .select({
+      role: householdMembers.role,
+      householdId: householdMembers.householdId,
+    })
+    .from(householdMembers)
+    .where(eq(householdMembers.userId, user.id))
+    .limit(1)
+
+  const caller = callerRows[0]
+  if (!caller || caller.role !== 'admin') {
+    return { success: false, error: 'Only admins can change roles' }
+  }
+
+  // Verify target member is in the same household
+  const targetRows = await db
+    .select({ id: householdMembers.id, userId: householdMembers.userId })
+    .from(householdMembers)
+    .where(
+      and(
+        eq(householdMembers.id, memberId),
+        eq(householdMembers.householdId, caller.householdId)
+      )
+    )
+    .limit(1)
+
+  if (!targetRows[0]) {
+    return { success: false, error: 'Member not found' }
+  }
+
+  // Prevent admin from changing their own role
+  if (targetRows[0].userId === user.id) {
+    return { success: false, error: 'Cannot change your own role' }
+  }
+
+  await db
+    .update(householdMembers)
+    .set({ role: newRole })
+    .where(eq(householdMembers.id, memberId))
+
+  return { success: true }
 }

@@ -9,6 +9,7 @@ import { updateProfile, uploadAvatar } from '@/app/actions/household'
 interface ProfileFormProps {
   initialDisplayName: string | null
   initialAvatarUrl: string | null
+  email: string | null
 }
 
 /**
@@ -17,7 +18,7 @@ interface ProfileFormProps {
  * Allows the current user to update their display name and upload an avatar.
  * Uses Server Actions for both operations.
  */
-export function ProfileForm({ initialDisplayName, initialAvatarUrl }: ProfileFormProps) {
+export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: ProfileFormProps) {
   const [displayName, setDisplayName] = useState(initialDisplayName ?? '')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(initialAvatarUrl)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -104,6 +105,21 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl }: ProfileFor
           disabled={isPending}
         />
       </div>
+
+      {/* Registered email (read-only) */}
+      {email && (
+        <div className="space-y-1.5">
+          <Label htmlFor="registered-email">Registered email</Label>
+          <Input
+            id="registered-email"
+            type="email"
+            value={email}
+            disabled
+            readOnly
+            className="bg-kinship-surface-container text-kinship-on-surface-variant cursor-not-allowed"
+          />
+        </div>
+      )}
 
       {message && (
         <p
