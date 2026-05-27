@@ -53,11 +53,19 @@ function toISOWithOffset(date: string, time: string): string {
 // Component
 // ---------------------------------------------------------------------------
 
+interface TaskPrefill {
+  title?: string
+  notes?: string
+  startDate?: string
+  ownerId?: string
+}
+
 interface TaskFormProps {
   areas: AreaItem[]
   members: MemberItem[]
   editingTask: TaskItem | null
   currentUserId: string
+  prefill?: TaskPrefill | null
   onSuccess: (task?: TaskItem) => void
   onCancel: () => void
 }
@@ -67,6 +75,7 @@ export function TaskForm({
   members,
   editingTask,
   currentUserId,
+  prefill,
   onSuccess,
   onCancel,
 }: TaskFormProps) {
@@ -99,11 +108,11 @@ export function TaskForm({
           : '',
       }
     : {
-        title: '',
-        notes: '',
+        title: prefill?.title ?? '',
+        notes: prefill?.notes ?? '',
         areaId: '',
-        ownerId: currentUserId,
-        startDate: format(new Date(), 'yyyy-MM-dd'),
+        ownerId: prefill?.ownerId ?? currentUserId,
+        startDate: prefill?.startDate ?? format(new Date(), 'yyyy-MM-dd'),
         startTime: '',
         endDate: '',
         endTime: '',

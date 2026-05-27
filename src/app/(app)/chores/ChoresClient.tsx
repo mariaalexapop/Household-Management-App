@@ -80,10 +80,22 @@ export function ChoresClient({
     setOptimisticTasks(initialTasks)
   }, [initialTasks])
 
-  // Auto-open add dialog from ?action=new
+  // Auto-open add dialog from ?action=new with optional prefill
   const searchParams = useSearchParams()
+  const [prefill, setPrefill] = useState<{ title?: string; notes?: string; startDate?: string; ownerId?: string } | null>(null)
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
+      const title = searchParams.get('title') ?? undefined
+      const startsAt = searchParams.get('startsAt') ?? undefined
+      const ownerId = searchParams.get('ownerId') ?? undefined
+      const notes = searchParams.get('notes') ?? undefined
+      setPrefill({
+        title,
+        notes,
+        startDate: startsAt ? startsAt.slice(0, 10) : undefined,
+        ownerId,
+      })
+      setEditingTask(null)
       setIsAddDialogOpen(true)
       router.replace('/chores', { scroll: false })
     }
@@ -352,8 +364,13 @@ export function ChoresClient({
             members={members}
             editingTask={editingTask}
             currentUserId={currentUserId}
-            onSuccess={handleFormSuccess}
+            prefill={!editingTask ? prefill : null}
+            onSuccess={(task) => {
+              setPrefill(null)
+              handleFormSuccess(task)
+            }}
             onCancel={() => {
+              setPrefill(null)
               setIsAddDialogOpen(false)
               setEditingTask(null)
             }}

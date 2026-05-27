@@ -346,6 +346,7 @@ function SuggestionsCard({ suggestions }: { suggestions: SerializedSuggestion[] 
   const handleEdit = (sug: SerializedSuggestion) => {
     const params = new URLSearchParams({ action: 'new', title: sug.suggestedTitle, startsAt: sug.deadlineDate })
     if (sug.suggestedOwnerId) params.set('ownerId', sug.suggestedOwnerId)
+    if (sug.suggestedNotes) params.set('notes', sug.suggestedNotes)
     router.push(`/chores?${params.toString()}`)
   }
 
