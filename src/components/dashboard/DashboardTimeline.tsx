@@ -48,7 +48,7 @@ interface Props {
 
 function memberInfo(members: SerializedMember[], id: string | null) {
   if (!id) return null
-  const m = members.find((x) => x.id === id)
+  const m = members.find((x) => x.id === id || x.userId === id)
   if (!m?.displayName) return null
   const initials = m.displayName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
   let hash = 0; for (const c of m.displayName) hash = ((hash << 5) - hash + c.charCodeAt(0)) | 0
