@@ -7,6 +7,8 @@ import { MembersList } from '@/components/household/MembersList'
 import { InviteModal } from '@/components/household/InviteModal'
 import { ActivityFeedPreview } from './ActivityFeedPreview'
 import { ModuleToggleList } from '../modules/ModuleToggleList'
+import { NotificationToggle } from '../NotificationToggle'
+import { Label } from '@/components/ui/label'
 import { TopBar } from '@/components/nav/TopBar'
 import { SettingsSubNav } from '@/components/nav/SettingsSubNav'
 import type { ActivityFeedItem } from '@/components/realtime/RealtimeProvider'
@@ -195,10 +197,67 @@ export default async function HouseholdSettingsPage() {
 
             <hr className="border-border" />
 
-            {/* Activity section — preview of 5 items */}
+            {/* Notifications section */}
+            <section id="notifications" className="space-y-4">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
+                  Notifications
+                </h2>
+                <p className="mt-1 text-sm text-kinship-on-surface-variant">
+                  Manage how you receive notifications
+                </p>
+              </div>
+
+              {/* Task assignment toggle */}
+              <div className="rounded-lg bg-kinship-surface-container-lowest p-4 flex items-center justify-between gap-4">
+                <div>
+                  <Label
+                    htmlFor="email-assign-toggle"
+                    className="font-body text-sm font-medium text-kinship-on-surface"
+                  >
+                    Email me when I&apos;m assigned a task
+                  </Label>
+                  <p className="font-body text-xs text-kinship-on-surface-variant mt-0.5">
+                    Receive an email notification when a household member assigns a task to you.
+                  </p>
+                </div>
+                <NotificationToggle defaultEnabled={true} />
+              </div>
+
+              {/* Invitation sent notifications */}
+              {pendingInvites.length > 0 && (
+                <div className="space-y-2">
+                  <p className="font-body text-xs font-semibold uppercase tracking-wider text-kinship-on-surface-variant">
+                    Invitations sent
+                  </p>
+                  {pendingInvites.map((invite) => (
+                    <div
+                      key={invite.id}
+                      className="rounded-lg bg-kinship-surface-container-lowest p-4 flex items-center justify-between gap-4"
+                    >
+                      <div>
+                        <p className="font-body text-sm font-medium text-kinship-on-surface">
+                          Invitation sent to {invite.email ?? 'invite link'}
+                        </p>
+                        <p className="font-body text-xs text-kinship-on-surface-variant mt-0.5">
+                          Waiting for them to accept and join your household.
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-amber-50 border border-amber-300 px-2.5 py-0.5 font-body text-xs font-medium text-amber-600">
+                        Pending
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <hr className="border-border" />
+
+            {/* Activity feed preview */}
             <section>
               <h2 className="font-display text-xl font-semibold text-kinship-on-surface mb-4">
-                Notifications
+                Recent Activity
               </h2>
               <ActivityFeedPreview initialItems={initialFeedItems} />
             </section>
