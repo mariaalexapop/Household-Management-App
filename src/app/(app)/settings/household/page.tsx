@@ -11,6 +11,8 @@ import { NotificationToggle } from '../NotificationToggle'
 import { Label } from '@/components/ui/label'
 import { TopBar } from '@/components/nav/TopBar'
 import { SettingsSubNav } from '@/components/nav/SettingsSubNav'
+import { ClearMockDataButton, GenerateMockDataButton } from '@/components/dashboard/MockDataActions'
+import { hasMockData } from '@/app/actions/mock-data'
 import type { ActivityFeedItem } from '@/components/realtime/RealtimeProvider'
 
 export const metadata = {
@@ -143,6 +145,8 @@ export default async function HouseholdSettingsPage() {
     expiresAt: row.expiresAt.toISOString(),
   }))
 
+  const mockDataExists = await hasMockData()
+
   const initialFeedItems: ActivityFeedItem[] = feedRows.map((row) => ({
     id: row.id,
     householdId: row.householdId,
@@ -261,6 +265,34 @@ export default async function HouseholdSettingsPage() {
                   ))}
                 </div>
               )}
+            </section>
+
+            <hr className="border-border" />
+
+            {/* Sample data section */}
+            <section>
+              <div className="mb-4">
+                <h2 className="font-display text-xl font-semibold text-kinship-on-surface">
+                  Sample Data
+                </h2>
+                <p className="mt-1 text-sm text-kinship-on-surface-variant">
+                  Generate sample data to explore how Kinship works, or clear it when you&apos;re done.
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-kinship-surface-container-lowest p-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-body text-sm font-medium text-kinship-on-surface">
+                    {mockDataExists ? 'Sample data is active' : 'No sample data'}
+                  </p>
+                  <p className="font-body text-xs text-kinship-on-surface-variant mt-0.5">
+                    {mockDataExists
+                      ? 'Clear sample data to start fresh with your own entries.'
+                      : 'Generate a few entries per module to see how the app works.'}
+                  </p>
+                </div>
+                {mockDataExists ? <ClearMockDataButton /> : <GenerateMockDataButton />}
+              </div>
             </section>
 
             <hr className="border-border" />

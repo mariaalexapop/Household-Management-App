@@ -19,6 +19,7 @@ import {
 import { createClient } from '@/lib/supabase/server'
 import { DashboardTimeline } from '@/components/dashboard/DashboardTimeline'
 import { seedSuggestions } from '@/app/actions/suggestions'
+import { hasMockData } from '@/app/actions/mock-data'
 import { registerChildren } from '@/lib/kids/child-colours'
 import type { ModuleKey } from '@/stores/onboarding'
 import { TopBar } from '@/components/nav/TopBar'
@@ -320,6 +321,9 @@ export default async function DashboardPage() {
   // Seed suggestions (ensures they exist without waiting for Inngest cron)
   await seedSuggestions(row.householdId)
 
+  // Check if mock data exists
+  const mockDataExists = await hasMockData()
+
   // Fetch pending suggestions from DB
   const allSuggestions = await db
     .select()
@@ -382,6 +386,7 @@ export default async function DashboardPage() {
           weekStartIso={weekStart.toISOString()}
           weekEndIso={weekEnd.toISOString()}
           nextWeekEndIso={nextWeekEnd.toISOString()}
+          hasMockData={mockDataExists}
         />
       </main>
     </>

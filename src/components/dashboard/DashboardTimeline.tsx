@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { updateTaskStatus, assignTask } from '@/app/actions/tasks'
 import { SortableCardGrid } from './SortableCardGrid'
 import { SmartIntakeBanner } from './SmartIntakeBanner'
+import { GenerateMockDataButton, ClearMockDataButton } from './MockDataActions'
 import { acceptSuggestion, dismissSuggestion } from '@/app/actions/suggestions'
 import type { ModuleKey } from '@/stores/onboarding'
 
@@ -50,6 +51,7 @@ interface Props {
   staleOverdue: { id: string; title: string; areaName: string | null; startsAt: string | null; ownerId: string | null; status: string }[]
   monthlyCosts?: { monthIndex: number; car: number; health: number; home: number; electronics: number; total: number }[]
   weekStartIso: string; weekEndIso: string; nextWeekEndIso: string
+  hasMockData?: boolean
 }
 
 function memberInfo(members: SerializedMember[], id: string | null) {
@@ -77,7 +79,7 @@ function timeLabel(dateStr: string): string {
 
 export function DashboardTimeline({
   activeModules, tasks, activities, policies, members, suggestions, staleOverdue, monthlyCosts,
-  weekStartIso, weekEndIso, nextWeekEndIso,
+  weekStartIso, weekEndIso, nextWeekEndIso, hasMockData: hasMockDataProp,
 }: Props) {
   const weekStart = parseISO(weekStartIso)
   const weekEnd = parseISO(weekEndIso)
@@ -154,12 +156,31 @@ export function DashboardTimeline({
   const weekRange = `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'd')}`
   const nextWeekRange = `${format(weekEnd, 'MMM d')} – ${format(addDays(weekEnd, 6), 'MMM d')}`
 
+  const isEmpty = tasks.length === 0 && activities.length === 0 && suggestions.length === 0 && staleOverdue.length === 0
+
   /* ════════════════════════════ RENDER ═══════════════════════════ */
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:gap-8">
       {/* LEFT — action list */}
       <div className="flex flex-col gap-5 lg:flex-[1.7] min-w-0">
         <SmartIntakeBanner />
+
+        {isEmpty && !hasMockDataProp && (
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-white ring-miro px-6 py-10 text-center">
+            <p className="font-display text-lg font-semibold text-kinship-on-surface">Your dashboard is empty</p>
+            <p className="font-body text-sm text-kinship-on-surface-variant max-w-sm">
+              Want to see how Kinship works? Generate some sample data to explore tasks, activities, cars, insurance, and more.
+            </p>
+            <GenerateMockDataButton />
+          </div>
+        )}
+
+        {hasMockDataProp && (
+          <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5">
+            <p className="flex-1 font-body text-xs text-amber-700">You&apos;re viewing sample data. Clear it when you&apos;re ready to start fresh.</p>
+            <ClearMockDataButton />
+          </div>
+        )}
 
         <section>
           <SectionHead title="This week" dateRange={weekRange} />
