@@ -76,8 +76,8 @@ export default async function DashboardPage() {
 
   // Fetch tasks: this week + next week + overdue
   type DashTask = {
-    id: string; title: string; areaName: string | null; startsAt: Date | null;
-    ownerId: string | null; status: string;
+    id: string; title: string; notes: string | null; areaName: string | null; startsAt: Date | null;
+    endsAt: Date | null; ownerId: string | null; status: string;
   }
   let allTasks: DashTask[] = []
 
@@ -86,8 +86,10 @@ export default async function DashboardPage() {
       .select({
         id: tasksTable.id,
         title: tasksTable.title,
+        notes: tasksTable.notes,
         areaName: choreAreas.name,
         startsAt: tasksTable.startsAt,
+        endsAt: tasksTable.endsAt,
         ownerId: tasksTable.ownerId,
         status: tasksTable.status,
       })
@@ -113,8 +115,9 @@ export default async function DashboardPage() {
 
   // Fetch activities: this week + next week
   type DashActivity = {
-    id: string; title: string; childName: string | null; childId: string | null;
-    startsAt: Date | null; assigneeId: string | null;
+    id: string; title: string; notes: string | null; location: string | null;
+    childName: string | null; childId: string | null;
+    startsAt: Date | null; endsAt: Date | null; assigneeId: string | null;
   }
   let allActivities: DashActivity[] = []
 
@@ -123,9 +126,12 @@ export default async function DashboardPage() {
       .select({
         id: kidActivities.id,
         title: kidActivities.title,
+        notes: kidActivities.notes,
+        location: kidActivities.location,
         childName: children.name,
         childId: kidActivities.childId,
         startsAt: kidActivities.startsAt,
+        endsAt: kidActivities.endsAt,
         assigneeId: kidActivities.assigneeId,
       })
       .from(kidActivities)

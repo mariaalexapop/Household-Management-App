@@ -19,6 +19,9 @@ interface TimelineRow {
   id: string; realId?: string; day: string; when?: string; title: string
   module: ModuleKey; whoInitials?: string; whoColor?: string; amount?: string
   isOverdue?: boolean; lateDays?: string; isDone?: boolean; isTask?: boolean; sortKey: number
+  // Detail fields for expand
+  notes?: string | null; areaName?: string | null; endsAt?: string | null
+  location?: string | null; childName?: string | null; ownerName?: string | null
 }
 interface SerializedMember { id: string; displayName: string | null; avatarUrl: string | null; userId: string }
 
@@ -37,8 +40,8 @@ interface SerializedSuggestion {
 
 interface Props {
   activeModules: ModuleKey[]
-  tasks: { id: string; title: string; areaName: string | null; startsAt: string | null; ownerId: string | null; status: string }[]
-  activities: { id: string; title: string; childName: string | null; childId: string | null; startsAt: string | null; assigneeId: string | null }[]
+  tasks: { id: string; title: string; notes: string | null; areaName: string | null; startsAt: string | null; endsAt: string | null; ownerId: string | null; status: string }[]
+  activities: { id: string; title: string; notes: string | null; location: string | null; childName: string | null; childId: string | null; startsAt: string | null; endsAt: string | null; assigneeId: string | null }[]
   policies: { id: string; insurer: string; policyType: string; expiryDate: string | null; nextPaymentDate: string | null; premiumCents: number | null; paymentSchedule: string | null }[]
   members: SerializedMember[]
   suggestions: SerializedSuggestion[]
@@ -86,17 +89,22 @@ export function DashboardTimeline({
       if (!t.startsAt) continue
       const d = parseISO(t.startsAt); const before = isBefore(startOfDay(d), startOfDay(weekStart))
       const isOv = before && t.status !== 'done'; const who = memberInfo(members, t.ownerId)
+      const ownerMember = t.ownerId ? members.find(m => m.userId === t.ownerId || m.id === t.ownerId) : null
       rows.push({ id: `task-${t.id}`, realId: t.id, day: isOv ? format(d, 'MMM d') : dayLabel(t.startsAt),
         when: timeLabel(t.startsAt), title: t.title, module: 'chores', whoInitials: who?.initials, whoColor: who?.color,
         isOverdue: isOv, lateDays: isOv ? `${differenceInCalendarDays(now, d)}d late` : undefined,
-        isDone: t.status === 'done', isTask: true, sortKey: d.getTime() })
+        isDone: t.status === 'done', isTask: true, sortKey: d.getTime(),
+        notes: t.notes, areaName: t.areaName, endsAt: t.endsAt, ownerName: ownerMember?.displayName })
     }
     for (const a of activities) {
       if (!a.startsAt) continue; const d = parseISO(a.startsAt)
       const who = memberInfo(members, a.assigneeId)
+      const assigneeMember = a.assigneeId ? members.find(m => m.userId === a.assigneeId || m.id === a.assigneeId) : null
       rows.push({ id: `act-${a.id}`, day: dayLabel(a.startsAt), when: timeLabel(a.startsAt),
         title: a.childName ? `${a.childName} — ${a.title}` : a.title, module: 'kids',
-        whoInitials: who?.initials, whoColor: who?.color, sortKey: d.getTime() })
+        whoInitials: who?.initials, whoColor: who?.color, sortKey: d.getTime(),
+        notes: a.notes, location: a.location, childName: a.childName, endsAt: a.endsAt,
+        ownerName: assigneeMember?.displayName })
     }
     return {
       overdue: rows.filter((r) => r.isOverdue).sort((a, b) => a.sortKey - b.sortKey),
@@ -201,11 +209,12 @@ function SectionHead({ title, dateRange, muted }: { title: string; dateRange: st
   )
 }
 
-/* ── Action row (compact) with inline assign ─────────────────── */
+/* ── Action row (compact) with inline assign + click-to-expand ── */
 function ActionRow({ row, done, onToggle, muted, members }: {
   row: TimelineRow; done: boolean; onToggle: () => void; muted?: boolean; members: SerializedMember[]
 }) {
   const [assignOpen, setAssignOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const popRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const [, startTransition] = useTransition()
@@ -228,67 +237,97 @@ function ActionRow({ row, done, onToggle, muted, members }: {
     })
   }
 
+  const hasDetails = row.notes || row.areaName || row.endsAt || row.location || row.ownerName
+  const moduleLabel = row.module === 'chores' ? 'Task' : row.module === 'kids' ? 'Activity' : row.module === 'car' ? 'Car' : row.module === 'insurance' ? 'Insurance' : 'Electronics'
+
   return (
-    <div className="grid items-center gap-x-3 border-t border-kinship-surface-container"
-      style={{ gridTemplateColumns: '20px 64px 48px 1fr auto', padding: '7px 0', opacity: done ? 0.55 : muted ? 0.92 : 1 }}>
-      <button onClick={onToggle} aria-label={done ? 'Mark not done' : 'Mark done'}
-        style={{ width: 18, height: 18, padding: 0, border: 'none', borderRadius: 9, cursor: 'pointer',
-          background: done ? '#00b473' : 'transparent', boxShadow: done ? 'none' : 'inset 0 0 0 1.5px #b0b3c0',
-          color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .12s' }}>
-        {done && <Check className="h-2.5 w-2.5" />}
-      </button>
-      <span className={`font-display text-[12px] font-semibold ${row.isOverdue ? 'text-amber-600' : (row.day === 'Today' || row.day === 'Tomorrow') ? 'text-kinship-primary' : 'text-kinship-on-surface'} ${done ? 'line-through' : ''}`}>{row.day}</span>
-      <span className="font-mono text-[10px] text-kinship-placeholder">{row.when || ''}</span>
-      <div className="flex items-center gap-2 min-w-0">
-        <span className="h-[6px] w-[6px] shrink-0 rounded-full" style={{ backgroundColor: MOD[row.module]?.dot ?? '#999' }} />
-        <span className={`truncate text-kinship-on-surface ${done ? 'line-through' : ''}`} style={{ fontSize: muted ? 12 : 13, fontWeight: 500 }}>{row.title}</span>
-        {done && <span className="shrink-0 text-[9px] font-semibold" style={{ color: '#00b473' }}>done</span>}
-        {row.isOverdue && row.lateDays && <span className="shrink-0 rounded-full px-[5px] py-px text-[8px] font-bold uppercase tracking-wider" style={{ background: '#fff3e0', color: '#d97706' }}>{row.lateDays}</span>}
-      </div>
-      <div className="flex items-center gap-2 justify-end relative" ref={popRef}>
-        {row.amount && <span className="font-mono text-[12px] text-kinship-on-surface" style={{ fontWeight: 500 }}>{row.amount}</span>}
-        {/* Assign button — avatar if assigned, placeholder if not */}
-        {row.isTask ? (
-          <button onClick={() => setAssignOpen(!assignOpen)} aria-label="Assign task"
-            className="flex items-center justify-center rounded-full transition-colors hover:ring-2 hover:ring-kinship-primary/30"
-            style={{ width: 24, height: 24 }}>
-            {row.whoInitials ? (
-              <div className="flex items-center justify-center rounded-full text-white w-full h-full" style={{ fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>
-            ) : (
-              <div className="flex items-center justify-center rounded-full w-full h-full" style={{ boxShadow: 'inset 0 0 0 1.5px #d0d3dc' }}>
-                <UserPlus className="h-[10px] w-[10px] text-kinship-placeholder" />
-              </div>
-            )}
-          </button>
-        ) : (
-          row.whoInitials && <div className="flex items-center justify-center rounded-full text-white" style={{ width: 24, height: 24, fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>
-        )}
-        {/* Assign popover */}
-        {assignOpen && (
-          <div className="absolute right-0 top-full mt-1 z-50 w-40 rounded-xl bg-white py-1 shadow-xl ring-1 ring-black/5">
-            <div className="px-2.5 py-1 font-body text-[9px] font-bold uppercase tracking-wider text-kinship-placeholder">Assign to</div>
-            {members.map((m) => {
-              const info = memberInfo([m], m.id)
-              return (
-                <button key={m.id} onClick={() => handleAssign(m.userId)}
-                  className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
-                  <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full text-white" style={{ fontSize: 8, fontWeight: 700, backgroundColor: info?.color ?? '#999' }}>{info?.initials ?? '?'}</div>
-                  <span className="font-body text-[11px] text-kinship-on-surface truncate">{m.displayName ?? 'Unknown'}</span>
-                </button>
-              )
-            })}
-            {row.whoInitials && (
-              <>
+    <div className="border-t border-kinship-surface-container" style={{ opacity: done ? 0.55 : muted ? 0.92 : 1 }}>
+      <div className="grid items-center gap-x-3" style={{ gridTemplateColumns: '20px 64px 48px 1fr auto', padding: '7px 0' }}>
+        {/* Checkbox */}
+        <button onClick={(e) => { e.stopPropagation(); onToggle() }} aria-label={done ? 'Mark not done' : 'Mark done'}
+          style={{ width: 18, height: 18, padding: 0, border: 'none', borderRadius: 9, cursor: 'pointer',
+            background: done ? '#00b473' : 'transparent', boxShadow: done ? 'none' : 'inset 0 0 0 1.5px #b0b3c0',
+            color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .12s' }}>
+          {done && <Check className="h-2.5 w-2.5" />}
+        </button>
+        {/* Day */}
+        <span className={`font-display text-[12px] font-semibold ${row.isOverdue ? 'text-amber-600' : (row.day === 'Today' || row.day === 'Tomorrow') ? 'text-kinship-primary' : 'text-kinship-on-surface'} ${done ? 'line-through' : ''}`}>{row.day}</span>
+        {/* Time */}
+        <span className="font-mono text-[10px] text-kinship-placeholder">{row.when || ''}</span>
+        {/* Title — clickable to expand */}
+        <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2 min-w-0 text-left cursor-pointer hover:opacity-80 transition-opacity">
+          <span className="h-[6px] w-[6px] shrink-0 rounded-full" style={{ backgroundColor: MOD[row.module]?.dot ?? '#999' }} />
+          <span className={`truncate text-kinship-on-surface ${done ? 'line-through' : ''}`} style={{ fontSize: muted ? 12 : 13, fontWeight: 500 }}>{row.title}</span>
+          {done && <span className="shrink-0 text-[9px] font-semibold" style={{ color: '#00b473' }}>done</span>}
+          {row.isOverdue && row.lateDays && <span className="shrink-0 rounded-full px-[5px] py-px text-[8px] font-bold uppercase tracking-wider" style={{ background: '#fff3e0', color: '#d97706' }}>{row.lateDays}</span>}
+        </button>
+        {/* Assign + amount */}
+        <div className="flex items-center gap-2 justify-end relative" ref={popRef}>
+          {row.amount && <span className="font-mono text-[12px] text-kinship-on-surface" style={{ fontWeight: 500 }}>{row.amount}</span>}
+          {row.isTask ? (
+            <button onClick={(e) => { e.stopPropagation(); setAssignOpen(!assignOpen) }} aria-label="Assign task"
+              className="flex items-center justify-center rounded-full transition-colors hover:ring-2 hover:ring-kinship-primary/30"
+              style={{ width: 24, height: 24 }}>
+              {row.whoInitials ? (
+                <div className="flex items-center justify-center rounded-full text-white w-full h-full" style={{ fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>
+              ) : (
+                <div className="flex items-center justify-center rounded-full w-full h-full" style={{ boxShadow: 'inset 0 0 0 1.5px #d0d3dc' }}>
+                  <UserPlus className="h-[10px] w-[10px] text-kinship-placeholder" />
+                </div>
+              )}
+            </button>
+          ) : (
+            row.whoInitials && <div className="flex items-center justify-center rounded-full text-white" style={{ width: 24, height: 24, fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>
+          )}
+          {assignOpen && (
+            <div className="absolute right-0 top-full mt-1 z-50 w-40 rounded-xl bg-white py-1 shadow-xl ring-1 ring-black/5">
+              <div className="px-2.5 py-1 font-body text-[9px] font-bold uppercase tracking-wider text-kinship-placeholder">Assign to</div>
+              {members.map((m) => {
+                const info = memberInfo([m], m.id)
+                return (
+                  <button key={m.id} onClick={() => handleAssign(m.userId)}
+                    className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
+                    <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full text-white" style={{ fontSize: 8, fontWeight: 700, backgroundColor: info?.color ?? '#999' }}>{info?.initials ?? '?'}</div>
+                    <span className="font-body text-[11px] text-kinship-on-surface truncate">{m.displayName ?? 'Unknown'}</span>
+                  </button>
+                )
+              })}
+              {row.whoInitials && (<>
                 <div className="mx-2 my-0.5 border-t border-kinship-surface-container" />
-                <button onClick={() => handleAssign(null)}
-                  className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
+                <button onClick={() => handleAssign(null)} className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
                   <span className="font-body text-[11px] text-kinship-on-surface-variant">Unassign</span>
                 </button>
-              </>
-            )}
-          </div>
-        )}
+              </>)}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Expanded detail panel */}
+      {expanded && (
+        <div className="ml-[23px] mb-2 rounded-lg bg-kinship-surface/60 px-3 py-2.5 flex flex-col gap-1.5">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="rounded-full px-2 py-px text-[9px] font-semibold uppercase tracking-wider" style={{ backgroundColor: MOD[row.module]?.dot ?? '#999', color: '#fff' }}>{moduleLabel}</span>
+            {row.areaName && <span className="font-body text-[10px] text-kinship-on-surface-variant">Area: {row.areaName}</span>}
+            {row.ownerName && <span className="font-body text-[10px] text-kinship-on-surface-variant">Assigned: {row.ownerName}</span>}
+            {row.location && <span className="font-body text-[10px] text-kinship-on-surface-variant">📍 {row.location}</span>}
+          </div>
+          {row.endsAt && (
+            <p className="font-body text-[10px] text-kinship-on-surface-variant">Ends: {format(parseISO(row.endsAt), 'EEE d MMM, h:mma')}</p>
+          )}
+          {row.notes && (
+            <p className="font-body text-[11px] text-kinship-on-surface leading-relaxed whitespace-pre-wrap">{row.notes}</p>
+          )}
+          {!hasDetails && (
+            <p className="font-body text-[10px] text-kinship-placeholder italic">No additional details.</p>
+          )}
+          {row.isTask && row.realId && (
+            <Link href={`/chores`} className="self-start mt-1 rounded-full border border-kinship-outline-variant px-2.5 py-[3px] font-body text-[10px] font-medium text-kinship-primary hover:bg-kinship-primary-surface transition-colors flex items-center gap-1">
+              <Pencil className="h-[8px] w-[8px]" /> Edit task
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   )
 }
