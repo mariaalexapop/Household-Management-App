@@ -70,11 +70,13 @@ export async function createHousehold(
         .values({ name: householdName })
         .returning({ id: households.id })
 
+      const meta = user.user_metadata ?? {}
       await tx.insert(householdMembers).values({
         householdId: household.id,
         userId: user.id,
         role: 'admin',
-        displayName: user.email ?? user.id,
+        displayName: meta.full_name ?? meta.name ?? user.email ?? user.id,
+        avatarUrl: meta.avatar_url ?? meta.picture ?? null,
       })
 
       await tx.insert(householdSettings).values({

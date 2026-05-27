@@ -61,13 +61,15 @@ export async function GET(request: Request) {
       .returning()
 
     if (claimedInvite) {
+      const meta = user.user_metadata ?? {}
       await db
         .insert(householdMembers)
         .values({
           householdId: claimedInvite.householdId,
           userId: user.id,
           role: 'member',
-          displayName: user.email ?? user.id,
+          displayName: meta.full_name ?? meta.name ?? user.email ?? user.id,
+          avatarUrl: meta.avatar_url ?? meta.picture ?? null,
         })
         .onConflictDoNothing()
 
@@ -82,12 +84,26 @@ export async function GET(request: Request) {
   // Use Drizzle (bypasses RLS) because the self-referential RLS policy on
   // household_members can return empty results for a freshly authenticated session.
   const memberRows = await db
-    .select({ householdId: householdMembers.householdId })
+    .select({
+      householdId: householdMembers.householdId,
+      avatarUrl: householdMembers.avatarUrl,
+      displayName: householdMembers.displayName,
+    })
     .from(householdMembers)
     .where(eq(householdMembers.userId, user.id))
     .limit(1)
 
   if (memberRows.length > 0) {
+    // Backfill avatar/name from Google if not yet set
+    const meta = user.user_metadata ?? {}
+    const googleAvatar = meta.avatar_url ?? meta.picture ?? null
+    const googleName = meta.full_name ?? meta.name ?? null
+    const updates: Record<string, string> = {}
+    if (!memberRows[0].avatarUrl && googleAvatar) updates.avatarUrl = googleAvatar
+    if (memberRows[0].displayName === user.email && googleName) updates.displayName = googleName
+    if (Object.keys(updates).length > 0) {
+      await db.update(householdMembers).set(updates).where(eq(householdMembers.userId, user.id))
+    }
     return NextResponse.redirect(`${appUrl}/dashboard`)
   }
 
