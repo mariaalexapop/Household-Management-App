@@ -23,6 +23,10 @@ export const createHouseholdSchema = z.object({
   activeModules: z
     .array(z.enum(['chores', 'car', 'insurance', 'electronics', 'kids']))
     .min(1, 'Select at least one module'),
+  inviteEmails: z
+    .array(z.string().email())
+    .optional()
+    .default([]),
 })
 
 export type Step1Data = z.infer<typeof step1Schema>

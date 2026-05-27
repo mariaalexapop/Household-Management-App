@@ -43,10 +43,18 @@ export default function Step3Page() {
     setIsSubmitting(true)
     setError(null)
 
+    // Collect invite emails from partner + flatmates
+    const inviteEmails: string[] = []
+    if (partnerEmail.trim()) inviteEmails.push(partnerEmail.trim())
+    for (const email of flatmateEmails) {
+      if (email.trim()) inviteEmails.push(email.trim())
+    }
+
     const result = await createHousehold({
       householdName,
       householdType,
       activeModules,
+      inviteEmails,
     })
 
     setIsSubmitting(false)

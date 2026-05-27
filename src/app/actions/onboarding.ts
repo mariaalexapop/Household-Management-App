@@ -6,15 +6,18 @@ import {
   households,
   householdMembers,
   householdSettings,
+  householdInvites,
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { createHouseholdSchema } from '@/lib/validations/onboarding'
+import { inngest } from '@/lib/inngest/client'
 import type { HouseholdType, ModuleKey } from '@/stores/onboarding'
 
 interface CreateHouseholdInput {
   householdName: string
   householdType: HouseholdType
   activeModules: ModuleKey[]
+  inviteEmails?: string[]
 }
 
 interface CreateHouseholdResult {
@@ -44,7 +47,7 @@ export async function createHousehold(
     return { success: false, error: firstError }
   }
 
-  const { householdName, householdType, activeModules } = parsed.data
+  const { householdName, householdType, activeModules, inviteEmails } = parsed.data
 
   // Prevent double-create: check if user already has a household
   const existing = await db
@@ -58,9 +61,9 @@ export async function createHousehold(
     return { success: true }
   }
 
-  // Atomic transaction: household → member (admin) → settings
+  // Atomic transaction: household → member (admin) → settings → invites
   try {
-    const householdId = await db.transaction(async (tx) => {
+    const { householdId, inviteTokens } = await db.transaction(async (tx) => {
       const [household] = await tx
         .insert(households)
         .values({ name: householdName })
@@ -79,8 +82,48 @@ export async function createHousehold(
         activeModules,
       })
 
-      return household.id
+      // Create invite rows for each email collected during onboarding
+      const tokens: { email: string; token: string }[] = []
+      if (inviteEmails.length > 0) {
+        const expiresAt = new Date()
+        expiresAt.setDate(expiresAt.getDate() + 7)
+
+        const inviteRows = await tx
+          .insert(householdInvites)
+          .values(
+            inviteEmails.map((email) => ({
+              householdId: household.id,
+              email,
+              invitedBy: user.id,
+              expiresAt,
+            }))
+          )
+          .returning({ email: householdInvites.email, token: householdInvites.token })
+
+        for (const row of inviteRows) {
+          if (row.email && row.token) {
+            tokens.push({ email: row.email, token: row.token })
+          }
+        }
+      }
+
+      return { householdId: household.id, inviteTokens: tokens }
     })
+
+    // Send invite emails via Inngest (outside transaction)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    await Promise.all(
+      inviteTokens.map((inv) =>
+        inngest.send({
+          name: 'household/invite.created',
+          data: {
+            email: inv.email,
+            householdName,
+            inviteUrl: `${appUrl}/auth/signup?invite=${inv.token}`,
+          },
+        })
+      )
+    )
 
     return { success: true, householdId }
   } catch (err) {
