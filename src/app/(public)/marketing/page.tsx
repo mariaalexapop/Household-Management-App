@@ -23,30 +23,35 @@ export const metadata = {
 const MODULES = [
   {
     label: 'Chores',
+    description: 'Recurring, fair, done',
     Icon: CheckSquare,
     lightClass: 'bg-module-chores-light',
     darkClass: 'text-module-chores-dark',
   },
   {
     label: 'Kids',
+    description: 'Who takes them where',
     Icon: CalendarHeart,
     lightClass: 'bg-module-kids-light',
     darkClass: 'text-module-kids-dark',
   },
   {
     label: 'Car',
+    description: 'MOT, tax, service',
     Icon: Car,
     lightClass: 'bg-module-car-light',
     darkClass: 'text-module-car-dark',
   },
   {
     label: 'Insurance',
+    description: 'Policies & renewals',
     Icon: Shield,
     lightClass: 'bg-module-ins-light',
     darkClass: 'text-module-ins-dark',
   },
   {
     label: 'Electronics',
+    description: 'Warranties & manuals',
     Icon: Monitor,
     lightClass: 'bg-module-elec-light',
     darkClass: 'text-module-elec-dark',
@@ -215,6 +220,9 @@ export default function MarketingPage() {
               </div>
               <p className={`font-display text-sm font-semibold ${m.darkClass}`}>
                 {m.label}
+              </p>
+              <p className={`font-body text-xs ${m.darkClass} opacity-85`}>
+                {m.description}
               </p>
             </div>
           ))}
