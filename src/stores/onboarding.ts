@@ -8,18 +8,28 @@ interface OnboardingState {
   householdName: string
   householdType: HouseholdType | null
   activeModules: ModuleKey[]
+  // Members added during onboarding (optional)
+  partnerEmail: string
+  flatmateEmails: string[]
+  kidNames: string[]
   setStep: (step: 1 | 2 | 3) => void
   setHouseholdName: (name: string) => void
   setHouseholdType: (type: HouseholdType) => void
   toggleModule: (module: ModuleKey) => void
+  setPartnerEmail: (email: string) => void
+  setFlatmateEmails: (emails: string[]) => void
+  setKidNames: (names: string[]) => void
   reset: () => void
 }
 
 const initialState = {
   step: 1 as const,
   householdName: '',
-  householdType: null,
+  householdType: null as HouseholdType | null,
   activeModules: [] as ModuleKey[],
+  partnerEmail: '',
+  flatmateEmails: [''],
+  kidNames: [''],
 }
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
@@ -33,5 +43,8 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
         ? state.activeModules.filter((m) => m !== module)
         : [...state.activeModules, module],
     })),
+  setPartnerEmail: (partnerEmail) => set({ partnerEmail }),
+  setFlatmateEmails: (flatmateEmails) => set({ flatmateEmails }),
+  setKidNames: (kidNames) => set({ kidNames }),
   reset: () => set(initialState),
 }))

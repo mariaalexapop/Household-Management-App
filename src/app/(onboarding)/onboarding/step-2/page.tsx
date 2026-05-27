@@ -26,11 +26,11 @@ export default function Step2Page() {
 
   return (
     <WizardLayout step={2} onBack={handleBack} onNext={handleNext} nextLabel="Next">
-      <h2 className="mb-2 font-display text-xl font-semibold text-kinship-on-surface">
+      <h2 className="font-display text-[30px] font-semibold tracking-tight leading-tight text-kinship-on-surface">
         Which modules do you need?
       </h2>
-      <p className="mb-6 font-body text-sm text-kinship-on-surface-variant">
-        Select everything that applies. You can change this later.
+      <p className="mt-1.5 mb-6 font-body text-sm text-kinship-on-surface-variant max-w-[420px]">
+        Pick what your household actually tracks — you can add or remove any of these later from settings.
       </p>
 
       <ModuleSelector selected={activeModules} onToggle={toggleModule} />
