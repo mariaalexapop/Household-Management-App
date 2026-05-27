@@ -327,10 +327,10 @@ export default function MarketingPage() {
 
           {/* Steps grid with connecting line */}
           <div className="relative mt-14">
-            {/* Connecting gradient line */}
-            <div className="absolute left-[10%] right-[10%] top-[34px] hidden h-0.5 rounded-full bg-gradient-to-r from-module-chores-dark/35 via-module-kids-dark/35 via-module-car-dark/35 to-module-ins-dark/35 md:block" />
+            {/* Connecting gradient line — behind the badges via z-0 */}
+            <div className="absolute left-[10%] right-[10%] top-[34px] z-0 hidden h-0.5 rounded-full bg-gradient-to-r from-module-chores-dark/35 via-module-kids-dark/35 via-module-car-dark/35 to-module-ins-dark/35 md:block" />
 
-            <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
+            <div className="relative z-10 grid gap-8 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
               {/* Step 01 */}
               <div className="flex flex-col gap-4">
                 <div className="flex justify-center">
@@ -338,7 +338,7 @@ export default function MarketingPage() {
                     01
                   </div>
                 </div>
-                <div className="flex min-h-[150px] items-center justify-center rounded-2xl bg-module-chores-light p-5">
+                <div className="flex h-[150px] items-center justify-center rounded-2xl bg-module-chores-light p-5">
                   <div className="flex items-center -space-x-2.5">
                     {['AH', 'NH', 'IR', 'FN'].map((initials, i) => (
                       <div
@@ -373,7 +373,7 @@ export default function MarketingPage() {
                     02
                   </div>
                 </div>
-                <div className="flex min-h-[150px] items-center justify-center rounded-2xl bg-module-kids-light p-5">
+                <div className="flex h-[150px] items-center justify-center rounded-2xl bg-module-kids-light p-5">
                   <div className="grid grid-cols-3 gap-1.5">
                     {[
                       { name: 'Chores', on: true },
@@ -414,8 +414,8 @@ export default function MarketingPage() {
                     03
                   </div>
                 </div>
-                <div className="flex min-h-[150px] flex-col items-stretch justify-center gap-1.5 rounded-2xl bg-module-car-light p-5">
-                  {['aviva-home.pdf', 'MOT cert · MK19 ZFR', 'Bosch receipt · Aug 24', "Iris's swim schedule"].map(
+                <div className="flex h-[150px] flex-col items-stretch justify-center gap-1.5 rounded-2xl bg-module-car-light p-5">
+                  {['aviva-home.pdf', 'Bosch receipt · Aug 24', "Iris's swim schedule"].map(
                     (doc) => (
                       <div
                         key={doc}
@@ -447,7 +447,7 @@ export default function MarketingPage() {
                     04
                   </div>
                 </div>
-                <div className="flex min-h-[150px] flex-col justify-center gap-2 rounded-2xl bg-module-ins-light p-5">
+                <div className="flex h-[150px] flex-col justify-center gap-2 rounded-2xl bg-module-ins-light p-5">
                   <div className="self-end rounded-xl rounded-br-sm bg-kinship-primary px-3 py-1.5 text-[11.5px] leading-snug text-white">
                     When does the MOT lapse?
                   </div>
