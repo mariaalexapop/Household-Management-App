@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
   // Verify caller is admin of the target household
   const [memberRow] = await db
-    .select({ role: householdMembers.role })
+    .select({ role: householdMembers.role, displayName: householdMembers.displayName })
     .from(householdMembers)
     .where(
       and(
@@ -95,7 +95,10 @@ export async function POST(request: NextRequest) {
     actorId: user.id,
     eventType: 'invite_sent',
     entityType: 'invite',
-    metadata: { invitedEmail: email },
+    metadata: {
+      actorName: memberRow.displayName ?? user.email ?? 'Someone',
+      invitedEmail: email,
+    },
   })
 
   // Build the sign-up URL that the invited user will land on

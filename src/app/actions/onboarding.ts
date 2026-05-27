@@ -114,7 +114,10 @@ export async function createHousehold(
             actorId: user.id,
             eventType: 'invite_sent',
             entityType: 'invite',
-            metadata: { invitedEmail: email },
+            metadata: {
+              actorName: user.email ?? 'Someone',
+              invitedEmail: email,
+            },
           }))
         )
       }

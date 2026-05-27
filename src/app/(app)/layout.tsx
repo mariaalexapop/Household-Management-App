@@ -51,13 +51,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <RealtimeProvider householdId={householdId} userId={user.id}>
       <ChatbotProvider>
         <ConnectionIndicator />
-        <div className="flex min-h-screen bg-kinship-surface">
+        <div className="flex h-screen overflow-hidden bg-kinship-surface">
           <Sidebar
             userName={displayName}
             userInitials={initials}
             userEmail={user.email}
           />
-          <main className="flex-1 min-w-0 flex flex-col mobile-only-pb">
+          <main className="flex-1 min-w-0 flex flex-col overflow-hidden mobile-only-pb">
             {children}
           </main>
         </div>
