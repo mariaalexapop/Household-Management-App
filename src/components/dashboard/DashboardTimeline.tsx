@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useTransition } from 'react'
-import { format, isToday, isBefore, parseISO, startOfDay, differenceInCalendarDays, addDays } from 'date-fns'
+import { format, isToday, isTomorrow, isBefore, parseISO, startOfDay, differenceInCalendarDays, addDays } from 'date-fns'
 import { Check, TrendingUp, ChevronRight, Upload, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -67,6 +67,7 @@ function memberInitials(members: SerializedMember[], memberId: string | null): {
 function dayLabel(dateStr: string): string {
   const d = parseISO(dateStr)
   if (isToday(d)) return 'Today'
+  if (isTomorrow(d)) return 'Tomorrow'
   return format(d, 'EEE d')
 }
 
@@ -328,7 +329,7 @@ function ActionRow({ row, done, onToggle, muted }: { row: TimelineRow; done: boo
 
       {/* Day + date */}
       <span className={`font-display text-[13.5px] font-semibold ${
-        row.isOverdue ? 'text-amber-600' : row.day === 'Today' ? 'text-kinship-primary' : 'text-kinship-on-surface'
+        row.isOverdue ? 'text-amber-600' : (row.day === 'Today' || row.day === 'Tomorrow') ? 'text-kinship-primary' : 'text-kinship-on-surface'
       } ${done ? 'line-through' : ''}`}>
         {row.day}
       </span>
