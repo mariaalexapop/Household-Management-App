@@ -60,7 +60,7 @@ export function OAuthButton() {
       variant="outline"
       disabled={isLoading}
       onClick={handleGoogleSignIn}
-      className="w-full gap-2 rounded-full"
+      className="w-full gap-2 h-10 rounded-lg text-[13px]"
     >
       <GoogleLogo className="h-4 w-4 shrink-0" />
       {isLoading ? 'Redirecting…' : 'Continue with Google'}
