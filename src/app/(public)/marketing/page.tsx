@@ -7,13 +7,10 @@ import {
   Monitor,
   Sparkles,
   MessageCircle,
-  Calendar,
-  FileText,
-  MessageSquare,
-  Bell,
   Lock,
   Check,
 } from 'lucide-react'
+import { ModuleCarousel } from '@/components/marketing/ModuleCarousel'
 
 
 export const metadata = {
@@ -67,93 +64,6 @@ const MODULES = [
 /* ------------------------------------------------------------------ */
 /* Module detail data                                                  */
 /* ------------------------------------------------------------------ */
-
-const MODULE_DETAILS = [
-  {
-    name: 'Home Chores',
-    Icon: CheckSquare,
-    lightClass: 'bg-module-chores-light',
-    darkClass: 'text-module-chores-dark',
-    helpBg: 'bg-module-chores-light',
-    tagline: 'Stop being the only person who remembers the bins.',
-    problems: [
-      'Recycling went out late three weeks running.',
-      'No one knows whose turn it is to do school run.',
-      "The fridge filter has been 'I'll do it tomorrow' since March.",
-    ],
-    how: 'Set recurring chores once. Kinship rotates them fairly between members, nudges the right person on the right day, and shows the household who actually pulled their weight this week.',
-  },
-  {
-    name: 'Kids Activities',
-    Icon: CalendarHeart,
-    lightClass: 'bg-module-kids-light',
-    darkClass: 'text-module-kids-dark',
-    helpBg: 'bg-module-kids-light',
-    tagline: 'A shared brain for the swimming-piano-dentist juggle.',
-    problems: [
-      'Two parents, two calendars, one missed swim lesson.',
-      'Grandparent picks up — but from where, at what time?',
-      'Term-time clubs change every six weeks.',
-    ],
-    how: "One timeline per child. Tag who's collecting, where, and what kit they need. Anyone in the household (or grandma) sees the same view, in their timezone.",
-  },
-  {
-    name: 'Car Maintenance',
-    Icon: Car,
-    lightClass: 'bg-module-car-light',
-    darkClass: 'text-module-car-dark',
-    helpBg: 'bg-module-car-light',
-    tagline: 'Never get a \u20AC1,000 surprise from a missed MOT again.',
-    problems: [
-      'MOT lapsed because the reminder went to an old email.',
-      'No one knows when the timing belt was last done.',
-      'You paid for the same brake fluid twice in 18 months.',
-    ],
-    how: 'Add a registration. Kinship pulls the MOT & tax dates from DVLA, tracks service history, and warns you 60 days out — with quotes from garages near you.',
-  },
-  {
-    name: 'Insurance',
-    Icon: Shield,
-    lightClass: 'bg-module-ins-light',
-    darkClass: 'text-module-ins-dark',
-    helpBg: 'bg-module-ins-light',
-    tagline: 'Renewals you actually understand, before they auto-bill.',
-    problems: [
-      "Your home insurance just renewed 47% higher. You didn't notice.",
-      'You have no idea what your travel policy covers.',
-      'The renewal email is a 40-page PDF.',
-    ],
-    how: "Upload the PDF. Kinship extracts cover, excess, key dates and renewal steps — then asks plain-English questions like 'is my new bike covered?' before deciding to renew.",
-  },
-  {
-    name: 'Electronics & Warranties',
-    Icon: Monitor,
-    lightClass: 'bg-module-elec-light',
-    darkClass: 'text-module-elec-dark',
-    helpBg: 'bg-module-elec-light',
-    tagline: 'The receipt is in a drawer somewhere. We promise.',
-    problems: [
-      'Washing machine broke at month 13 — receipt long gone.',
-      "You can't remember which TV has the extended cover.",
-      'Manuals are bookmarks no one will ever open.',
-    ],
-    how: 'Snap the receipt at purchase. Kinship logs the warranty length, files the manual, and pings you a month before cover ends so you can actually claim.',
-  },
-  {
-    name: 'Calendar',
-    Icon: Calendar,
-    lightClass: 'bg-module-calendar-light',
-    darkClass: 'text-module-calendar-dark',
-    helpBg: 'bg-module-calendar-light',
-    tagline: 'Everything above, on one shared week.',
-    problems: [
-      'You overbook because chores and kids live in different apps.',
-      "You can't see when both parents are out at once.",
-      'School inset day blindsides you. Again.',
-    ],
-    how: 'Every module flows into one weekly view, colour-coded. Filter by member, by module, or zoom out to the whole household.',
-  },
-]
 
 /* ------------------------------------------------------------------ */
 /* Pricing data                                                        */
@@ -376,76 +286,24 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* ---- Modules detail section ---- */}
+      {/* ---- Modules detail section (carousel) ---- */}
       <section id="product" className="bg-kinship-surface py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="font-body text-sm font-semibold uppercase tracking-wider text-kinship-primary">
-              Modules
-            </span>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-kinship-on-surface md:text-4xl">
-              Six small headaches.{' '}
-              <br className="hidden sm:inline" />
-              One quietly-organised home.
-            </h2>
-            <p className="mt-4 font-body text-base leading-relaxed text-kinship-on-surface-variant md:text-lg">
-              Each module tackles a real source of household friction — then feeds
-              everything into a single shared calendar so nothing slips.
-            </p>
-          </div>
+          <span className="font-body text-sm font-semibold uppercase tracking-wider text-kinship-primary">
+            Modules
+          </span>
+          <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-kinship-on-surface md:text-[42px]">
+            Six small headaches.
+            <br />
+            One quietly-organised home.
+          </h2>
+          <p className="mt-4 max-w-xl font-body text-base leading-relaxed text-kinship-on-surface-variant">
+            Each module is built around the actual ways households drop the ball.
+            Use the dots below to flip through them.
+          </p>
 
-          <div className="mt-14 grid gap-6 md:grid-cols-2">
-            {MODULE_DETAILS.map((mod) => (
-              <div
-                key={mod.name}
-                className="rounded-2xl bg-kinship-surface-container-lowest p-6 ring-miro"
-              >
-                {/* Module chip + name */}
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${mod.lightClass} ${mod.darkClass}`}
-                  >
-                    <mod.Icon className="h-4.5 w-4.5" />
-                  </div>
-                  <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
-                    {mod.name}
-                  </h3>
-                </div>
-
-                {/* Tagline */}
-                <p className="mt-3 font-body text-base font-medium italic text-kinship-on-surface-variant">
-                  {mod.tagline}
-                </p>
-
-                {/* Sound familiar? */}
-                <div className="mt-4">
-                  <p className="font-body text-xs font-semibold uppercase tracking-wider text-kinship-on-surface-variant">
-                    Sound familiar?
-                  </p>
-                  <ul className="mt-2 space-y-1.5">
-                    {mod.problems.map((problem, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-2 font-body text-sm text-kinship-on-surface-variant"
-                      >
-                        <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-kinship-on-surface-variant/40" />
-                        {problem}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* How Kinship helps */}
-                <div className={`mt-4 rounded-xl ${mod.helpBg} p-4`}>
-                  <p className={`font-body text-xs font-semibold uppercase tracking-wider ${mod.darkClass}`}>
-                    How Kinship helps
-                  </p>
-                  <p className={`mt-1.5 font-body text-sm leading-relaxed ${mod.darkClass}/90`}>
-                    {mod.how}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="mt-12">
+            <ModuleCarousel />
           </div>
         </div>
       </section>
