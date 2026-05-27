@@ -17,6 +17,7 @@ import {
 } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardTimeline } from '@/components/dashboard/DashboardTimeline'
+import { seedSuggestions } from '@/app/actions/suggestions'
 import { registerChildren } from '@/lib/kids/child-colours'
 import type { ModuleKey } from '@/stores/onboarding'
 import { TopBar } from '@/components/nav/TopBar'
@@ -188,6 +189,9 @@ export default async function DashboardPage() {
       .from(electronics)
       .where(eq(electronics.householdId, row.householdId))
   }
+
+  // Seed suggestions (ensures they exist without waiting for Inngest cron)
+  await seedSuggestions(row.householdId)
 
   // Fetch pending suggestions from DB
   const allSuggestions = await db
