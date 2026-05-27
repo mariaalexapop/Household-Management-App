@@ -111,19 +111,24 @@ export async function createHousehold(
     })
 
     // Send invite emails via Inngest (outside transaction)
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-    await Promise.all(
-      inviteTokens.map((inv) =>
-        inngest.send({
-          name: 'household/invite.created',
-          data: {
-            email: inv.email,
-            householdName,
-            inviteUrl: `${appUrl}/auth/signup?invite=${inv.token}`,
-          },
-        })
+    // Non-blocking: if Inngest is unavailable the invite records still exist
+    try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+      await Promise.all(
+        inviteTokens.map((inv) =>
+          inngest.send({
+            name: 'household/invite.created',
+            data: {
+              email: inv.email,
+              householdName,
+              inviteUrl: `${appUrl}/auth/signup?invite=${inv.token}`,
+            },
+          })
+        )
       )
-    )
+    } catch (err) {
+      console.warn('[createHousehold] Failed to enqueue invite emails — Inngest may not be running:', err)
+    }
 
     return { success: true, householdId }
   } catch (err) {

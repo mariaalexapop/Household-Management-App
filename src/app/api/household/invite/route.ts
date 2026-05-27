@@ -94,14 +94,19 @@ export async function POST(request: NextRequest) {
   const inviteUrl = `${appUrl}/auth/signup?invite=${invite.token}`
 
   // Enqueue Inngest event to send the branded invite email via Resend
-  await inngest.send({
-    name: 'household/invite.created',
-    data: {
-      email,
-      householdName,
-      inviteUrl,
-    },
-  })
+  // Non-blocking: if Inngest is unavailable the invite record still exists
+  try {
+    await inngest.send({
+      name: 'household/invite.created',
+      data: {
+        email,
+        householdName,
+        inviteUrl,
+      },
+    })
+  } catch (err) {
+    console.warn('[invite] Failed to enqueue invite email — Inngest may not be running:', err)
+  }
 
   return NextResponse.json({ success: true })
 }
