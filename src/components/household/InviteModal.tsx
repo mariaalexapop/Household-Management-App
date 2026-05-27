@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
@@ -31,6 +33,7 @@ type TabId = 'email' | 'link'
  *   - Email input, share link section with mono font
  */
 export function InviteModal({ householdId }: InviteModalProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<TabId>('email')
 
@@ -59,8 +62,13 @@ export function InviteModal({ householdId }: InviteModalProps) {
       const data = await res.json()
 
       if (res.ok) {
-        setEmailResult({ success: true })
-        setEmail('')
+        const sentEmail = email
+        resetAndClose()
+        toast.success(`Invite sent to ${sentEmail}`, {
+          description: 'They will receive an email with a link to join your household.',
+        })
+        router.refresh()
+        return
       } else {
         setEmailResult({ error: data.error ?? 'Failed to send invite' })
       }
@@ -182,13 +190,6 @@ export function InviteModal({ householdId }: InviteModalProps) {
                 />
               </div>
 
-              {emailResult?.success && (
-                <div className="rounded-xl bg-kinship-success-surface p-3">
-                  <p className="font-body text-sm text-kinship-success">
-                    Invite sent! They will receive a link to create their account and join.
-                  </p>
-                </div>
-              )}
               {emailResult?.error && (
                 <div className="rounded-xl bg-red-50 p-3">
                   <p className="font-body text-sm text-destructive" role="alert">
