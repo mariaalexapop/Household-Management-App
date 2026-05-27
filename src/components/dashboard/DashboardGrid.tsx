@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
+import { Plus, X, CheckSquare, CalendarHeart, Car, Shield, Monitor } from 'lucide-react'
 import { EmptyModuleState } from './EmptyModuleState'
 import { ChoresDashboardCard } from './ChoresDashboardCard'
 import type { UpcomingTask } from './ChoresDashboardCard'
@@ -128,6 +130,14 @@ function buildTimeline(
   return items.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 8)
 }
 
+const ADD_OPTIONS: { moduleKey: ModuleKey; label: string; href: string; icon: typeof CheckSquare; bg: string; text: string }[] = [
+  { moduleKey: 'chores', label: 'Add Task', href: '/chores?action=new', icon: CheckSquare, bg: 'bg-[#c3faf5]', text: 'text-[#187574]' },
+  { moduleKey: 'kids', label: 'Add Activity', href: '/kids?action=new', icon: CalendarHeart, bg: 'bg-[#ffc6c6]', text: 'text-[#600000]' },
+  { moduleKey: 'car', label: 'Add Car', href: '/cars?action=new', icon: Car, bg: 'bg-[#ffe6cd]', text: 'text-[#7a4000]' },
+  { moduleKey: 'insurance', label: 'Add Policy', href: '/insurance?action=new', icon: Shield, bg: 'bg-[#d9d4ff]', text: 'text-[#3d2a8a]' },
+  { moduleKey: 'electronics', label: 'Add Item', href: '/electronics?action=new', icon: Monitor, bg: 'bg-[#d4f5c3]', text: 'text-[#1f5c1f]' },
+]
+
 export function DashboardGrid({
   activeModules,
   upcomingTasks,
@@ -137,6 +147,30 @@ export function DashboardGrid({
   upcomingElectronics,
 }: DashboardGridProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [addMenuOpen, setAddMenuOpen] = useState(false)
+  const addMenuRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  // Close add menu on outside click or Escape
+  useEffect(() => {
+    if (!addMenuOpen) return
+    function handleClick(e: MouseEvent) {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) {
+        setAddMenuOpen(false)
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setAddMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [addMenuOpen])
+
+  const visibleAddOptions = ADD_OPTIONS.filter((o) => activeModules.includes(o.moduleKey))
 
   if (activeModules.length === 0) {
     return <EmptyModuleState />
@@ -260,6 +294,49 @@ export function DashboardGrid({
 
         <ComingUpTimeline items={filteredTimeline} />
       </div>
+
+      {/* Floating add button with category picker */}
+      {visibleAddOptions.length > 0 && (
+        <div className="fixed bottom-20 right-4 z-30 md:hidden" ref={addMenuRef}>
+          {/* Category menu */}
+          {addMenuOpen && (
+            <div className="absolute bottom-16 right-0 mb-2 w-52 rounded-2xl bg-white p-2 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-bottom-2">
+              <p className="px-3 py-1.5 font-body text-[10px] font-semibold uppercase tracking-wider text-kinship-placeholder">
+                Add new
+              </p>
+              {visibleAddOptions.map((option) => {
+                const Icon = option.icon
+                return (
+                  <button
+                    key={option.moduleKey}
+                    onClick={() => {
+                      setAddMenuOpen(false)
+                      router.push(option.href)
+                    }}
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 transition-colors hover:bg-kinship-surface-container`}
+                  >
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${option.bg}`}>
+                      <Icon className={`h-4 w-4 ${option.text}`} />
+                    </div>
+                    <span className="font-body text-[13px] font-medium text-kinship-on-surface">
+                      {option.label}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* FAB */}
+          <button
+            onClick={() => setAddMenuOpen(!addMenuOpen)}
+            aria-label="Add new item"
+            className={`flex h-14 w-14 items-center justify-center rounded-full bg-kinship-primary text-white shadow-lg transition-transform active:scale-95 ${addMenuOpen ? 'rotate-45' : ''}`}
+          >
+            {addMenuOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
