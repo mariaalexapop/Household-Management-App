@@ -221,7 +221,7 @@ export default function MarketingPage() {
               <p className={`font-display text-sm font-semibold ${m.darkClass}`}>
                 {m.label}
               </p>
-              <p className={`font-body text-xs ${m.darkClass} opacity-85`}>
+              <p className={`font-body text-xs ${m.darkClass} opacity-80`}>
                 {m.description}
               </p>
             </div>
