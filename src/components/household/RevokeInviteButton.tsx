@@ -5,30 +5,30 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
-interface RemoveMemberButtonProps {
-  memberId: string
-  memberName: string | null
+interface RevokeInviteButtonProps {
+  inviteId: string
+  inviteEmail: string | null
 }
 
-export function RemoveMemberButton({ memberId, memberName }: RemoveMemberButtonProps) {
+export function RevokeInviteButton({ inviteId, inviteEmail }: RevokeInviteButtonProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
-  async function handleRemove() {
-    if (!confirm(`Remove ${memberName ?? 'this member'} from the household?`)) return
+  async function handleRevoke() {
+    if (!confirm(`Revoke invite for ${inviteEmail ?? 'this person'}?`)) return
 
     setLoading(true)
 
     try {
-      const res = await fetch(`/api/household/members/${memberId}`, {
+      const res = await fetch(`/api/household/invites/${inviteId}`, {
         method: 'DELETE',
       })
       const data = await res.json()
 
       if (!res.ok) {
-        toast.error(data.error ?? 'Failed to remove member')
+        toast.error(data.error ?? 'Failed to revoke invite')
       } else {
-        toast.success(`${memberName ?? 'Member'} removed from household`)
+        toast.success(`Invite for ${inviteEmail ?? 'invite link'} revoked`)
         router.refresh()
       }
     } catch {
@@ -42,10 +42,10 @@ export function RemoveMemberButton({ memberId, memberName }: RemoveMemberButtonP
     <Button
       variant="destructive"
       size="xs"
-      onClick={handleRemove}
+      onClick={handleRevoke}
       disabled={loading}
     >
-      {loading ? 'Removing...' : 'Remove'}
+      {loading ? 'Revoking...' : 'Revoke'}
     </Button>
   )
 }

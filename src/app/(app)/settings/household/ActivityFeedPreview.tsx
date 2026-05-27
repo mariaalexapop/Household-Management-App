@@ -38,6 +38,10 @@ function getEventText(item: ActivityFeedItem): string {
       const invitedEmail = meta?.invitedEmail ?? 'someone'
       return `${actorName} invited ${invitedEmail}`
     }
+    case 'invite_revoked': {
+      const revokedEmail = meta?.revokedEmail ?? 'an invite'
+      return `${actorName} revoked invite for ${revokedEmail}`
+    }
     default:
       return `${actorName} performed an action`
   }

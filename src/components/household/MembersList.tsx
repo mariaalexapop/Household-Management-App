@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { RemoveMemberButton } from './RemoveMemberButton'
+import { RevokeInviteButton } from './RevokeInviteButton'
 import { RoleSelector } from './RoleSelector'
 
 export interface HouseholdMember {
@@ -126,9 +127,14 @@ export function MembersList({ members, currentUserId, isAdmin, pendingInvites = 
                 </div>
               </div>
 
-              <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
-                Pending
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
+                  Pending
+                </Badge>
+                {isAdmin && (
+                  <RevokeInviteButton inviteId={invite.id} inviteEmail={invite.email} />
+                )}
+              </div>
             </div>
           ))}
         </>
