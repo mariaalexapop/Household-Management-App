@@ -642,10 +642,10 @@ export default function MarketingPage() {
             {PRICING_PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative flex flex-col rounded-2xl p-6 ring-miro ${
+                className={`relative flex flex-col rounded-2xl p-6 ${
                   plan.featured
                     ? 'bg-kinship-surface-container-lowest ring-2 ring-kinship-primary shadow-float'
-                    : 'bg-kinship-surface-container-lowest'
+                    : 'bg-kinship-surface-container-lowest ring-miro'
                 }`}
               >
                 {plan.featured && (
