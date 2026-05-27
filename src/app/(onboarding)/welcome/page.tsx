@@ -133,9 +133,12 @@ export default async function WelcomePage() {
 
         {/* Primary CTA */}
         <div className="mt-10">
-          <Button size="lg" render={<Link href="/dashboard" />}>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center rounded-full bg-kinship-primary px-6 py-2.5 font-display text-sm font-semibold text-white hover:bg-kinship-primary-pressed transition-colors"
+          >
             Take me to the dashboard
-          </Button>
+          </Link>
         </div>
       </div>
     </div>

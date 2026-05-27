@@ -259,9 +259,12 @@ export default async function NotificationsPage() {
                         <div className="w-2 h-2 rounded-full bg-kinship-primary shrink-0" />
                       )}
                       {action && (
-                        <Button variant="outline" size="sm" render={<a href={action.href} />}>
+                        <a
+                          href={action.href}
+                          className="inline-flex items-center justify-center rounded-lg border border-kinship-outline bg-white px-2.5 py-1 font-body text-xs font-medium text-kinship-on-surface hover:bg-kinship-surface-container transition-colors"
+                        >
                           {action.label}
-                        </Button>
+                        </a>
                       )}
                     </div>
                   )

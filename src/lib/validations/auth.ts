@@ -17,6 +17,7 @@ export type LoginFormData = z.infer<typeof loginSchema>
 
 export const signupSchema = z
   .object({
+    fullName: z.string().min(1, 'Please enter your name').max(100),
     email: z.string().email('Please enter a valid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string().min(8, 'Password must be at least 8 characters'),

@@ -103,7 +103,7 @@ export function AuthForm({ mode, inviteToken, inviteEmail, nextUrl }: AuthFormPr
         // a self-referential RLS policy that returns empty results.
         router.push(nextUrl ?? '/dashboard')
       } else if (mode === 'signup') {
-        const { email, password } = data as SignupFormData
+        const { email, password, fullName } = data as SignupFormData
         const callbackUrl = inviteToken
           ? `${window.location.origin}/api/auth/callback?invite=${inviteToken}`
           : `${window.location.origin}/api/auth/callback`
@@ -112,6 +112,7 @@ export function AuthForm({ mode, inviteToken, inviteEmail, nextUrl }: AuthFormPr
           password,
           options: {
             emailRedirectTo: callbackUrl,
+            data: { full_name: fullName },
           },
         })
         if (error) {
@@ -166,6 +167,23 @@ export function AuthForm({ mode, inviteToken, inviteEmail, nextUrl }: AuthFormPr
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      {mode === 'signup' && (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="fullName">Full name</Label>
+          <Input
+            id="fullName"
+            type="text"
+            autoComplete="name"
+            placeholder="Your name"
+            aria-invalid={'fullName' in errors && !!errors.fullName}
+            {...register('fullName' as never)}
+          />
+          {'fullName' in errors && errors.fullName && (
+            <p className="text-sm text-destructive">{errors.fullName.message as string}</p>
+          )}
+        </div>
+      )}
+
       {showEmail && (
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="email">Email address</Label>
