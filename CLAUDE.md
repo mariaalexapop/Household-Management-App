@@ -11,6 +11,7 @@ Project initialized. See `.planning/PROJECT.md` for full context, `.planning/ROA
 ## Agent Rules
 
 - Always use Context7 when I need library/API documentation, code generation, setup, or configuration steps without me having to explicitly ask.
+- **Always maintain the changelog.** After every commit, update the session changelog in `memory/redesign_session_2026-05-27.md` (or create a new dated file for new sessions). Record: commit hash, summary of changes, bug fixes, and any known issues. This file is the source of truth for what changed and why — read it at the start of every session to restore context.
 
 ## Git Workflow
 
