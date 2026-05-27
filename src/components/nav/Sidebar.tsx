@@ -1,12 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, CalendarDays, CheckSquare, Users, Car, Shield, Plug,
   Sparkles, Settings,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 
 interface SidebarProps {
   userName?: string | null
@@ -48,16 +47,9 @@ const NAV_SECTIONS = [
 
 export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
   const pathname = usePathname()
-  const router = useRouter()
 
   const isActive = (href: string) =>
     href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
-
-  async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/auth/login')
-  }
 
   return (
     <aside className="hidden md:flex w-[232px] shrink-0 flex-col border-r border-kinship-outline-variant bg-white/70 backdrop-blur-xl h-screen sticky top-0">
@@ -106,11 +98,11 @@ export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
 
       {/* Footer — user */}
       <div className="border-t border-kinship-outline-variant px-3.5 py-2.5">
-        <button
-          onClick={handleSignOut}
+        <Link
+          href="/settings"
           className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 hover:bg-kinship-surface-container transition-colors"
         >
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-kinship-destructive text-white font-body text-[10px] font-semibold">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-kinship-primary text-white font-body text-[10px] font-semibold">
             {userInitials ?? '?'}
           </div>
           <div className="flex-1 min-w-0 text-left">
@@ -122,7 +114,7 @@ export function Sidebar({ userName, userInitials, userEmail }: SidebarProps) {
             </div>
           </div>
           <Settings className="h-[15px] w-[15px] text-kinship-placeholder" />
-        </button>
+        </Link>
       </div>
     </aside>
   )
