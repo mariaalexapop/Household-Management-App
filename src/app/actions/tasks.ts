@@ -368,6 +368,41 @@ export async function updateTaskStatus(
 // Bulk Actions
 // ---------------------------------------------------------------------------
 
+const assignTaskSchema = z.object({
+  id: z.string().uuid(),
+  ownerId: z.string().nullable(),
+})
+
+/**
+ * Assign or unassign a task to a household member.
+ * Accepts userId (not householdMembers.id).
+ */
+export async function assignTask(
+  data: unknown
+): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) return { success: false, error: 'Not authenticated' }
+
+  const parsed = assignTaskSchema.safeParse(data)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Validation failed' }
+
+  const householdId = await getHouseholdId(user.id)
+  if (!householdId) return { success: false, error: 'No household found' }
+
+  const [updated] = await db
+    .update(tasks)
+    .set({ ownerId: parsed.data.ownerId })
+    .where(and(eq(tasks.id, parsed.data.id), eq(tasks.householdId, householdId)))
+    .returning({ id: tasks.id })
+
+  if (!updated) return { success: false, error: 'Task not found' }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/chores')
+  return { success: true }
+}
+
 export async function bulkUpdateTaskStatus(
   ids: string[],
   status: 'todo' | 'in_progress' | 'done'

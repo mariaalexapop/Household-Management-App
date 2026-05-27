@@ -6,7 +6,7 @@ import { Check, TrendingUp, ChevronRight, Upload, Users, Lightbulb, AlertTriangl
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { updateTaskStatus, updateTask } from '@/app/actions/tasks'
+import { updateTaskStatus, assignTask } from '@/app/actions/tasks'
 import { acceptSuggestion, dismissSuggestion } from '@/app/actions/suggestions'
 import type { ModuleKey } from '@/stores/onboarding'
 
@@ -218,12 +218,12 @@ function ActionRow({ row, done, onToggle, muted, members }: {
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc) }
   }, [assignOpen])
 
-  const handleAssign = (memberId: string | null) => {
+  const handleAssign = (memberUserId: string | null) => {
     setAssignOpen(false)
     if (!row.isTask || !row.realId) return
     startTransition(async () => {
-      await updateTask({ id: row.realId!, ownerId: memberId, title: row.title })
-      toast.success(memberId ? 'Task assigned' : 'Task unassigned')
+      await assignTask({ id: row.realId!, ownerId: memberUserId })
+      toast.success(memberUserId ? 'Task assigned' : 'Task unassigned')
       router.refresh()
     })
   }
@@ -270,7 +270,7 @@ function ActionRow({ row, done, onToggle, muted, members }: {
             {members.map((m) => {
               const info = memberInfo([m], m.id)
               return (
-                <button key={m.id} onClick={() => handleAssign(m.id)}
+                <button key={m.id} onClick={() => handleAssign(m.userId)}
                   className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
                   <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full text-white" style={{ fontSize: 8, fontWeight: 700, backgroundColor: info?.color ?? '#999' }}>{info?.initials ?? '?'}</div>
                   <span className="font-body text-[11px] text-kinship-on-surface truncate">{m.displayName ?? 'Unknown'}</span>
