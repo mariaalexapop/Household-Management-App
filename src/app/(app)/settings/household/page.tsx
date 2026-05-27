@@ -152,8 +152,8 @@ export default async function HouseholdSettingsPage() {
 
       <div className="flex-1 overflow-auto px-6 py-2">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr]">
-          {/* Left sub-nav */}
-          <div className="hidden md:block">
+          {/* Left sub-nav — self-aligning column so sticky works within scroll container */}
+          <div className="hidden md:block self-start sticky top-2">
             <SettingsSubNav />
           </div>
 

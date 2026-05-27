@@ -29,7 +29,7 @@ export function SettingsSubNav() {
   }
 
   return (
-    <nav className="rounded-2xl bg-white ring-miro p-3 h-fit sticky top-2">
+    <nav className="rounded-2xl bg-white ring-miro p-3 h-fit">
       <div className="flex flex-col gap-0.5">
         {sections.map((section) => {
           const active = isActive(section)
