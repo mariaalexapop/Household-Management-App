@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { eq, and } from 'drizzle-orm'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
-import { householdMembers, households, householdInvites } from '@/lib/db/schema'
+import { activityFeed, householdMembers, households, householdInvites } from '@/lib/db/schema'
 import { inngest } from '@/lib/inngest/client'
 
 /**
@@ -88,6 +88,15 @@ export async function POST(request: NextRequest) {
   if (!invite) {
     return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 })
   }
+
+  // Log to activity feed
+  await db.insert(activityFeed).values({
+    householdId,
+    actorId: user.id,
+    eventType: 'invite_sent',
+    entityType: 'invite',
+    metadata: { invitedEmail: email },
+  })
 
   // Build the sign-up URL that the invited user will land on
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'

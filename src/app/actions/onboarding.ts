@@ -3,6 +3,7 @@
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import {
+  activityFeed,
   households,
   householdMembers,
   householdSettings,
@@ -105,6 +106,17 @@ export async function createHousehold(
             tokens.push({ email: row.email, token: row.token })
           }
         }
+
+        // Log invite_sent events to activity feed
+        await tx.insert(activityFeed).values(
+          inviteEmails.map((email) => ({
+            householdId: household.id,
+            actorId: user.id,
+            eventType: 'invite_sent',
+            entityType: 'invite',
+            metadata: { invitedEmail: email },
+          }))
+        )
       }
 
       return { householdId: household.id, inviteTokens: tokens }
