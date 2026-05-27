@@ -2,12 +2,13 @@
 
 import { useState, useMemo, useTransition, useRef, useEffect } from 'react'
 import { format, isToday, isTomorrow, isBefore, parseISO, startOfDay, differenceInCalendarDays, addDays } from 'date-fns'
-import { Check, TrendingUp, ChevronRight, Upload, Users, Lightbulb, AlertTriangle, UserPlus, Pencil } from 'lucide-react'
+import { Check, TrendingUp, ChevronRight, Users, Lightbulb, AlertTriangle, UserPlus, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { updateTaskStatus, assignTask } from '@/app/actions/tasks'
 import { SortableCardGrid } from './SortableCardGrid'
+import { SmartIntakeBanner } from './SmartIntakeBanner'
 import { acceptSuggestion, dismissSuggestion } from '@/app/actions/suggestions'
 import type { ModuleKey } from '@/stores/onboarding'
 
@@ -158,12 +159,7 @@ export function DashboardTimeline({
     <div className="flex flex-col gap-5 lg:flex-row lg:gap-8">
       {/* LEFT — action list */}
       <div className="flex flex-col gap-5 lg:flex-[1.7] min-w-0">
-        <Link href="/notifications" className="flex items-center gap-2.5 rounded-xl bg-kinship-primary-surface px-3.5 py-2 text-kinship-primary hover:bg-kinship-primary/10 transition-colors">
-          <Upload className="h-[13px] w-[13px] shrink-0" />
-          <span className="font-body text-[12px] font-medium">Drop a receipt, photo or PDF — Kinship files it for you.</span>
-          <span className="flex-1" />
-          <span className="rounded-full bg-white/70 px-2.5 py-0.5 font-body text-[10.5px] font-semibold text-kinship-primary">+ Add</span>
-        </Link>
+        <SmartIntakeBanner />
 
         <section>
           <SectionHead title="This week" dateRange={weekRange} />
