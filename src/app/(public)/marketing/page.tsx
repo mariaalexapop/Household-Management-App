@@ -116,8 +116,8 @@ const PRICING_PLANS = [
 ]
 
 const NAV_LINKS = [
-  { label: 'Product', href: '#product' },
-  { label: 'Modules', href: '#modules' },
+  { label: 'Modules', href: '#product' },
+  { label: 'How it works', href: '#how' },
   { label: 'AI assistant', href: '#ai' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'Privacy', href: '#footer' },
@@ -131,7 +131,7 @@ export default function MarketingPage() {
   return (
     <div className="min-h-screen bg-kinship-surface">
       {/* ---- Top nav ---- */}
-      <header className="sticky top-0 z-30 border-b border-kinship-surface-container bg-kinship-surface/80 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-kinship-surface-container bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           {/* Logo + brand */}
           <Link href="/" className="flex items-center gap-2">
@@ -175,7 +175,8 @@ export default function MarketingPage() {
       </header>
 
       {/* ---- Hero section ---- */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:py-24">
+      <section className="bg-white">
+      <div className="mx-auto max-w-7xl px-6 py-16 md:py-24">
         <div className="grid gap-12 md:grid-cols-2 md:items-center">
           {/* Left column */}
           <div>
@@ -257,10 +258,10 @@ export default function MarketingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ---- Module tiles ---- */}
-      <section id="modules" className="mx-auto max-w-7xl px-6 pb-20">
+      <div id="modules" className="mx-auto max-w-7xl px-6 pb-20">
         <h2 className="mb-8 text-center font-display text-2xl font-semibold text-kinship-on-surface">
           Five modules. One household.
         </h2>
@@ -284,7 +285,9 @@ export default function MarketingPage() {
             </div>
           ))}
         </div>
+      </div>
       </section>
+      {/* end hero white bg */}
 
       {/* ---- Modules detail section (carousel) ---- */}
       <section id="product" className="bg-kinship-surface py-20">
@@ -308,8 +311,177 @@ export default function MarketingPage() {
         </div>
       </section>
 
+      {/* ---- How it works section ---- */}
+      <section id="how" className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="max-w-2xl">
+            <span className="font-body text-sm font-semibold uppercase tracking-wider text-kinship-primary">
+              How it works
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-kinship-on-surface md:text-[38px]">
+              Four steps. Then it quietly gets on with it.
+            </h2>
+            <p className="mt-3 font-body text-sm leading-relaxed text-kinship-on-surface-variant md:text-base">
+              No spreadsheets, no group chats, no PDFs printed out and clipped to the fridge.
+            </p>
+          </div>
+
+          {/* Steps grid with connecting line */}
+          <div className="relative mt-14">
+            {/* Connecting gradient line */}
+            <div className="absolute left-[10%] right-[10%] top-[34px] hidden h-0.5 rounded-full bg-gradient-to-r from-module-chores-dark/35 via-module-kids-dark/35 via-module-car-dark/35 to-module-ins-dark/35 md:block" />
+
+            <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
+              {/* Step 01 */}
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-center">
+                  <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white font-display text-xl font-bold text-module-chores-dark ring-2 ring-module-chores-dark">
+                    01
+                  </div>
+                </div>
+                <div className="flex min-h-[150px] items-center justify-center rounded-2xl bg-module-chores-light p-5">
+                  <div className="flex items-center -space-x-2.5">
+                    {['AH', 'NH', 'IR', 'FN'].map((initials, i) => (
+                      <div
+                        key={i}
+                        className="flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-white font-display text-xs font-bold text-white"
+                        style={{ backgroundColor: ['#4ecdc4', '#7bc67e', '#e8a838', '#8b5cf6'][i] }}
+                      >
+                        {initials}
+                      </div>
+                    ))}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-white bg-kinship-surface-container font-bold text-kinship-on-surface-variant">
+                      +
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
+                    Set up your household
+                  </h3>
+                  <p className="mt-2 font-body text-sm leading-relaxed text-kinship-on-surface-variant">
+                    Create a shared space for everyone under your roof — and people
+                    who help from outside. Grandparents, au pairs, a co-parent in
+                    another city.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 02 */}
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-center">
+                  <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white font-display text-xl font-bold text-module-kids-dark ring-2 ring-module-kids-dark">
+                    02
+                  </div>
+                </div>
+                <div className="flex min-h-[150px] items-center justify-center rounded-2xl bg-module-kids-light p-5">
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { name: 'Chores', on: true },
+                      { name: 'Kids', on: true },
+                      { name: 'Car', on: true },
+                      { name: 'Insur.', on: true },
+                      { name: 'Elec.', on: false },
+                      { name: 'Cal.', on: false },
+                    ].map((m) => (
+                      <div
+                        key={m.name}
+                        className={`rounded-lg px-2 py-1.5 text-center font-display text-[10px] font-semibold ${
+                          m.on
+                            ? 'bg-white/60 text-kinship-on-surface'
+                            : 'bg-kinship-surface-container/40 text-kinship-on-surface-variant/50'
+                        }`}
+                      >
+                        {m.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
+                    Switch on what matters
+                  </h3>
+                  <p className="mt-2 font-body text-sm leading-relaxed text-kinship-on-surface-variant">
+                    Pick the modules that solve your headaches — leave the rest off.
+                    Change your mind any time from Settings.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 03 */}
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-center">
+                  <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white font-display text-xl font-bold text-module-car-dark ring-2 ring-module-car-dark">
+                    03
+                  </div>
+                </div>
+                <div className="flex min-h-[150px] flex-col items-stretch justify-center gap-1.5 rounded-2xl bg-module-car-light p-5">
+                  {['aviva-home.pdf', 'MOT cert · MK19 ZFR', 'Bosch receipt · Aug 24', "Iris's swim schedule"].map(
+                    (doc) => (
+                      <div
+                        key={doc}
+                        className="flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 ring-1 ring-kinship-outline-variant/30"
+                      >
+                        <span className="font-mono text-[11px] text-kinship-on-surface">
+                          {doc}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
+                    Add it once, everyone has it
+                  </h3>
+                  <p className="mt-2 font-body text-sm leading-relaxed text-kinship-on-surface-variant">
+                    Drop in policies, receipts, kids&apos; schedules, MOT dates.
+                    Your whole household sees the same view — on web, on the phone,
+                    on the train.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 04 */}
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-center">
+                  <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white font-display text-xl font-bold text-module-ins-dark ring-2 ring-module-ins-dark">
+                    04
+                  </div>
+                </div>
+                <div className="flex min-h-[150px] flex-col justify-center gap-2 rounded-2xl bg-module-ins-light p-5">
+                  <div className="self-end rounded-xl rounded-br-sm bg-kinship-primary px-3 py-1.5 text-[11.5px] leading-snug text-white">
+                    When does the MOT lapse?
+                  </div>
+                  <div className="self-start rounded-xl rounded-bl-sm bg-white px-3 py-2 text-[11.5px] leading-snug text-kinship-on-surface ring-1 ring-kinship-outline-variant/30">
+                    Ford Focus · <strong>14 June</strong> (18 days). Reminder?
+                    <div className="mt-1.5 flex gap-1">
+                      <span className="rounded-full bg-kinship-primary px-2 py-0.5 text-[10px] font-semibold text-white">
+                        Yes
+                      </span>
+                      <span className="rounded-full bg-kinship-surface-container px-2 py-0.5 text-[10px] font-semibold text-kinship-on-surface-variant">
+                        No
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-kinship-on-surface">
+                    Ask Kinship instead of digging
+                  </h3>
+                  <p className="mt-2 font-body text-sm leading-relaxed text-kinship-on-surface-variant">
+                    Don&apos;t open the PDF. Just ask — &ldquo;when does the MOT
+                    lapse?&rdquo;, &ldquo;is the new bike covered?&rdquo; — and
+                    Kinship answers, citing the document.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ---- AI Assistant section ---- */}
-      <section id="ai" className="bg-kinship-canvas py-20">
+      <section id="ai" className="bg-kinship-surface py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 md:grid-cols-2 md:items-center">
             {/* Left column */}
