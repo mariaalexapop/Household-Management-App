@@ -239,7 +239,7 @@ export async function acceptSuggestion(
       householdId,
       title: suggestion.suggestedTitle,
       notes: suggestion.suggestedNotes,
-      ownerId: suggestion.suggestedOwnerId ?? user.id,
+      ownerId: null,
       status: 'todo',
       startsAt: new Date(suggestion.deadlineDate),
       createdBy: user.id,

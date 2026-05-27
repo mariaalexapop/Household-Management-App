@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useMemo, useTransition } from 'react'
+import { useState, useMemo, useTransition, useRef, useEffect } from 'react'
 import { format, isToday, isTomorrow, isBefore, parseISO, startOfDay, differenceInCalendarDays, addDays } from 'date-fns'
 import { Check, TrendingUp, ChevronRight, Upload, Users, Lightbulb, AlertTriangle, UserPlus, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { updateTaskStatus } from '@/app/actions/tasks'
+import { updateTaskStatus, updateTask } from '@/app/actions/tasks'
 import { acceptSuggestion, dismissSuggestion } from '@/app/actions/suggestions'
 import type { ModuleKey } from '@/stores/onboarding'
 
@@ -160,13 +160,13 @@ export function DashboardTimeline({
           {overdue.length > 0 && (
             <div className="mt-2">
               <div className="font-display text-[10px] font-bold uppercase tracking-wider text-amber-600 mb-0.5">Overdue · {overdue.length}</div>
-              {overdue.map((r) => <ActionRow key={r.id} row={r} done={doneSet.has(r.id)} onToggle={() => toggleDone(r)} />)}
+              {overdue.map((r) => <ActionRow key={r.id} row={r} done={doneSet.has(r.id)} onToggle={() => toggleDone(r)} members={members} />)}
             </div>
           )}
           <div className={overdue.length > 0 ? 'mt-2' : 'mt-0.5'}>
             {thisWeek.length === 0 && overdue.length === 0
               ? <p className="py-2 font-body text-[12px] text-kinship-on-surface-variant italic">Nothing scheduled this week.</p>
-              : thisWeek.map((r) => <ActionRow key={r.id} row={r} done={doneSet.has(r.id)} onToggle={() => toggleDone(r)} />)}
+              : thisWeek.map((r) => <ActionRow key={r.id} row={r} done={doneSet.has(r.id)} onToggle={() => toggleDone(r)} members={members} />)}
           </div>
         </section>
 
@@ -175,7 +175,7 @@ export function DashboardTimeline({
           <div className="mt-0.5">
             {nextWeek.length === 0
               ? <p className="py-2 font-body text-[12px] text-kinship-placeholder italic">Nothing scheduled. Enjoy the calm.</p>
-              : nextWeek.map((r) => <ActionRow key={r.id} row={r} done={doneSet.has(r.id)} onToggle={() => toggleDone(r)} muted />)}
+              : nextWeek.map((r) => <ActionRow key={r.id} row={r} done={doneSet.has(r.id)} onToggle={() => toggleDone(r)} muted members={members} />)}
           </div>
         </section>
       </div>
@@ -201,8 +201,33 @@ function SectionHead({ title, dateRange, muted }: { title: string; dateRange: st
   )
 }
 
-/* ── Action row (compact) ────────────────────────────────────── */
-function ActionRow({ row, done, onToggle, muted }: { row: TimelineRow; done: boolean; onToggle: () => void; muted?: boolean }) {
+/* ── Action row (compact) with inline assign ─────────────────── */
+function ActionRow({ row, done, onToggle, muted, members }: {
+  row: TimelineRow; done: boolean; onToggle: () => void; muted?: boolean; members: SerializedMember[]
+}) {
+  const [assignOpen, setAssignOpen] = useState(false)
+  const popRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const [, startTransition] = useTransition()
+
+  useEffect(() => {
+    if (!assignOpen) return
+    const close = (e: MouseEvent) => { if (popRef.current && !popRef.current.contains(e.target as Node)) setAssignOpen(false) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setAssignOpen(false) }
+    document.addEventListener('mousedown', close); document.addEventListener('keydown', esc)
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc) }
+  }, [assignOpen])
+
+  const handleAssign = (memberId: string | null) => {
+    setAssignOpen(false)
+    if (!row.isTask || !row.realId) return
+    startTransition(async () => {
+      await updateTask({ id: row.realId!, ownerId: memberId, title: row.title })
+      toast.success(memberId ? 'Task assigned' : 'Task unassigned')
+      router.refresh()
+    })
+  }
+
   return (
     <div className="grid items-center gap-x-3 border-t border-kinship-surface-container"
       style={{ gridTemplateColumns: '20px 64px 48px 1fr auto', padding: '7px 0', opacity: done ? 0.55 : muted ? 0.92 : 1 }}>
@@ -220,9 +245,49 @@ function ActionRow({ row, done, onToggle, muted }: { row: TimelineRow; done: boo
         {done && <span className="shrink-0 text-[9px] font-semibold" style={{ color: '#00b473' }}>done</span>}
         {row.isOverdue && row.lateDays && <span className="shrink-0 rounded-full px-[5px] py-px text-[8px] font-bold uppercase tracking-wider" style={{ background: '#fff3e0', color: '#d97706' }}>{row.lateDays}</span>}
       </div>
-      <div className="flex items-center gap-2 justify-end">
+      <div className="flex items-center gap-2 justify-end relative" ref={popRef}>
         {row.amount && <span className="font-mono text-[12px] text-kinship-on-surface" style={{ fontWeight: 500 }}>{row.amount}</span>}
-        {row.whoInitials && <div className="flex items-center justify-center rounded-full text-white" style={{ width: 24, height: 24, fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>}
+        {/* Assign button — avatar if assigned, placeholder if not */}
+        {row.isTask ? (
+          <button onClick={() => setAssignOpen(!assignOpen)} aria-label="Assign task"
+            className="flex items-center justify-center rounded-full transition-colors hover:ring-2 hover:ring-kinship-primary/30"
+            style={{ width: 24, height: 24 }}>
+            {row.whoInitials ? (
+              <div className="flex items-center justify-center rounded-full text-white w-full h-full" style={{ fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>
+            ) : (
+              <div className="flex items-center justify-center rounded-full w-full h-full" style={{ boxShadow: 'inset 0 0 0 1.5px #d0d3dc' }}>
+                <UserPlus className="h-[10px] w-[10px] text-kinship-placeholder" />
+              </div>
+            )}
+          </button>
+        ) : (
+          row.whoInitials && <div className="flex items-center justify-center rounded-full text-white" style={{ width: 24, height: 24, fontSize: 9, fontWeight: 700, backgroundColor: row.whoColor ?? '#999' }}>{row.whoInitials}</div>
+        )}
+        {/* Assign popover */}
+        {assignOpen && (
+          <div className="absolute right-0 top-full mt-1 z-50 w-40 rounded-xl bg-white py-1 shadow-xl ring-1 ring-black/5">
+            <div className="px-2.5 py-1 font-body text-[9px] font-bold uppercase tracking-wider text-kinship-placeholder">Assign to</div>
+            {members.map((m) => {
+              const info = memberInfo([m], m.id)
+              return (
+                <button key={m.id} onClick={() => handleAssign(m.id)}
+                  className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
+                  <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full text-white" style={{ fontSize: 8, fontWeight: 700, backgroundColor: info?.color ?? '#999' }}>{info?.initials ?? '?'}</div>
+                  <span className="font-body text-[11px] text-kinship-on-surface truncate">{m.displayName ?? 'Unknown'}</span>
+                </button>
+              )
+            })}
+            {row.whoInitials && (
+              <>
+                <div className="mx-2 my-0.5 border-t border-kinship-surface-container" />
+                <button onClick={() => handleAssign(null)}
+                  className="flex w-full items-center gap-2 px-2.5 py-1.5 hover:bg-kinship-surface-container transition-colors">
+                  <span className="font-body text-[11px] text-kinship-on-surface-variant">Unassign</span>
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
