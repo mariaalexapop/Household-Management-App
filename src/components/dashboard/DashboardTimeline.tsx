@@ -240,9 +240,9 @@ export function DashboardTimeline({
   }
   const suggestions = useMemo(() => {
     const items: Suggestion[] = []
-    const thirtyDays = now.getTime() + 30 * 86400000
+    const cutoff = parseISO(nextWeekEndIso).getTime()
 
-    // Car deadlines
+    // Car deadlines within this/next week
     for (const c of cars) {
       const label = `${c.make} ${c.model}`
       for (const [date, type] of [
@@ -250,39 +250,42 @@ export function DashboardTimeline({
       ] as [string | null, string][]) {
         if (!date) continue
         const d = parseISO(date)
-        if (d.getTime() < now.getTime() || d.getTime() > thirtyDays) continue
+        if (d.getTime() > cutoff) continue
         const days = differenceInCalendarDays(d, now)
+        const overdue = days < 0
         items.push({
           id: `sug-car-${c.id}-${type}`, title: `${type} — ${label}`,
-          reason: days <= 0 ? 'Due today' : days <= 7 ? `Due in ${days} days` : `Due ${format(d, 'MMM d')}`,
+          reason: overdue ? `${Math.abs(days)}d overdue` : days === 0 ? 'Due today' : days === 1 ? 'Due tomorrow' : `Due in ${days} days`,
           dueDate: date, module: 'car', urgency: days <= 7 ? 'soon' : 'upcoming',
         })
       }
     }
 
-    // Insurance expiry
+    // Insurance expiry within this/next week
     for (const p of policies) {
       if (!p.expiryDate) continue
       const d = parseISO(p.expiryDate)
-      if (d.getTime() < now.getTime() || d.getTime() > thirtyDays) continue
+      if (d.getTime() > cutoff) continue
       const days = differenceInCalendarDays(d, now)
+      const overdue = days < 0
       items.push({
         id: `sug-ins-${p.id}`, title: `${p.insurer} — ${p.policyType} renewal`,
-        reason: days <= 0 ? 'Expires today' : days <= 7 ? `Expires in ${days} days` : `Expires ${format(d, 'MMM d')}`,
-        dueDate: p.expiryDate, module: 'insurance', urgency: days <= 14 ? 'soon' : 'upcoming',
+        reason: overdue ? `${Math.abs(days)}d overdue` : days === 0 ? 'Expires today' : days === 1 ? 'Expires tomorrow' : `Expires in ${days} days`,
+        dueDate: p.expiryDate, module: 'insurance', urgency: days <= 7 ? 'soon' : 'upcoming',
       })
     }
 
-    // Electronics warranty expiry
+    // Electronics warranty expiry within this/next week
     for (const e of electronics) {
       if (!e.warrantyExpiryDate) continue
       const d = parseISO(e.warrantyExpiryDate)
-      if (d.getTime() < now.getTime() || d.getTime() > thirtyDays) continue
+      if (d.getTime() > cutoff) continue
       const days = differenceInCalendarDays(d, now)
+      const overdue = days < 0
       items.push({
         id: `sug-elec-${e.id}`, title: `${e.name} — warranty expiring`,
-        reason: days <= 7 ? `Expires in ${days} days` : `Expires ${format(d, 'MMM d')}`,
-        dueDate: e.warrantyExpiryDate, module: 'electronics', urgency: days <= 14 ? 'soon' : 'upcoming',
+        reason: overdue ? `${Math.abs(days)}d overdue` : days === 0 ? 'Expires today' : days === 1 ? 'Expires tomorrow' : `Expires in ${days} days`,
+        dueDate: e.warrantyExpiryDate, module: 'electronics', urgency: days <= 7 ? 'soon' : 'upcoming',
       })
     }
 
@@ -299,7 +302,7 @@ export function DashboardTimeline({
         suggestedMemberId: leastLoaded?.id,
         suggestedMemberName: leastLoaded?.name,
       }))
-  }, [cars, policies, electronics, balance, now])
+  }, [cars, policies, electronics, balance, now, nextWeekEndIso])
 
   const weekRange = `${format(weekStart, 'MMM d')} – ${format(addDays(weekStart, 6), 'd')}`
   const nextWeekRange = `${format(weekEnd, 'MMM d')} – ${format(addDays(weekEnd, 6), 'MMM d')}`
@@ -570,7 +573,7 @@ function SuggestionsCard({ suggestions, members }: {
         <Lightbulb className="h-[14px] w-[14px] text-amber-500" />
         <span className="font-display text-[14px] font-semibold text-kinship-on-surface">Suggested</span>
         <div className="flex-1" />
-        <span className="font-body text-[11px] text-kinship-placeholder">next 30 days</span>
+        <span className="font-body text-[11px] text-kinship-placeholder">this &amp; next week</span>
       </div>
 
       <div className="px-4 py-2">
