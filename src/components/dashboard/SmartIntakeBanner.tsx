@@ -4,8 +4,6 @@ import { useCallback, useRef, useState } from 'react'
 import { Upload, X, FileText, Loader2, Check, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { executeIntakeActions } from '@/app/actions/intake'
 
 type IntakeActionType = 'create_insurance' | 'create_electronics' | 'create_car' | 'create_task' | 'store_for_rag'
 
@@ -80,29 +78,33 @@ export function SmartIntakeBanner() {
     setStage('executing')
 
     try {
-      // Upload file to Supabase if present
-      let fileInfo: { storagePath: string; fileName: string; fileSizeBytes: number } | undefined
-      if (file) {
-        const supabase = createClient()
-        const storagePath = `intake/${Date.now()}-${file.name}`
-        const { error } = await supabase.storage.from('documents').upload(storagePath, file)
-        if (!error) {
-          fileInfo = { storagePath, fileName: file.name, fileSizeBytes: file.size }
-        }
-      }
+      const formData = new FormData()
+      formData.append('actions', JSON.stringify(analysis.actions))
+      if (file) formData.append('file', file)
 
-      const result = await executeIntakeActions(analysis.actions, fileInfo)
+      const res = await fetch('/api/intake/execute', { method: 'POST', body: formData })
+      const result = await res.json()
 
       if (result.success) {
         setStage('done')
         toast.success('Done! Records created successfully.')
         setTimeout(() => { reset(); router.refresh() }, 1500)
+      } else if (result.results) {
+        const failed = result.results.filter((r: { ok: boolean; error?: string }) => !r.ok)
+        const succeeded = result.results.filter((r: { ok: boolean }) => r.ok).length
+        if (succeeded > 0) {
+          setStage('done')
+          toast.success(`${succeeded} action(s) completed. ${failed.length > 0 ? `${failed.length} skipped.` : ''}`)
+          setTimeout(() => { reset(); router.refresh() }, 1500)
+        } else {
+          toast.error(`Actions failed: ${failed.map((r: { error?: string }) => r.error).join(', ')}`)
+          setStage('review')
+        }
       } else {
-        const failed = result.results.filter((r) => !r.ok)
-        toast.error(`Some actions failed: ${failed.map((r) => r.error).join(', ')}`)
+        toast.error(result.error ?? 'Execution failed')
         setStage('review')
       }
-    } catch (err) {
+    } catch {
       toast.error('Something went wrong')
       setStage('review')
     }
