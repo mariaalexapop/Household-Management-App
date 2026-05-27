@@ -16,6 +16,7 @@
 - [x] **Phase 4: Tracker Modules** - Car maintenance, insurance management, electronics registry, costs dashboard, calendar data extension
 - [x] **Phase 5: AI Chatbot & RAG** - Document embedding pipeline, pgvector RAG, chatbot, task creation from chat
 - [x] **Phase 6: Platform & Polish** - Mobile responsiveness, PWA installability, performance audit
+- [ ] **Phase 7: Deadline-to-Task Intelligence** - Smart task generation from module deadlines, dashboard shows tasks only
 
 ---
 
@@ -188,25 +189,25 @@ Plans:
 
 ---
 
-## Backlog
+### Phase 7: Deadline-to-Task Intelligence
 
-### Phase 999.1: Deadline-to-task intelligence — smart task generation from module deadlines (BACKLOG)
+**Goal:** Deadlines from car (MOT, tax, service), insurance (expiry, payment), and electronics (warranty expiry) automatically generate actionable task suggestions. The dashboard timeline shows only tasks — deadlines surface as smart suggestions in a sidebar card. When a deadline approaches, the system suggests creating a task (e.g. "RCA expires Jun 2 → Create task: Renew RCA") with pre-filled title, due date, and suggested assignee. Users can accept, edit, or dismiss.
 
-**Goal:** Deadlines from car (MOT, tax, service), insurance (expiry, payment), and electronics (warranty expiry) should automatically generate actionable task suggestions — not clutter the dashboard timeline directly. The dashboard should show only tasks; deadlines live in a separate "upcoming" or sidebar context. When a deadline is approaching, the system suggests creating a task (e.g. "RCA expires Jun 2 → Create task: Renew RCA") with pre-filled title, due date, and suggested assignee. Users can accept, edit, or dismiss. Accepted suggestions become real tasks that appear in the timeline.
+**Depends on:** Phase 2 (task system), Phase 4 (car/insurance/electronics modules with deadline dates).
 
 **Requirements:** TBD
+
+**Success Criteria:**
+1. Dashboard timeline shows only tasks (chores + kids activities) — no raw car/insurance/electronics deadlines mixed in.
+2. A "Suggested" sidebar card shows upcoming deadlines as task proposals with smart templates (e.g. insurance expiry → "Renew [insurer] [type] policy").
+3. Users can one-click accept (creates task with pre-filled data), edit before creating, or dismiss a suggestion.
+4. Dismissed suggestions don't reappear for that deadline cycle.
+5. Suggestions are scoped to this week + next week (not ancient overdue items).
+
 **Plans:** 0 plans
 
-**Context captured:**
-- Dashboard timeline currently mixes tasks and deadlines — user wants tasks only in the main timeline
-- Deadlines should surface as suggestions (current "Suggested" card is a starting point but needs refinement)
-- Each deadline type needs a smart task template (e.g. insurance expiry → "Renew [insurer] [type] policy", car MOT → "Book MOT for [car]")
-- Suggestions should include: one-click create, edit before create, assign to member, dismiss
-- Consider: should dismissed suggestions reappear? Snooze period? Persistent dismissal?
-- Consider: Inngest background job that checks deadlines daily and creates suggestion records in DB (not just computed client-side)
-
 Plans:
-- [ ] TBD (promote with /gsd-review-backlog when ready)
+- [ ] TBD (use /gsd-plan-phase 7 to create plans)
 
 ---
 
