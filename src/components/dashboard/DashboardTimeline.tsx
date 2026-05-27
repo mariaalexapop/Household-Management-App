@@ -46,6 +46,7 @@ interface Props {
   members: SerializedMember[]
   suggestions: SerializedSuggestion[]
   staleOverdue: { id: string; title: string; areaName: string | null; startsAt: string | null; ownerId: string | null; status: string }[]
+  monthlyCosts?: { monthIndex: number; car: number; health: number; home: number; electronics: number; total: number }[]
   weekStartIso: string; weekEndIso: string; nextWeekEndIso: string
 }
 
@@ -73,7 +74,7 @@ function timeLabel(dateStr: string): string {
 }
 
 export function DashboardTimeline({
-  activeModules, tasks, activities, policies, members, suggestions, staleOverdue,
+  activeModules, tasks, activities, policies, members, suggestions, staleOverdue, monthlyCosts,
   weekStartIso, weekEndIso, nextWeekEndIso,
 }: Props) {
   const weekStart = parseISO(weekStartIso)
@@ -193,6 +194,7 @@ export function DashboardTimeline({
         {members.length > 0 && <BalanceCard topMember={topMember} others={othersWithLess} bars={balance.filter((b) => b.pct > 0)} hasData={tasks.length > 0} />}
         {suggestions.length > 0 && <SuggestionsCard suggestions={suggestions} />}
         {staleOverdue.length > 0 && <ReviewCard staleOverdue={staleOverdue} members={members} />}
+        {monthlyCosts && monthlyCosts.some((m) => m.total > 0) && <MoneyPulseChart monthlyCosts={monthlyCosts} />}
         {upcomingPayments.length > 0 && <MoneyPulseCard payments={upcomingPayments} total={paymentTotal} />}
       </div>
     </div>
@@ -510,6 +512,130 @@ function ReviewCard({ staleOverdue, members }: {
             </div>
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+/* ── Money pulse chart ────────────────────────────────────────── */
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const CHART_LINES = [
+  { key: 'total', label: 'Total', color: '#1a1a2e' },
+  { key: 'health', label: 'Health', color: '#e05252' },
+  { key: 'car', label: 'Car', color: '#c67d2a' },
+  { key: 'home', label: 'Home', color: '#6a55d9' },
+] as const
+
+function MoneyPulseChart({ monthlyCosts }: { monthlyCosts: { monthIndex: number; car: number; health: number; home: number; electronics: number; total: number }[] }) {
+  const now = new Date()
+  const currentMonthIdx = now.getMonth() // 0-indexed
+
+  // Build chart data: past months use real data, future months use prediction
+  // Prediction = average of months with data
+  const monthsWithData = monthlyCosts.filter((m) => m.monthIndex <= currentMonthIdx && m.total > 0)
+  const avg = (key: 'car' | 'health' | 'home' | 'total') => {
+    if (monthsWithData.length === 0) return 0
+    return Math.round(monthsWithData.reduce((s, m) => s + m[key], 0) / monthsWithData.length)
+  }
+  const avgCar = avg('car')
+  const avgHealth = avg('health')
+  const avgHome = avg('home')
+  const avgTotal = avg('total')
+
+  // Show from Jan through 6 months after current month (max Dec)
+  const lastMonth = Math.min(currentMonthIdx + 6, 11)
+
+  const chartData = Array.from({ length: lastMonth + 1 }, (_, i) => {
+    const m = monthlyCosts[i]
+    const isPast = i <= currentMonthIdx
+    return {
+      name: MONTH_LABELS[i],
+      total: isPast ? m.total / 100 : avgTotal / 100,
+      health: isPast ? m.health / 100 : avgHealth / 100,
+      car: isPast ? m.car / 100 : avgCar / 100,
+      home: isPast ? m.home / 100 : avgHome / 100,
+      predicted: !isPast,
+    }
+  })
+
+  const [activeLines, setActiveLines] = useState<Set<string>>(new Set(['total', 'health', 'car', 'home']))
+  const toggle = (key: string) => setActiveLines((prev) => {
+    const next = new Set(prev)
+    if (next.has(key)) { if (next.size > 1) next.delete(key) } else next.add(key)
+    return next
+  })
+
+  // Dynamic import of recharts to avoid SSR issues
+  const [RechartsModule, setRechartsModule] = useState<typeof import('recharts') | null>(null)
+  useEffect(() => {
+    import('recharts').then(setRechartsModule)
+  }, [])
+
+  if (!RechartsModule) return null
+  const { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } = RechartsModule
+
+  return (
+    <div className="rounded-2xl bg-white ring-miro overflow-hidden">
+      <div className="flex items-baseline gap-2 border-b border-kinship-surface-container px-3.5 py-2">
+        <TrendingUp className="h-[13px] w-[13px] text-kinship-on-surface" />
+        <span className="font-display text-[13px] font-semibold text-kinship-on-surface">Cost evolution</span>
+        <div className="flex-1" />
+        <span className="font-body text-[10px] text-kinship-placeholder">{now.getFullYear()}</span>
+      </div>
+
+      {/* Legend toggles */}
+      <div className="flex flex-wrap gap-2 px-3.5 pt-2.5 pb-1">
+        {CHART_LINES.map((line) => (
+          <button
+            key={line.key}
+            onClick={() => toggle(line.key)}
+            className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 font-body text-[10px] font-medium transition-all ${
+              activeLines.has(line.key) ? 'opacity-100' : 'opacity-35'
+            }`}
+          >
+            <span className="h-[6px] w-[6px] rounded-full" style={{ backgroundColor: line.color }} />
+            {line.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Chart */}
+      <div className="px-2 pb-3 pt-1">
+        <ResponsiveContainer width="100%" height={180}>
+          <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 0, left: -10 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#999' }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: '#999' }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `€${v}`} />
+            <Tooltip
+              contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #eee' }}
+              formatter={(value: unknown, name: unknown) => [`€${Number(value).toFixed(0)}`, String(name).charAt(0).toUpperCase() + String(name).slice(1)]}
+              labelFormatter={(label: unknown) => {
+                const l = String(label)
+                const idx = MONTH_LABELS.indexOf(l)
+                return idx > currentMonthIdx ? `${l} (predicted)` : l
+              }}
+            />
+            <ReferenceLine
+              x={MONTH_LABELS[currentMonthIdx]}
+              stroke="#ccc"
+              strokeDasharray="4 4"
+              label={{ value: 'Now', position: 'top', fontSize: 9, fill: '#999' }}
+            />
+            {CHART_LINES.map((line) =>
+              activeLines.has(line.key) ? (
+                <Line
+                  key={line.key}
+                  type="monotone"
+                  dataKey={line.key}
+                  stroke={line.color}
+                  strokeWidth={line.key === 'total' ? 2 : 1.5}
+                  dot={false}
+                  strokeDasharray={undefined}
+                />
+              ) : null
+            )}
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   )

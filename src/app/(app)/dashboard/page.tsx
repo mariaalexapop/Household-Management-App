@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { eq, ne, asc, desc, and, or, isNotNull, gte, lt } from 'drizzle-orm'
+import { eq, ne, asc, desc, and, or, isNotNull, gte, lt, sql } from 'drizzle-orm'
 import { startOfWeek, addDays, addMonths, differenceInCalendarDays } from 'date-fns'
 import { db } from '@/lib/db'
 import {
@@ -11,6 +11,7 @@ import {
   kidActivities,
   children,
   cars,
+  serviceRecords,
   insurancePolicies,
   electronics,
   suggestions,
@@ -197,6 +198,125 @@ export default async function DashboardPage() {
       .where(eq(electronics.householdId, row.householdId))
   }
 
+  // ── Monthly cost data for Money Pulse chart (Jan → Dec current year) ──
+  const currentYear = now.getFullYear()
+  const yearStart = new Date(currentYear, 0, 1)
+  const yearEnd = new Date(currentYear + 1, 0, 1)
+
+  const [carServiceRows, carMotTaxRows, insRows, elecCostRows] = await Promise.all([
+    db.execute(sql`
+      SELECT to_char(${serviceRecords.serviceDate}, 'YYYY-MM') AS month,
+             COALESCE(SUM(${serviceRecords.costCents}), 0)::int AS total
+      FROM ${serviceRecords}
+      WHERE ${serviceRecords.householdId} = ${row.householdId}
+        AND ${serviceRecords.serviceDate} >= ${yearStart.toISOString()}
+        AND ${serviceRecords.serviceDate} < ${yearEnd.toISOString()}
+      GROUP BY month
+    `),
+    db.execute(sql`
+      SELECT ${cars.motCostCents} AS mot_cost_cents,
+             ${cars.motPaymentDate} AS mot_payment_date,
+             ${cars.taxCostCents} AS tax_cost_cents,
+             ${cars.taxPaymentDate} AS tax_payment_date
+      FROM ${cars}
+      WHERE ${cars.householdId} = ${row.householdId}
+        AND (${cars.motCostCents} IS NOT NULL OR ${cars.taxCostCents} IS NOT NULL)
+    `),
+    db.execute(sql`
+      SELECT ${insurancePolicies.premiumCents} AS premium_cents,
+             ${insurancePolicies.paymentSchedule} AS payment_schedule,
+             ${insurancePolicies.nextPaymentDate} AS next_payment_date,
+             ${insurancePolicies.createdAt} AS created_at,
+             ${insurancePolicies.policyType} AS policy_type
+      FROM ${insurancePolicies}
+      WHERE ${insurancePolicies.householdId} = ${row.householdId}
+        AND ${insurancePolicies.premiumCents} IS NOT NULL
+        AND ${insurancePolicies.paymentSchedule} IS NOT NULL
+    `),
+    db.execute(sql`
+      SELECT to_char(${electronics.purchaseDate}, 'YYYY-MM') AS month,
+             COALESCE(SUM(${electronics.costCents}), 0)::int AS total
+      FROM ${electronics}
+      WHERE ${electronics.householdId} = ${row.householdId}
+        AND ${electronics.purchaseDate} >= ${yearStart.toISOString()}
+        AND ${electronics.purchaseDate} < ${yearEnd.toISOString()}
+      GROUP BY month
+    `),
+  ])
+
+  // Build cost maps
+  function costRowsToMap(rows: unknown): Map<string, number> {
+    const m = new Map<string, number>()
+    for (const r of rows as Array<{ month: string | null; total: number | string | null }>) {
+      if (!r.month) continue
+      m.set(r.month, typeof r.total === 'string' ? parseInt(r.total, 10) : (r.total ?? 0))
+    }
+    return m
+  }
+
+  const carCostMap = costRowsToMap(carServiceRows)
+  const elecCostMap = costRowsToMap(elecCostRows)
+
+  // Add MOT/tax costs from cars table
+  for (const c of carMotTaxRows as unknown as Array<{ mot_cost_cents: number | string | null; mot_payment_date: string | Date | null; tax_cost_cents: number | string | null; tax_payment_date: string | Date | null }>) {
+    if (c.mot_cost_cents && c.mot_payment_date) {
+      const d = new Date(c.mot_payment_date)
+      if (d.getFullYear() === currentYear) {
+        const key = `${currentYear}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        carCostMap.set(key, (carCostMap.get(key) ?? 0) + (typeof c.mot_cost_cents === 'string' ? parseInt(c.mot_cost_cents, 10) : c.mot_cost_cents))
+      }
+    }
+    if (c.tax_cost_cents && c.tax_payment_date) {
+      const d = new Date(c.tax_payment_date)
+      if (d.getFullYear() === currentYear) {
+        const key = `${currentYear}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        carCostMap.set(key, (carCostMap.get(key) ?? 0) + (typeof c.tax_cost_cents === 'string' ? parseInt(c.tax_cost_cents, 10) : c.tax_cost_cents))
+      }
+    }
+  }
+
+  // Project insurance premiums by category
+  const carInsMap = new Map<string, number>()
+  const medMap = new Map<string, number>()
+  const homeInsMap = new Map<string, number>()
+  for (const p of insRows as unknown as Array<{ premium_cents: number | string | null; payment_schedule: string | null; next_payment_date: string | Date | null; created_at: string | Date | null; policy_type: string | null }>) {
+    const cents = typeof p.premium_cents === 'string' ? parseInt(p.premium_cents, 10) : (p.premium_cents ?? 0)
+    if (!cents || !p.payment_schedule) continue
+    const targetMap = p.policy_type === 'car' ? carInsMap : (p.policy_type === 'health' || p.policy_type === 'life') ? medMap : homeInsMap
+    const interval = p.payment_schedule === 'monthly' ? 1 : p.payment_schedule === 'quarterly' ? 3 : 12
+    const policyStart = p.created_at ? new Date(p.created_at) : null
+    const earliest = policyStart ? policyStart.getFullYear() * 12 + policyStart.getMonth() : currentYear * 12
+    if (p.next_payment_date) {
+      const anchor = new Date(p.next_payment_date)
+      const anchorM = anchor.getFullYear() * 12 + anchor.getMonth()
+      for (let m = 0; m < 12; m++) {
+        const target = currentYear * 12 + m
+        if (target < earliest) continue
+        if ((target - anchorM) % interval === 0) {
+          const key = `${currentYear}-${String(m + 1).padStart(2, '0')}`
+          targetMap.set(key, (targetMap.get(key) ?? 0) + cents)
+        }
+      }
+    } else {
+      for (let m = 0; m < 12; m += interval) {
+        const target = currentYear * 12 + m
+        if (target < earliest) continue
+        const key = `${currentYear}-${String(m + 1).padStart(2, '0')}`
+        targetMap.set(key, (targetMap.get(key) ?? 0) + cents)
+      }
+    }
+  }
+
+  // Assemble 12-month array
+  const monthlyCosts = Array.from({ length: 12 }, (_, i) => {
+    const key = `${currentYear}-${String(i + 1).padStart(2, '0')}`
+    const car = (carCostMap.get(key) ?? 0) + (carInsMap.get(key) ?? 0)
+    const health = medMap.get(key) ?? 0
+    const home = homeInsMap.get(key) ?? 0
+    const elec = elecCostMap.get(key) ?? 0
+    return { monthIndex: i, car, health, home, electronics: elec, total: car + health + home + elec }
+  })
+
   // Seed suggestions (ensures they exist without waiting for Inngest cron)
   await seedSuggestions(row.householdId)
 
@@ -258,6 +378,7 @@ export default async function DashboardPage() {
           members={serialize(members)}
           suggestions={serializedSuggestions}
           staleOverdue={serialize(staleOverdue)}
+          monthlyCosts={monthlyCosts}
           weekStartIso={weekStart.toISOString()}
           weekEndIso={weekEnd.toISOString()}
           nextWeekEndIso={nextWeekEnd.toISOString()}
