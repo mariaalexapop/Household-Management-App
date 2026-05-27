@@ -79,13 +79,15 @@ export async function GET(request: Request) {
   }
 
   // --- Normal post-auth routing ---
-  const { data: members } = await supabase
-    .from('household_members')
-    .select('household_id')
-    .eq('user_id', user.id)
+  // Use Drizzle (bypasses RLS) because the self-referential RLS policy on
+  // household_members can return empty results for a freshly authenticated session.
+  const memberRows = await db
+    .select({ householdId: householdMembers.householdId })
+    .from(householdMembers)
+    .where(eq(householdMembers.userId, user.id))
     .limit(1)
 
-  if (Array.isArray(members) && members.length > 0) {
+  if (memberRows.length > 0) {
     return NextResponse.redirect(`${appUrl}/dashboard`)
   }
 
