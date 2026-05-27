@@ -85,15 +85,13 @@ export default async function SignupPage({ searchParams }: Props) {
           </p>
 
           {/* Google OAuth */}
-          {!inviteToken && <OAuthButton />}
+          <OAuthButton inviteToken={inviteToken} />
 
-          {!inviteToken && (
-            <div className="my-5 flex items-center gap-2">
-              <div className="h-px flex-1 bg-kinship-outline-variant" />
-              <span className="font-body text-[11px] text-kinship-placeholder select-none">or</span>
-              <div className="h-px flex-1 bg-kinship-outline-variant" />
-            </div>
-          )}
+          <div className="my-5 flex items-center gap-2">
+            <div className="h-px flex-1 bg-kinship-outline-variant" />
+            <span className="font-body text-[11px] text-kinship-placeholder select-none">or</span>
+            <div className="h-px flex-1 bg-kinship-outline-variant" />
+          </div>
 
           {/* Signup form */}
           <AuthForm mode="signup" inviteToken={inviteToken} inviteEmail={inviteEmail} />

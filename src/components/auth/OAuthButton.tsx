@@ -33,17 +33,21 @@ function GoogleLogo({ className }: { className?: string }) {
   )
 }
 
-export function OAuthButton() {
+export function OAuthButton({ inviteToken }: { inviteToken?: string }) {
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClient()
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
+      const redirectTo = inviteToken
+        ? `${window.location.origin}/api/auth/callback?invite=${inviteToken}`
+        : `${window.location.origin}/api/auth/callback`
+
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
+          redirectTo,
         },
       })
       // signInWithOAuth triggers a redirect — the loading state will remain
